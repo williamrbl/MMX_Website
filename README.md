@@ -1,4 +1,4 @@
-# MMX Website (mmx)
+# MMX Website
 
 A Quasar Project
 
