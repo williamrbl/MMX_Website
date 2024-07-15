@@ -1,6 +1,11 @@
 # MMX Website (mmx)
 
-A Quasar Project
+Website creation for my music club
+
+A Quasar Project waiting to be Dockerized
+
+
+For now
 
 ## Install the dependencies
 ```bash
