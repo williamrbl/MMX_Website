@@ -4,8 +4,8 @@ Website creation for my music club
 
 A Quasar Project waiting to be Dockerized
 
-
-For now
+---------------------------------------------------------
+For now :
 
 ## Install the dependencies
 ```bash
