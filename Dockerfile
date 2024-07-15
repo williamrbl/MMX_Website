@@ -18,7 +18,7 @@ RUN npx quasar build
 
 RUN npm install -g serve
 
-WORKDIR /app/dist/pwa
+WORKDIR /app/dist/spa
 
 EXPOSE 3000
 

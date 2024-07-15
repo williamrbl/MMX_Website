@@ -48,12 +48,40 @@
 
     <q-footer
       elevated
-      class="large-screen-only"
+      class="large-screen-only q-px-lg"
       style="background-color: primary"
     >
-      <h6 class="q-ma-lg footer-text">
-        Association de musique du Pole Léonard de Vinci
-      </h6>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        "
+      >
+        <h6 class="footer-text">
+          Association de musique du Pole Léonard de Vinci
+        </h6>
+        <div>
+          <q-btn
+            flat
+            round
+            dense
+            icon="la la-instagram"
+            href="https://www.instagram.com/musiquemix_/"
+            target="_blank"
+          />
+          <q-btn
+            flat
+            round
+            dense
+            icon="la la-youtube"
+            href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
+            target="_blank"
+          />
+          <h7 style="opacity: 0.5">A website by Willers</h7>
+        </div>
+      </div>
     </q-footer>
 
     <!-- <q-footer
@@ -89,7 +117,7 @@ export default {
   display: flex
   align-items: center
   justify-content: left
-  height: 30px
+  height: 40px
 
 .footer-text
   text-align: center

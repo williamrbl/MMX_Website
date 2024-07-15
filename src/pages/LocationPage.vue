@@ -3,8 +3,16 @@
     <q-img src="src/assets/Fond.jpg">
       <div
         class="row q-px-xl"
-        style="display: flex; align-items: center; justify-content: center"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+        "
       >
+        <q-card style="background: #800b95">
+          <h6>Tarifs</h6>
+        </q-card>
         <q-card class="q-pa-md col" style="background: #800b95">
           <q-input
             color="white"
@@ -26,6 +34,7 @@
             label-color="white"
             style="color: white; color-scheme: white"
           />
+          <q-btn label="Envoyer la demande"/>
         </q-card>
         <q-date v-model="days" range multiple />
       </div>
