@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <q-img src="src/assets/Fond.jpg" style="position: sticky; height: 100vh">
+    <q-img :src="fond" style="position: sticky; height: 100vh">
       <div style="display: flex; justify-content: center; align-items: center">
         <q-card
           class="bg-purple-9"
@@ -21,8 +21,14 @@
 </template>
 
 <script setup>
+import fond from "src/assets/Fond.jpg";
 defineOptions({
   name: "HomePage",
+  data() {
+    return {
+      fond,
+    };
+  },
 });
 </script>
 

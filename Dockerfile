@@ -16,10 +16,17 @@ COPY . .
 # Build the Quasar project for production
 RUN npx quasar build
 
+# Install serve globally
 RUN npm install -g serve
 
+# Change the working directory to the build output directory
 WORKDIR /app/dist/spa
 
+# Ensure static assets are included
+COPY src/assets /app/dist/spa/assets
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-CMD ["serve","-s",".","-l","3000"]
+# Start the app
+CMD ["serve", "-s", ".", "-l", "3000"]
