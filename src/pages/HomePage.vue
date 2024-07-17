@@ -14,6 +14,7 @@
           "
         >
           <h5 class="q-pa-md">Bienvenue sur le site de Musique Mix</h5>
+          <h5 class="q-pa-md">Test</h5>
         </q-card>
       </div>
     </q-img>

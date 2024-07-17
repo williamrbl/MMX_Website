@@ -30,7 +30,7 @@ module.exports = configure(function (/* ctx */) {
       // 'fontawesome-v6',
       "eva-icons",
       // 'themify',
-      'line-awesome',
+      "line-awesome",
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       "roboto-font", // optional, you are not bound to it
@@ -139,14 +139,14 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: "GenerateSW", // Or 'InjectManifest'
-      workboxOptions: {
-        navigateFallback: "/index.html",
+      workboxPluginMode: "GenerateSW",
+      GenerateSW: {
+        navigateFallback: "index.html",
         navigateFallbackDenylist: [
-          // Add appropriate regex patterns
+          // Ensure each entry in the denylist has 'hasIndices' property
+          { urlPattern: /^\/admin/, hasIndices: false },
+          // Add more entries as needed
         ],
-        // Ensure this property is correctly defined
-        hasIndices: true,
       },
     },
 

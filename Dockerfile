@@ -14,16 +14,16 @@ RUN npm install
 COPY . .
 
 # Build the Quasar project for production
-RUN npx quasar build
+RUN npx quasar build -m pwa
 
 # Install serve globally
 RUN npm install -g serve
 
 # Change the working directory to the build output directory
-WORKDIR /app/dist/spa
+WORKDIR /app/dist/pwa
 
 # Ensure static assets are included
-COPY src/assets /app/dist/spa/assets
+COPY src/assets /app/dist/pwa/assets
 
 # Expose the port the app runs on
 EXPOSE 3000
