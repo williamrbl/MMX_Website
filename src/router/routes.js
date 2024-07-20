@@ -11,12 +11,12 @@ const routes = [
       },
       { path: "/devis", component: () => import("src/pages/DevisPage.vue") },
       {
-        path: "/links",
-        component: () => import("src/pages/RessourcesExternes.vue"),
-      },
-      {
         path: "/arena2024",
         component: () => import("src/pages/articles/ArenaDeux.vue"),
+      },
+      {
+        path: "/displayparameters",
+        component: () => import("src/pages/DisplayParameters.vue"),
       },
     ],
   },

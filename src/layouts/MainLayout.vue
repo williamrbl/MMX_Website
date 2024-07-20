@@ -1,16 +1,15 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <!-- LARGE SCREEN -->
-
     <q-header
       elevated
       bordered
       class="shadow-2 text-white large-screen-only"
-      style="background-color: primary"
+      style="background-color: primary; height: 70px"
     >
       <q-toolbar
         class="constrain"
-        style="display: flex; justify-content: space-between"
+        style="display: flex; justify-content: space-between; height: 100%"
       >
         <div
           style="display: flex; align-items: center"
@@ -35,7 +34,6 @@
             to="/locations"
           />
           <q-route-tab name="devis" label="Devis" to="/devis" />
-          <q-route-tab name="links" label="Liens Sympas" to="/links" />
         </q-tabs>
       </q-toolbar>
     </q-header>
@@ -43,7 +41,7 @@
     <q-footer
       elevated
       class="large-screen-only q-px-lg"
-      style="background-color: primary"
+      style="background-color: primary; height: 50px"
     >
       <div
         style="
@@ -51,6 +49,7 @@
           justify-content: space-between;
           align-items: center;
           width: 100%;
+          height: 100%;
         "
       >
         <h6 class="footer-text">
@@ -81,7 +80,6 @@
     </q-footer>
 
     <!-- SMALL SCREEN -->
-
     <q-header
       elevated
       bordered
@@ -98,14 +96,6 @@
         </q-avatar>
       </div>
     </q-header>
-
-    <!-- <q-footer
-      elevated
-      class="small-screen-only"
-      style="background-color: primary"
-    >
-      <h6 class="q-ma-lg footer-text">dioqshoo</h6>
-    </q-footer> -->
 
     <q-page-container class="bg-purple-3">
       <router-view />
@@ -129,22 +119,21 @@ export default {
 </script>
 
 <style lang="sass">
-
 .q-toolbar
-  height:70px
+  height: 70px
 
 .toolbar-title-font
-  font-size:25px
-  font-family:"CALIBRI"
+  font-size: 25px
+  font-family: "CALIBRI"
 
 .q-footer
   display: flex
   align-items: center
   justify-content: left
-  height: 40px
+  height: 50px
 
 .footer-text
   text-align: center
-  font-size:15px
-  font-family:"CALIBRI"
+  font-size: 15px
+  font-family: "CALIBRI"
 </style>

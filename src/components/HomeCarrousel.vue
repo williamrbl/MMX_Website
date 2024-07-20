@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md" style="width: 50%">
+  <div style="width: 50%">
     <q-carousel
       v-model="slide"
       transition-prev="slide-right"
@@ -10,24 +10,27 @@
       style="background-color: purple"
       @click="handleCarouselClick"
     >
-      <q-carousel-slide name="one" class="column no-wrap flex-center">
-        <div class="q-pa-md centered col">
-          <div class="annonce-font">Musique Mix à Paris La Défense Arena</div>
-          <div style="font-family: 'calibri'; font-size: small">
-            pour la deuxième année consécutive !
-          </div>
-        </div>
-
+      <q-carousel-slide name="one" class="column flex-center">
         <q-img
           :src="trio"
-          style="width: 70%; height: 70%"
+          style="width: 100%; height: 100%; border-radius: 5px"
           @mouseover="isHovered = true"
           @mouseleave="isHovered = false"
         >
+          <div style="display: flex; align-items: end; justify-content: center">
+            <div class="annonce-font">Musique Mix à Paris La Défense Arena</div>
+          </div>
+
           <div
             v-if="isHovered"
             class="bg-grey-5 cursor-pointer"
-            style="border: 1px solid white; bottom: 0; right: 0; opacity: 0.7"
+            style="
+              border: 1px solid white;
+              bottom: 0;
+              right: 0;
+              opacity: 0.7;
+              border-radius: 5px;
+            "
             @click="changePage('arena2024')"
           >
             Voir plus
@@ -60,7 +63,7 @@
           { label: 3, value: 'three' },
           { label: 4, value: 'four' },
         ]"
-        style="border: 1px solid white"
+        style="border: 1px solid white; color: white;"
         @click="handleButtonToggleClick"
       />
     </div>
