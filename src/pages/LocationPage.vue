@@ -34,7 +34,7 @@
             label-color="white"
             style="color: white; color-scheme: white"
           />
-          <q-btn label="Envoyer la demande"/>
+          <q-btn label="Envoyer la demande" />
         </q-card>
         <q-date v-model="days" range multiple />
       </div>

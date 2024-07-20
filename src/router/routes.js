@@ -14,6 +14,10 @@ const routes = [
         path: "/links",
         component: () => import("src/pages/RessourcesExternes.vue"),
       },
+      {
+        path: "/arena2024",
+        component: () => import("src/pages/articles/ArenaDeux.vue"),
+      },
     ],
   },
 

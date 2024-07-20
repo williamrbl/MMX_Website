@@ -15,6 +15,7 @@
         <div
           style="display: flex; align-items: center"
           @click="$router.push('/')"
+          class="cursor-pointer"
         >
           <q-avatar size="50px" class="q-ma-lg">
             <img :src="logo" />
@@ -26,6 +27,7 @@
         </div>
 
         <q-tabs v-model="tab" indicator-color="transparent" no-caps>
+          <q-btn flat icon="eva-home-outline" to="/" />
           <q-route-tab name="photos" label="Photos" to="/photos" />
           <q-route-tab
             name="locations"
@@ -34,7 +36,6 @@
           />
           <q-route-tab name="devis" label="Devis" to="/devis" />
           <q-route-tab name="links" label="Liens Sympas" to="/links" />
-          <q-btn flat icon="eva-home-outline" to="/" />
         </q-tabs>
       </q-toolbar>
     </q-header>
@@ -53,26 +54,28 @@
         "
       >
         <h6 class="footer-text">
-          Association de musique du Pole Léonard de Vinci
+          Association de musique du Pôle Léonard de Vinci
         </h6>
-        <div>
-          <q-btn
-            flat
-            round
-            dense
-            icon="la la-instagram"
-            href="https://www.instagram.com/musiquemix_/"
-            target="_blank"
-          />
-          <q-btn
-            flat
-            round
-            dense
-            icon="la la-youtube"
-            href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
-            target="_blank"
-          />
-          <h7 style="opacity: 0.5">A website by Willers</h7>
+        <div class="row" style="display: flex; align-items: center">
+          <div style="opacity: 0.5">Hot Blood, love is gonna get ya</div>
+          <div class="q-px-md">
+            <q-btn
+              flat
+              round
+              dense
+              icon="la la-instagram"
+              href="https://www.instagram.com/musiquemix_/"
+              target="_blank"
+            />
+            <q-btn
+              flat
+              round
+              dense
+              icon="la la-youtube"
+              href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
+              target="_blank"
+            />
+          </div>
         </div>
       </div>
     </q-footer>
@@ -112,11 +115,14 @@
 
 <script>
 import logo from "src/assets/Logo.jpg";
+import { ref } from "vue";
+
 export default {
   name: "MainLayout",
   data() {
     return {
       logo,
+      tab: ref("mails"),
     };
   },
 };
