@@ -54,5 +54,20 @@ app.get("/data", async (req, res) => {
 	}
 })
 
+app.post("/createCollection/:name", async (req, res) => {
+	const collectionName = req.params.name
+
+	const dynamicSchema = new mongoose.Schema({name: String})
+	const DynamicModel = mongoose.model(collectionName, dynamicSchema)
+
+	try {
+		const myDocument = new DynamicModel({name: "example"})
+		await myDocument.save()
+		res.send(`Collection '${collectionName}' created and document inserted.`)
+	} catch (error) {
+		res.status(500).send("Error creating collection: " + error.message)
+	}
+})
+
 //Listen
 app.listen(3000)
