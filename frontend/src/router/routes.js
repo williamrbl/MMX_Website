@@ -18,6 +18,10 @@ const routes = [
         path: "/displayparameters",
         component: () => import("src/pages/DisplayParameters.vue"),
       },
+      {
+        path: "/editphotos",
+        component: () => import("src/pages/EditPhotos.vue"),
+      },
     ],
   },
 

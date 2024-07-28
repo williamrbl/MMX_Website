@@ -16,8 +16,6 @@ app.use(express.json())
 const {MongoClient, ServerApiVersion} = require("mongodb")
 const uri = process.env.URI
 
-console.log("=======>", uri)
-
 const client = new MongoClient(uri, {
 	serverApi: {
 		version: ServerApiVersion.v1,
@@ -39,14 +37,25 @@ async function run() {
 }
 run().catch(console.dir)
 
-//Get content
-app.get("/data", async (req, res) => {
+//Get list of collections
+app.get("/listCollections", async (req, res) => {
 	try {
 		await client.connect()
 		const database = client.db(process.env.DATABASE)
-		const collection = database.collection("Arena")
-		const data = await collection.find({}).toArray()
-		res.json(data)
+		const collections = await database.listCollections().toArray()
+		res.json(collections)
+	} catch (err) {
+		res.status(500).send({message: err.message})
+	}
+})
+
+//Get photos
+app.get("/photos/:name", async (req, res) => {
+	try {
+		await client.connect()
+		const database = client.db(process.env.DATABASE)
+		const collections = await database.listCollections().toArray()
+		res.json(collections)
 	} catch (err) {
 		res.status(500).send(err.message)
 	} finally {
@@ -54,18 +63,32 @@ app.get("/data", async (req, res) => {
 	}
 })
 
-app.post("/createCollection/:name", async (req, res) => {
-	const collectionName = req.params.name
+// Create a new collection
 
-	const dynamicSchema = new mongoose.Schema({name: String})
-	const DynamicModel = mongoose.model(collectionName, dynamicSchema)
-
+app.post("/createCollection", async (req, res) => {
 	try {
-		const myDocument = new DynamicModel({name: "example"})
-		await myDocument.save()
-		res.send(`Collection '${collectionName}' created and document inserted.`)
-	} catch (error) {
-		res.status(500).send("Error creating collection: " + error.message)
+		await client.connect()
+		const database = client.db(process.env.DATABASE)
+		await database.createCollection(req.body.name)
+		res.status(201).send(`Collection ${req.body.name} created successfully`)
+	} catch (err) {
+		res.status(500).send(err.message)
+	} finally {
+		await client.close()
+	}
+})
+
+//Delete a collection
+app.post("/deleteCollection", async (req, res) => {
+	try {
+		await client.connect()
+		const database = client.db(process.env.DATABASE)
+		await database.collection.remove(req.body.name)
+		res.status(201).send(`Collection ${req.body.name} removed successfully`)
+	} catch (err) {
+		res.status(500).send(err.message)
+	} finally {
+		await client.close()
 	}
 })
 
