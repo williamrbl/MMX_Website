@@ -1,27 +1,26 @@
 <template>
-  <div>fljd</div>
   <q-parallax
     :src="fond"
-    speed="0.5"
-    style="width: 100%; height: 100vh"
+    :speed="0.3"
+    style="width: 100%; height: 120dvh"
     class="q-py-xl"
   >
     <div style="width: 100%">
-      <q-card
-        class="centered"
+      <div
         style="
-          width: 500px;
-          height: 100px;
-          background-color: rgba(128, 0, 128, 0.5);
+          color: white;
+          font-size: 40px;
+          font-family: 'calibri';
+          margin-left: 10%;
         "
       >
-        <div style="color: white">Bienvenue sur le site de Musique Mix</div>
-      </q-card>
+        Bienvenue sur le site de Musique Mix
+      </div>
 
       <div class="spacer" />
 
       <div style="width: 100%; margin-left: 10%">
-        <div style="color: white; font-size: 40px; font-family: 'calibri'">
+        <div style="color: white; font-size: 30px; font-family: 'calibri'">
           Actualités
         </div>
       </div>

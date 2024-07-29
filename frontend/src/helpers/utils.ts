@@ -10,6 +10,17 @@ function alert(arg: string | Error) {
   } as QNotifyCreateOptions);
 }
 
+function validate(arg: string | Error) {
+  const message = arg instanceof Error ? arg.message : arg;
+  console.log(arg);
+  Notify.create({
+    message: message,
+    type: "positive",
+    position: "top-right",
+  } as QNotifyCreateOptions);
+}
+
 export default {
   alert,
+  validate,
 };

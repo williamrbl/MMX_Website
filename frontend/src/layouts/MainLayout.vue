@@ -3,9 +3,8 @@
     <!-- LARGE SCREEN -->
     <q-header
       elevated
-      bordered
-      class="shadow-2 text-white large-screen-only"
-      style="background-color: primary; height: 70px"
+      class="shadow-2 text-white"
+      style="background-color: primary; height: 10vh"
     >
       <q-toolbar
         class="constrain"
@@ -40,8 +39,8 @@
 
     <q-footer
       elevated
-      class="large-screen-only q-px-lg"
-      style="background-color: primary; height: 50px"
+      class="q-px-lg"
+      style="background-color: primary; height: 5vh"
     >
       <div
         style="
@@ -79,25 +78,7 @@
       </div>
     </q-footer>
 
-    <!-- SMALL SCREEN -->
-    <q-header
-      elevated
-      bordered
-      class="shadow-2 text-white small-screen-only"
-      style="background-color: primary; height: 8vh"
-    >
-      <div style="display: flex; justify-content: center">
-        <q-avatar
-          size="40px"
-          class="row"
-          style="display: flex; align-content: center"
-        >
-          <img :src="logo" />
-        </q-avatar>
-      </div>
-    </q-header>
-
-    <q-page-container class="bg-purple-3">
+    <q-page-container class="bg-purple-3" style="height: 100vh;">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -119,8 +100,6 @@ export default {
 </script>
 
 <style lang="sass">
-.q-toolbar
-  height: 70px
 
 .toolbar-title-font
   font-size: 25px

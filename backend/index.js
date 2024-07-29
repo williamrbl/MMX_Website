@@ -83,7 +83,7 @@ app.post("/deleteCollection", async (req, res) => {
 	try {
 		await client.connect()
 		const database = client.db(process.env.DATABASE)
-		await database.collection.remove(req.body.name)
+		await database.collection(req.body.name).drop()
 		res.status(201).send(`Collection ${req.body.name} removed successfully`)
 	} catch (err) {
 		res.status(500).send(err.message)
