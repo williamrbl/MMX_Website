@@ -1,6 +1,6 @@
 <template>
   <div class="row q-pa-lg">
-    <div class="section-title col-2">Edit photos</div>
+    <div class="section-title col-4">Gérer les collections de photos</div>
 
     <q-btn
       outline
@@ -29,7 +29,7 @@
         if (selectedCollection) {
           addingPhotos = true;
         } else {
-          this.utils.alert('No collection selected');
+          this.utils.alert('Veuillez sélectionner une collection');
         }
       "
     />
@@ -42,7 +42,7 @@
         if (selectedCollection) {
           deletingCollection = true;
         } else {
-          this.utils.alert('No collection selected');
+          this.utils.alert('Veuillez sélectionner une collection');
         }
       "
     />
@@ -62,7 +62,10 @@
     </q-card>
   </q-dialog>
 
-  <q-dialog v-model="deletingCollection">
+  <q-dialog
+    v-model="deletingCollection"
+    @keyup.enter="deleteCollection(selectedCollection)"
+  >
     <q-card class="q-pa-md" style="width: 30%">
       <div>Collection being deleted : {{ selectedCollection }}</div>
       <div class="q-pt-md" style="display: flex; justify-content: end">
@@ -172,6 +175,7 @@ export default {
           this.nameCollection = "";
           this.addingCollection = false;
           this.getCollections();
+          utils.validate("La collection a bien été créée");
         } catch (error) {
           console.error("Error adding collection:", error);
           utils.alert("Erreur lors de l'ajout de la collection");
@@ -180,32 +184,28 @@ export default {
     },
 
     async deleteCollection(name) {
-      if (name.trim === "") {
-        console.log("error");
-        utils.alert("Veuillez sélectionner une collection à supprimer");
-      } else {
-        name = name.toLowerCase();
-        try {
-          const response = await fetch(`${process.env.API}/deleteCollection`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name }),
-          });
+      name = name.toLowerCase();
+      try {
+        const response = await fetch(`${process.env.API}/deleteCollection`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name }),
+        });
 
-          if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
-          }
-
-          this.nameCollection = "";
-          this.deletingCollection = false;
-          (this.deletedCollection = ""), (this.selectedCollection = "");
-          this.getCollections();
-        } catch (error) {
-          console.error("Error adding collection:", error);
-          utils.alert("Erreur lors de la suppression de la collection");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
         }
+
+        this.nameCollection = "";
+        this.deletingCollection = false;
+        (this.deletedCollection = ""), (this.selectedCollection = "");
+        utils.validate("La collection a bien été supprimée");
+        this.getCollections();
+      } catch (error) {
+        console.error("Error adding collection:", error);
+        utils.alert("Erreur lors de la suppression de la collection");
       }
     },
 
