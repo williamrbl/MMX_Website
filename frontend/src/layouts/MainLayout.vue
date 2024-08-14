@@ -78,7 +78,7 @@
       </div>
     </q-footer>
 
-    <q-page-container class="bg-purple-3" style="height: 100vh;">
+    <q-page-container class="bg-purple-3" style="height: 100%">
       <router-view />
     </q-page-container>
   </q-layout>

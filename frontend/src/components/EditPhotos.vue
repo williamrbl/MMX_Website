@@ -49,15 +49,94 @@
   </div>
 
   <q-dialog v-model="addingCollection">
-    <q-card class="q-pa-md" style="width: 30%">
-      <q-input
-        label="Veuillez entrer le nom de la nouvelle collection"
-        v-model="nameCollection"
-        @keyup.enter="addCollection(nameCollection)"
-      />
+    <q-card class="q-pa-md" style="width: 40%">
+      <div class="titre-popup q-pb-md">Ajout d'une collection</div>
+      <q-separator />
+      <div class="q-pa-md">
+        <q-input
+          label="Veuillez entrer le nom de la nouvelle collection"
+          v-model="nameCollection"
+        />
+        <div class="row" style="display: flex; align-items: center">
+          <div class="q-pa-md col-4">
+            <q-btn icon="event" round color="primary">
+              <q-popup-proxy
+                @before-show="updateProxy"
+                cover
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-date v-model="proxyDate">
+                  <div class="row items-center justify-end q-gutter-sm">
+                    <q-btn label="Cancel" color="primary" flat v-close-popup />
+                    <q-btn
+                      label="OK"
+                      color="primary"
+                      flat
+                      @click="save"
+                      v-close-popup
+                    />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-btn>
+            <div class="q-mb-sm">
+              <q-badge color="purple">
+                Date: {{ utils.formatDate(date) }}
+              </q-badge>
+            </div>
+          </div>
+
+          <q-file
+            outlined
+            v-model="cover"
+            label="Couverture de collection"
+            class="col"
+            @change="onCoverChange"
+            v-if="!cover"
+          >
+            <template v-slot:prepend>
+              <q-icon name="attach_file" />
+            </template>
+          </q-file>
+
+          <div v-else class="row" style="width: 60%">
+            <div
+              class="q-pa-md"
+              style="border: solid black 1px; border-radius: 5px"
+            >
+              <q-img src="coverUrl()" class="col-9" />
+            </div>
+            <q-btn
+              flat
+              dense
+              round
+              icon="eva-close-outline"
+              style="color: black"
+              class="col-3"
+              @click="deselectCover()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <q-separator />
+
       <div class="q-pt-md" style="display: flex; justify-content: end">
-        <q-btn outline label="Cancel" @click="addingCollection = false" />
-        <q-btn outline label="Ok" @click="addCollection(nameCollection)" />
+        <q-btn
+          outline
+          label="Cancel"
+          @click="
+            {
+              addingCollection = false;
+              nameCollection = '';
+              date = new Date();
+              proxyDate = new Date();
+              cover = null;
+            }
+          "
+        />
+        <q-btn outline label="Ok" @click="submitCollection" />
       </div>
     </q-card>
   </q-dialog>
@@ -107,12 +186,25 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import { ref } from "vue";
 
 export default {
   name: "EditPhotos",
   setup() {
+    const date = ref(new Date());
+    const proxyDate = ref(new Date());
     return {
       utils,
+      date,
+      proxyDate,
+
+      updateProxy() {
+        proxyDate.value = date.value;
+      },
+
+      save() {
+        date.value = proxyDate.value;
+      },
     };
   },
   data() {
@@ -124,9 +216,14 @@ export default {
       deletingCollection: false,
       addingPhotos: false,
       selectedFiles: "",
+      cover: null,
     };
   },
   methods: {
+    handleRefresh() {
+      this.getCollections();
+    },
+
     async getCollections() {
       try {
         const response = await fetch(`${process.env.API}/listCollections`, {
@@ -152,34 +249,33 @@ export default {
       }
     },
 
-    async addCollection(name) {
-      if (name.trim === "") {
-        utils.alert("Veuillez entrer un nom pour la collection");
-      } else if (this.options.includes(name.toLowerCase())) {
-        utils.alert("La collection existe déjà");
-      } else {
-        name = name.toLowerCase();
-        try {
-          const response = await fetch(`${process.env.API}/createCollection`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name }),
-          });
+    async addCollection(name, date, cover) {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("date", date.toISOString());
+      formData.append("cover", cover);
 
-          if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
-          }
+      console.log(formData);
+      try {
+        const response = await fetch(`${process.env.API}/createCollection`, {
+          method: "POST",
+          body: formData,
+        });
 
-          this.nameCollection = "";
-          this.addingCollection = false;
-          this.getCollections();
-          utils.validate("La collection a bien été créée");
-        } catch (error) {
-          console.error("Error adding collection:", error);
-          utils.alert("Erreur lors de l'ajout de la collection");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
         }
+
+        this.nameCollection = "";
+        this.addingCollection = false;
+        this.cover = null;
+        this.date = new Date();
+        this.proxyDate = new Date();
+        this.getCollections();
+        utils.validate("La collection a bien été créée");
+      } catch (error) {
+        console.error("Error adding collection:", error);
+        utils.alert("Erreur lors de l'ajout de la collection");
       }
     },
 
@@ -200,20 +296,67 @@ export default {
 
         this.nameCollection = "";
         this.deletingCollection = false;
-        (this.deletedCollection = ""), (this.selectedCollection = "");
+        this.selectedCollection = "";
         utils.validate("La collection a bien été supprimée");
         this.getCollections();
       } catch (error) {
-        console.error("Error adding collection:", error);
+        console.error("Error deleting collection:", error);
         utils.alert("Erreur lors de la suppression de la collection");
       }
     },
 
     async addPhotos() {},
+
+    deselectCover() {
+      if (this.cover) {
+        URL.revokeObjectURL(this.cover);
+        this.cover = null;
+      }
+    },
+
+    onCoverChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.cover = file;
+      }
+    },
+
+    submitCollection() {
+      if (!this.nameCollection.trim()) {
+        utils.alert("Veuillez entrer un nom pour la collection");
+        return;
+      }
+
+      if (this.options.includes(this.nameCollection.toLowerCase())) {
+        utils.alert("La collection existe déjà");
+        return;
+      }
+
+      this.addCollection(this.nameCollection, this.date, this.cover);
+    },
   },
 
   mounted() {
     this.getCollections();
+  },
+
+  computed: {
+    coverUrl() {
+      return this.cover ? URL.createObjectURL(this.cover) : "";
+    },
+  },
+  watch: {
+    cover(newVal) {
+      if (this._oldCoverUrl) {
+        URL.revokeObjectURL(this._oldCoverUrl);
+      }
+      this._oldCoverUrl = this.cover ? URL.createObjectURL(newVal) : "";
+    },
+  },
+  beforeUnmount() {
+    if (this._oldCoverUrl) {
+      URL.revokeObjectURL(this._oldCoverUrl);
+    }
   },
 };
 </script>
@@ -224,5 +367,10 @@ export default {
   font-size: 30px;
   font-weight: 200;
   color: white;
+}
+
+.titre-popup {
+  font-size: 20px;
+  color: black;
 }
 </style>
