@@ -7,6 +7,12 @@ function alert(arg: string | Error) {
     message: message,
     type: "negative",
     position: "top-right",
+    actions: [
+      {
+        icon: "close",
+        color: "white",
+      },
+    ],
   } as QNotifyCreateOptions);
 }
 
@@ -17,6 +23,12 @@ function validate(arg: string | Error) {
     message: message,
     type: "positive",
     position: "top-right",
+    actions: [
+      {
+        icon: "close",
+        color: "white",
+      },
+    ],
   } as QNotifyCreateOptions);
 }
 

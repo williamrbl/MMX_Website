@@ -7,6 +7,7 @@ const multer = require("multer")
 const mongoose = require("mongoose")
 const path = require("path")
 const crypto = require("crypto")
+const fs = require("fs")
 const {
 	MongoClient,
 	ServerApiVersion,
@@ -42,31 +43,6 @@ async function connectToDatabase() {
 }
 
 connectToDatabase().catch(console.dir)
-
-// Multer and GridFS setup
-const storage = new GridFsStorage({
-	url: uri,
-	file: (req, file) => {
-		return new Promise((resolve, reject) => {
-			crypto.randomBytes(16, (err, buf) => {
-				if (err) {
-					return reject(err)
-				}
-				const filename = buf.toString("hex") + path.extname(file.originalname)
-				const fileInfo = {
-					filename: filename,
-					bucketName: "uploads",
-				}
-				resolve(fileInfo)
-			})
-		})
-	},
-})
-
-const upload = multer({storage})
-
-// Serve images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // Get list of collections
 app.get("/listCollections", async (req, res) => {
@@ -145,7 +121,6 @@ app.get("/articles", async (req, res) => {
 })
 
 // Add caroussel page
-
 const articleSchema = new mongoose.Schema({
 	_id: String,
 	type: String,
@@ -183,13 +158,29 @@ app.post("/deleteCarousselPage", upload.none(), async (req, res) => {
 		const articleId = req.body._id
 		const collection = client.db("Caroussel").collection("articles")
 		collection.deleteOne({_id: articleId})
+		res.status(200).send("Article deleted successfully")
 	} catch (err) {
 		console.error("Error deleting article:", err)
 	}
 })
 
+// Delete photo caroussel
+app.post("/deletePhotoCaroussel", upload.none(), async (req, res) => {
+	try {
+		const photoID = req.body._id
+		const collection = client.db("Caroussel").collection("articles")
+		await collection.updateOne({_id: photoID}, {$set: {photo: ""}})
+		res.status(200).send("Article deleted successfully")
+	} catch (err) {
+		console.error("Error deleting article:", err)
+	}
+})
+
+// add photo to caroussel
+app.post("/addPhotoCaroussel", upload.single("photo"), async (req, res) => {})
+
 // Listen
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })

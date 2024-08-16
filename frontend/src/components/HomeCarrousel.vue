@@ -40,6 +40,7 @@
 
       <q-carousel-slide name="two" class="column no-wrap flex-center">
         <div class="q-pa-md centered col">
+          <div color="white">{{ articlesImported }}</div>
           <div class="annonce-font">Longue vie au studio</div>
         </div>
       </q-carousel-slide>
@@ -63,18 +64,24 @@
           { label: 3, value: 'three' },
           { label: 4, value: 'four' },
         ]"
-        style="border: 1px solid white; color: white;"
+        style="border: 1px solid white; color: white"
         @click="handleButtonToggleClick"
       />
     </div>
+  </div>
+  <div v-if="display">
+    <EditCaroussel :articlesImported="articlesImported" />
   </div>
 </template>
 
 <script>
 import trio from "src/assets/trioarena.jpg";
+import EditCaroussel from "./EditCaroussel.vue";
 
 export default {
   name: "HomeCarrousel",
+  components: { EditCaroussel },
+
   data() {
     return {
       trio,
@@ -85,6 +92,8 @@ export default {
       intervalDuration: 5000,
       restartDelay: 10000,
       slides: ["one", "two", "three", "four"],
+      display: false,
+      articlesImported: [],
     };
   },
   methods: {

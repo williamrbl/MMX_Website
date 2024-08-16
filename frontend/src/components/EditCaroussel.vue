@@ -25,19 +25,22 @@
   >
     <div
       v-for="article in articles"
-      class="row q-pa-md"
+      class="row"
       :key="article._id"
-      style="
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-
-      "
+      style="display: flex; flex-direction: column; margin-bottom: 10px"
     >
-      <div class="row q-pa-lg" style="border: 1px solid blueviolet; border-radius: 5px; display: flex; align-items: center;">
+      <div class="row" style="display: flex; align-items: center">
         <div class="col" style="margin-bottom: 5px">{{ article._id }}</div>
         <div class="col" style="margin-bottom: 5px">
           {{ article.description }}
+        </div>
+        <div class="col" style="margin-bottom: 5px">
+          <q-btn
+            outline
+            color="purple"
+            label="Photo"
+            @click="editPhotos(article)"
+          />
         </div>
         <q-btn
           flat
@@ -56,8 +59,19 @@
         <div>
           <q-input v-model="inputName" label="Name of the article" />
           <q-input v-model="inputDescription" label="Description" />
+          <div class="centered q-py-md">
+            <q-file
+              outlined
+              v-model="newArticleFile"
+              label="Photo"
+              style="width: 50%"
+            >
+              <template v-slot:prepend>
+                <q-icon name="attach_file" />
+              </template>
+            </q-file>
+          </div>
         </div>
-        <q-separator />
         <div class="q-pt-md" style="display: flex; justify-content: end">
           <q-btn outline label="Cancel" @click="addingArticle = false" />
           <q-btn outline label="Ok" @click="addArticle()" />
@@ -65,27 +79,78 @@
       </div>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="isPhotoModif">
+    <q-card style="width: 60%; height: 50%">
+      <div style="display: flex; justify-content: end">
+        <q-btn
+          flat
+          dense
+          icon="eva-close"
+          @click="
+            {
+              isPhotoModif = false;
+              modifPhoto = '';
+            }
+          "
+        />
+      </div>
+      <div class="centered">
+        <q-img
+          :src="modifPhoto"
+          style="width: 60%; height: 60%"
+          v-if="modifPhoto"
+        />
+        <q-file outlined v-model="file" v-else>
+          <template v-slot:prepend>
+            <q-icon name="attach_file" />
+          </template>
+        </q-file>
+      </div>
+      <div class="centered">
+        <q-btn
+          flat
+          dense
+          icon="eva-trash-outline"
+          @click="deletePhotoCaroussel(currentArticle)"
+          v-if="modifPhoto"
+        />
+        <q-btn
+          outline
+          color="purple"
+          label="Add Photo"
+          @click="addPhotoCarrousel"
+          v-if="file"
+        />
+      </div>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
 import utils from "src/helpers/utils.ts";
-import { ref } from "vue";
 
 export default {
   name: "EditCarroussel",
+  props: {
+    articlesImported: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       articles: [],
       addingArticle: false,
       inputName: "",
       inputDescription: "",
+      isPhotoModif: false,
+      modifPhoto: "",
+      currentArticle: null,
+      file: null,
     };
   },
   methods: {
-    handleRefresh() {
-      this.getArticles();
-    },
-
     async getArticles() {
       try {
         const response = await fetch(`${process.env.API}/articles`, {
@@ -98,7 +163,7 @@ export default {
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
-        this.articles = await response.json(); // Make sure this updates `articles`
+        this.articles = await response.json();
       } catch (error) {
         console.error("Error getting articles:", error);
         utils.alert("Erreur lors de la récupération des articles");
@@ -107,15 +172,15 @@ export default {
 
     async addArticle() {
       if (this.articles.length >= 4) {
-        // Updated check for array length
         utils.alert("Vous avez atteint le nombre maximal de pages");
+      } else if (this.inputName == "" || this.inputDescription == "") {
+        utils.alert("Veuillez remplir toutes les informations");
       } else {
         const formData = new FormData();
         formData.append("_id", this.inputName);
         formData.append("type", "article");
         formData.append("description", this.inputDescription);
-        formData.append("article", "");
-        formData.append("photo", "");
+
         try {
           const response = await fetch(`${process.env.API}/addCarousselPage`, {
             method: "POST",
@@ -127,7 +192,7 @@ export default {
           }
           this.inputName = "";
           this.inputDescription = "";
-          await this.getArticles(); // Ensure the data is updated
+          await this.getArticles();
           utils.validate("La page a bien été ajoutée");
           this.addingArticle = false;
         } catch (error) {
@@ -146,14 +211,81 @@ export default {
           },
           body: JSON.stringify(article),
         });
+
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
-        await this.getArticles(); // Ensure the data is updated
+        await this.getArticles();
         utils.validate("La page a bien été supprimée");
       } catch (error) {
         console.error("Error deleting article:", error);
         utils.alert("Erreur lors de la suppression de l'article");
+      }
+    },
+
+    editPhotos(article) {
+      this.isPhotoModif = true;
+      this.modifPhoto = article.photo;
+      this.currentArticle = article;
+    },
+
+    async deletePhotoCaroussel() {
+      if (!this.currentArticle) return;
+
+      try {
+        const response = await fetch(
+          `${process.env.API}/deletePhotoCaroussel`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.currentArticle),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        utils.validate("La photo a bien été supprimée");
+        this.modifPhoto = "";
+        this.currentArticle.photo = "";
+        await this.getArticles();
+      } catch (error) {
+        console.error("Error deleting photo:", error);
+        utils.alert("Erreur lors de la suppression de la photo");
+      }
+    },
+
+    async addPhotoCarrousel() {
+      if (!this.file || !this.currentArticle) {
+        utils.alert(
+          "Please select a file and make sure you have an article selected."
+        );
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("photo", this.file);
+      formData.append("_id", this.currentArticle._id);
+
+      try {
+        const response = await fetch(`${process.env.API}/addPhotoCaroussel`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        utils.validate("Photo added successfully");
+        this.isPhotoModif = false;
+        this.file = null;
+        this.modifPhoto = "";
+        await this.getArticles();
+      } catch (error) {
+        console.error("Error adding photo to carousel:", error);
+        utils.alert("Error adding photo to carousel");
       }
     },
   },

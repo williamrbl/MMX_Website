@@ -16,7 +16,7 @@
           icon="eva-refresh-outline"
           @click="refreshPage"
           v-if="isConnected"
-          size="30px"
+          size="20px"
           style="color: white"
         />
         <q-btn
@@ -26,7 +26,7 @@
           icon="eva-log-out-outline"
           @click="logOut"
           v-if="isConnected"
-          size="30px"
+          size="20px"
           style="color: white"
         />
       </div>
@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import EditPhotos from "src/components/EditPhotos.vue";
 import EditCaroussel from "src/components/EditCaroussel.vue";
 import utils from "src/helpers/utils.ts";
@@ -83,48 +82,44 @@ import utils from "src/helpers/utils.ts";
 export default {
   name: "PageConnexion",
   components: { EditPhotos, EditCaroussel },
-  setup() {
-    const isConnected = ref(false);
-    const inputPassword = ref("");
-    const isPwd = ref(true);
-
-    const checkConnection = () => {
-      if (inputPassword.value === "") {
+  data() {
+    return {
+      isConnected: false,
+      inputPassword: "",
+      isPwd: true,
+    };
+  },
+  methods: {
+    checkConnection() {
+      if (this.inputPassword === "") {
         utils.alert("Veuillez saisir un mot de passe");
-      } else if (inputPassword.value !== process.env.PASSWORD) {
+      } else if (this.inputPassword !== process.env.PASSWORD) {
         utils.alert("Le mot de passe est incorrect");
       } else {
-        isConnected.value = true;
-        inputPassword.value = "";
+        this.isConnected = true;
+        this.inputPassword = "";
         utils.validate("Connexion réussie");
       }
-    };
+    },
 
-    const logOut = () => {
-      isConnected.value = false;
-      isPwd.value = true;
+    logOut() {
+      this.isConnected = false;
+      this.isPwd = true;
       utils.validate("Déconnexion réussie");
-    };
+    },
 
-    const refreshPage = () => {
-      // Access components using refs
-      this.$refs.carousselComponent.handleRefresh();
-      this.$refs.photosComponent.handleRefresh();
-    };
+    refreshPage() {
+      if (this.$refs.photosComponent && this.$refs.carousselComponent) {
+        this.$refs.photosComponent.handleRefresh();
+        this.$refs.carousselComponent.handleRefresh();
+      } else {
+        utils.alert("Components not available.");
+      }
+    },
 
-    const togglePasswordVisibility = () => {
-      isPwd.value = !isPwd.value;
-    };
-
-    return {
-      isConnected,
-      inputPassword,
-      isPwd,
-      checkConnection,
-      logOut,
-      refreshPage,
-      togglePasswordVisibility,
-    };
+    togglePasswordVisibility() {
+      this.isPwd = !this.isPwd;
+    },
   },
 };
 </script>
