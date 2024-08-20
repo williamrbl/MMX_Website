@@ -112,13 +112,13 @@ app.post("/createCollection", upload.single("cover"), async (req, res) => {
 		}`
 
 		const newCollection = {
-			_id: new Date().getTime().toString(),
+			_id: "Titre",
 			date: new Date(date),
 			img: imgURL,
 			nom: name,
 		}
 
-		await database.collection(name).insertOne(newCollection)
+		await database.collection(name.toLowerCase()).insertOne(newCollection)
 		res.status(201).send(`Collection ${name} created successfully with data`)
 	} catch (err) {
 		res.status(500).send(err.message)
@@ -128,6 +128,7 @@ app.post("/createCollection", upload.single("cover"), async (req, res) => {
 // Delete a collection
 app.post("/deleteCollection", async (req, res) => {
 	try {
+		console.log(req.body.name)
 		const database = client.db(process.env.DATABASE)
 		await database.collection(req.body.name).drop()
 		res.status(201).send(`Collection ${req.body.name} removed successfully`)
