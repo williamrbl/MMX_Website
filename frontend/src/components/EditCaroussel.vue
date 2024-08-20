@@ -10,7 +10,6 @@
       @click="addingArticle = true"
     />
   </div>
-
   <div
     class="col"
     style="
@@ -33,6 +32,9 @@
         <div class="col" style="margin-bottom: 5px">{{ article._id }}</div>
         <div class="col" style="margin-bottom: 5px">
           {{ article.description }}
+          <q-popup-edit v-model="article.description" auto-save v-slot="scope">
+        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="handleEnter(scope)" />
+      </q-popup-edit>
         </div>
         <div class="col" style="margin-bottom: 5px">
           <q-btn
@@ -129,15 +131,10 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import { nextTick } from "vue";
 
 export default {
   name: "EditCarroussel",
-  props: {
-    articlesImported: {
-      type: Array,
-      default: () => [],
-    },
-  },
   data() {
     return {
       articles: [],
@@ -151,6 +148,10 @@ export default {
     };
   },
   methods: {
+    handleRefresh(){
+      this.getArticles();
+    },
+
     async getArticles() {
       try {
         const response = await fetch(`${process.env.API}/articles`, {
@@ -182,7 +183,7 @@ export default {
         formData.append("description", this.inputDescription);
 
         try {
-          const response = await fetch(`${process.env.API}/addCarousselPage`, {
+          const response = await fetch(`${process.env.API}/addCaroussel`, {
             method: "POST",
             body: formData,
           });
@@ -202,14 +203,36 @@ export default {
       }
     },
 
-    async deleteArticle(article) {
+    async updateArticle(){
+      console.log(this.articles)
       try {
-        const response = await fetch(`${process.env.API}/deleteCarousselPage`, {
+        const response = await fetch(`${process.env.API}/updateCaroussel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(article),
+          body: JSON.stringify(this.articles),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getArticles();
+        utils.validate("L'article à été mis à jour !");
+      } catch (error) {
+        console.error("Error updating article:", error);
+        utils.alert("Erreur lors de la MAJ de l'article");
+      }
+    },
+
+    async deleteArticle() {
+      try {
+        const response = await fetch(`${process.env.API}/deleteCaroussel`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.articles),
         });
 
         if (!response.ok) {
@@ -288,6 +311,13 @@ export default {
         utils.alert("Error adding photo to carousel");
       }
     },
+
+    async handleEnter(scope){
+      scope.set();
+      await nextTick();
+      console.log(this.articles)
+      this.updateArticle();
+    }
   },
   mounted() {
     this.getArticles();

@@ -10,27 +10,27 @@
       style="background-color: purple"
       @click="handleCarouselClick"
     >
-      <q-carousel-slide name="one" class="column flex-center">
+
+        <q-carousel-slide
+        v-for="(slideName, index) in slides"
+        :key="index"
+        :name="slideName"
+        class="column flex-center"
+      >
+
+
         <q-img
-          :src="trio"
-          style="width: 100%; height: 100%; border-radius: 5px"
+          :src="articles[index].photo"
+          class="carousel-img"
           @mouseover="isHovered = true"
           @mouseleave="isHovered = false"
         >
-          <div style="display: flex; align-items: end; justify-content: center">
-            <div class="annonce-font">Musique Mix à Paris La Défense Arena</div>
+          <div class="description-container">
+            <div class="annonce-font">{{ articles[index].description }}</div>
           </div>
-
           <div
             v-if="isHovered"
-            class="bg-grey-5 cursor-pointer"
-            style="
-              border: 1px solid white;
-              bottom: 0;
-              right: 0;
-              opacity: 0.7;
-              border-radius: 5px;
-            "
+            class="hover-overlay"
             @click="changePage('arena2024')"
           >
             Voir plus
@@ -38,50 +38,24 @@
         </q-img>
       </q-carousel-slide>
 
-      <q-carousel-slide name="two" class="column no-wrap flex-center">
-        <div class="q-pa-md centered col">
-          <div color="white">{{ articlesImported }}</div>
-          <div class="annonce-font">Longue vie au studio</div>
-        </div>
-      </q-carousel-slide>
-
-      <q-carousel-slide name="three" class="column no-wrap flex-center">
-        <div class="q-pa-md centered col">
-          <div class="annonce-font">Recrutements</div>
-        </div>
-      </q-carousel-slide>
-
-      <q-carousel-slide name="four" class="column no-wrap flex-center">
-      </q-carousel-slide>
     </q-carousel>
-
     <div class="row justify-center q-mt-md">
       <q-btn-toggle
         v-model="slide"
-        :options="[
-          { label: 1, value: 'one' },
-          { label: 2, value: 'two' },
-          { label: 3, value: 'three' },
-          { label: 4, value: 'four' },
-        ]"
-        style="border: 1px solid white; color: white"
+        :options="options"
+        class="toggle-btn"
         @click="handleButtonToggleClick"
       />
     </div>
   </div>
-  <div v-if="display">
-    <EditCaroussel :articlesImported="articlesImported" />
-  </div>
 </template>
+
 
 <script>
 import trio from "src/assets/trioarena.jpg";
-import EditCaroussel from "./EditCaroussel.vue";
 
 export default {
   name: "HomeCarrousel",
-  components: { EditCaroussel },
-
   data() {
     return {
       trio,
@@ -91,9 +65,9 @@ export default {
       restartTimeout: null,
       intervalDuration: 5000,
       restartDelay: 10000,
-      slides: ["one", "two", "three", "four"],
-      display: false,
-      articlesImported: [],
+      slides: [],
+      articles: [],
+      options: [],
     };
   },
   methods: {
@@ -114,6 +88,7 @@ export default {
 
     restartAutoAdvance() {
       this.stopInterval();
+      if (this.restartTimeout) clearTimeout(this.restartTimeout);
       this.restartTimeout = setTimeout(this.startInterval, this.restartDelay);
     },
 
@@ -128,10 +103,43 @@ export default {
     changePage(page) {
       this.$router.push(`/${page}`);
     },
+
+    async getArticles() {
+      try {
+        const response = await fetch(`${process.env.API}/articles`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        this.articles = data;
+        this.slides = data.map((_, index) => `slide-${index}`);
+        this.options = data.map((_, index) => ({
+          label: index + 1,
+          value: this.slides[index],
+        }));
+
+        // Start from the first slide
+        this.slide = this.slides[0];
+      } catch (error) {
+        console.error("Error getting articles:", error);
+        this.$q.notify({
+          color: "negative",
+          message: "Erreur lors de la récupération des articles",
+        });
+      }
+    },
   },
 
   mounted() {
     this.startInterval();
+    this.getArticles();
   },
 
   beforeUnmount() {
@@ -142,9 +150,39 @@ export default {
 </script>
 
 <style scoped>
+.carousel-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.description-container {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.hover-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: 1px solid white;
+  opacity: 0.7;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  cursor: pointer;
+  color: white;
+}
+
+.toggle-btn {
+  border: 1px solid white;
+  color: white;
+}
+
 .annonce-font {
   font-size: large;
   color: white;
-  font-family: "CALIBRI";
+  font-family: "Calibri";
 }
 </style>

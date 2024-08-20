@@ -44,6 +44,34 @@ async function connectToDatabase() {
 
 connectToDatabase().catch(console.dir)
 
+//Multer setup
+
+const storage = multer.diskStorage({
+	destination: (req, file, cb) => {
+	  cb(null, 'uploads/'); 
+	},
+	filename: (req, file, cb) => {
+	  cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+	}
+  });
+  
+  // Initialize upload variable with multer settings
+  const upload = multer({
+	storage: storage,
+	limits: { fileSize: 1000000 }, 
+	fileFilter: (req, file, cb) => {
+	  const fileTypes = /jpeg|jpg|png|gif/;
+	  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+	  const mimeType = fileTypes.test(file.mimetype);
+  
+	  if (extname && mimeType) {
+		return cb(null, true);
+	  } else {
+		cb('Error: Images Only!');
+	  }
+	}
+  });
+
 // Get list of collections
 app.get("/listCollections", async (req, res) => {
 	try {
@@ -84,7 +112,7 @@ app.post("/createCollection", upload.single("cover"), async (req, res) => {
 		}`
 
 		const newCollection = {
-			_id: new Date().getTime().toString(), // Using current timestamp as a unique _id
+			_id: new Date().getTime().toString(),
 			date: new Date(date),
 			img: imgURL,
 			nom: name,
@@ -130,7 +158,7 @@ const articleSchema = new mongoose.Schema({
 })
 const Article = mongoose.model("Article", articleSchema, "articles")
 
-app.post("/addCarousselPage", upload.none(), async (req, res) => {
+app.post("/addCaroussel", upload.none(), async (req, res) => {
 	try {
 		await mongoose.connect(`${uri}`, {
 			useUnifiedTopology: true,
@@ -152,8 +180,25 @@ app.post("/addCarousselPage", upload.none(), async (req, res) => {
 	}
 })
 
+app.post("/updateCaroussel", upload.none(), async (req, res) => {
+	try {
+		const articles = req.body;
+		if (!Array.isArray(articles)) {
+			return res.status(400).send("Invalid input format. 'articles' should be an array.");
+		}
+		const collection = client.db("Caroussel").collection("articles");
+		await collection.deleteMany({});
+		await collection.insertMany(articles);
+		res.status(200).send("Articles updated successfully");
+	} catch (err) {
+		console.error("Error updating articles:", err);
+		res.status(500).send("Error updating articles");
+	}
+});
+
+
 // Delete article
-app.post("/deleteCarousselPage", upload.none(), async (req, res) => {
+app.post("/deleteCaroussel", upload.none(), async (req, res) => {
 	try {
 		const articleId = req.body._id
 		const collection = client.db("Caroussel").collection("articles")
