@@ -91,6 +91,7 @@
             outlined
             v-model="cover"
             label="Couverture de collection"
+            accept="image/png, image/jpeg"
             class="col"
             @change="onCoverChange"
             v-if="!cover"
@@ -161,7 +162,12 @@
   <q-dialog v-model="addingPhotos">
     <q-card class="q-pa-md" style="width: 30%">
       <div>Adding pictures to : {{ this.selectedCollection }}</div>
-      <q-file outlined v-model="selectedFiles">
+      <q-file
+        outlined
+        v-model="selectedFiles"
+        accept="image/png, image/jpeg, image/jpg"
+        @input="handleFileUpload"
+      >
         <template>
           <div class="row" style="display: flex; align-items: center">
             <q-icon name="attach_file" class="col-1" />
@@ -169,7 +175,7 @@
               style="opacity: 0.5; font-size: medium; margin-left: 3px"
               class="col-11"
             >
-              Select files to photos to collection
+              Select files to add to collection
             </div>
           </div>
         </template>
@@ -215,13 +221,30 @@ export default {
       selectedCollection: "",
       deletingCollection: false,
       addingPhotos: false,
-      selectedFiles: "",
+      selectedFiles: [],
       cover: null,
+      file: null,
     };
   },
   methods: {
     handleRefresh() {
       this.getCollections();
+    },
+
+    handleFileUpload(event) {
+      const files = event.target.files;
+      if (files.length > 0) {
+        const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+        const invalidFiles = Array.from(files).filter(
+          (file) => !allowedTypes.includes(file.type)
+        );
+
+        if (invalidFiles.length > 0) {
+          utils.alert("Mauvais type de fichier pour les photos");
+          return;
+        }
+        this.selectedFiles = files;
+      }
     },
 
     async getCollections() {
@@ -250,12 +273,18 @@ export default {
     },
 
     async addCollection(name, date, cover) {
+      const allowedTypes = ["image/png", "image/jpeg"];
+      if (cover && !allowedTypes.includes(cover.type)) {
+        utils.alert("Mauvais type de fichier pour la couverture");
+        return;
+      }
       const formData = new FormData();
       formData.append("name", name);
       formData.append("date", date.toISOString());
-      formData.append("cover", cover);
+      if (cover) {
+        formData.append("cover", cover);
+      }
 
-      console.log(formData);
       try {
         const response = await fetch(`${process.env.API}/createCollection`, {
           method: "POST",
@@ -305,7 +334,41 @@ export default {
       }
     },
 
-    async addPhotos() {},
+    async addPhotos() {
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+      const invalidFiles = Array.from(this.selectedFiles).filter(
+        (file) => !allowedTypes.includes(file.type)
+      );
+
+      if (invalidFiles.length > 0) {
+        utils.alert("Mauvais type de fichier pour les photos");
+        return;
+      }
+
+      const formData = new FormData();
+      Array.from(this.selectedFiles).forEach((file) =>
+        formData.append("photos", file)
+      );
+      formData.append("collection", this.selectedCollection);
+
+      try {
+        const response = await fetch(`${process.env.API}/addPhotos`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        this.addingPhotos = false;
+        this.selectedFiles = [];
+        utils.validate("Les photos ont bien été ajoutées");
+      } catch (error) {
+        console.error("Error adding photos:", error);
+        utils.alert("Erreur lors de l'ajout des photos");
+      }
+    },
 
     deselectCover() {
       if (this.cover) {
@@ -316,8 +379,11 @@ export default {
 
     onCoverChange(event) {
       const file = event.target.files[0];
-      if (file) {
+      const allowedTypes = ["image/png", "image/jpeg"];
+      if (file && allowedTypes.includes(file.type)) {
         this.cover = file;
+      } else {
+        utils.alert("Mauvais type de fichier pour la couverture");
       }
     },
 

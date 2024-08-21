@@ -73,6 +73,7 @@
               outlined
               ref="fileInput"
               label="Photo"
+              accept="image/png, image/jpeg"
               style="width: 50%"
               @input="handleFileUpload"
             >
@@ -181,14 +182,17 @@ export default {
     },
 
     async addArticle() {
+      const allowedTypes = ["image/png", "image/jpeg"];
       if (this.articles.length >= 4) {
         utils.alert("Vous avez atteint le nombre maximal de pages");
       } else if (
         this.inputName === "" ||
         this.inputDescription === "" ||
-        this.file === ""
+        !this.file
       ) {
         utils.alert("Veuillez remplir toutes les informations");
+      } else if (!allowedTypes.includes(this.file.type)) {
+        utils.alert("Mauvais type de fichier");
       } else {
         const formData = new FormData();
         formData.append("_id", this.inputName);
