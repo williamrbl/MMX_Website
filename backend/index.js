@@ -41,39 +41,6 @@ async function connectToDatabase() {
 
 connectToDatabase().catch(console.dir);
 
-//Multer setup
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-// Initialize upload variable with multer settings
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 1000000 },
-  fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const extname = fileTypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimeType = fileTypes.test(file.mimetype);
-
-    if (extname && mimeType) {
-      return cb(null, true);
-    } else {
-      cb("Error: Images Only!");
-    }
-  },
-});
-
 // Firestorage setup
 
 const serviceAccount = JSON.parse(process.env.VUE_APP_serviceAccountKey);
@@ -253,38 +220,93 @@ app.get("/articles", async (req, res) => {
 });
 
 // Add caroussel page
-const articleSchema = new mongoose.Schema({
-  _id: String,
-  type: String,
-  description: String,
-  article: String,
-  img: String,
-});
-const Article = mongoose.model("Article", articleSchema);
 
 app.post("/addCaroussel", async (req, res) => {
-  try {
-    await mongoose.connect(`${uri}`, {
-      useUnifiedTopology: true,
+  res.set("Access-Control-Allow-Origin", "*");
+
+  const bb = busboy({ headers: req.headers });
+
+  const fields = {};
+  let fileData = {};
+  let photoFile = null;
+
+  const uuid = UUID();
+
+  // Handle file upload
+  bb.on("file", (name, file, info) => {
+    const { mimeType } = info;
+    console.log(`File [${name}]: mimeType: %j`, mimeType);
+
+    const tempFilePath = path.join(os.tmpdir(), name);
+    const writeStream = fs.createWriteStream(tempFilePath);
+
+    file.pipe(writeStream);
+
+    fileData = { tempFilePath, mimeType };
+
+    writeStream.on("close", () => {
+      console.log(`File [${name}] written to ${tempFilePath}`);
     });
-    const { _id, type, description, article, photo } = req.body;
-    const newArticle = new Article({
-      _id,
-      type,
-      description,
-      article: article || "",
-      photo: photo || "",
-    });
-    const collection = client.db("Caroussel").collection("articles");
-    collection.insertOne(newArticle);
-    res.status(200).send("Article added successfully");
-  } catch (error) {
-    console.error("Error adding article:", error);
-    res.status(500).send("Server error");
-  }
+  });
+
+  // Handle form fields
+  bb.on("field", (fieldname, val) => {
+    fields[fieldname] = val;
+  });
+
+  bb.on("finish", async () => {
+    try {
+      const { description, _id } = fields;
+
+      let photoURL = "";
+      if (fileData.tempFilePath) {
+        const destinationFileName = `${_id}.png`; // Use _id as the filename
+
+        await bucket.upload(fileData.tempFilePath, {
+          destination: `caroussel/${destinationFileName}`,
+          uploadType: "media",
+          metadata: {
+            contentType: fileData.mimeType,
+            metadata: {
+              firebaseStorageDownloadTokens: uuid,
+            },
+          },
+        });
+
+        photoURL = `https://firebasestorage.googleapis.com/v0/b/${
+          bucket.name
+        }/o/${encodeURIComponent(
+          `caroussel/${destinationFileName}`
+        )}?alt=media&token=${uuid}`;
+      }
+
+      const newArticle = {
+        _id: _id,
+        type: "article",
+        article: "",
+        description: description,
+        photo: photoURL,
+      };
+
+      const collection = client.db("Caroussel").collection("articles");
+      await collection.insertOne(newArticle);
+
+      res.status(201).send("Caroussel item added successfully");
+    } catch (err) {
+      console.error("Error adding caroussel item:", err);
+      res.status(500).send("Error adding caroussel item");
+    } finally {
+      // Clean up the temporary file
+      if (fileData.tempFilePath && fs.existsSync(fileData.tempFilePath)) {
+        fs.unlinkSync(fileData.tempFilePath);
+      }
+    }
+  });
+
+  req.pipe(bb);
 });
 
-app.post("/updateCaroussel", upload.none(), async (req, res) => {
+app.post("/updateCaroussel", async (req, res) => {
   try {
     const articles = req.body;
     if (!Array.isArray(articles)) {
@@ -303,11 +325,19 @@ app.post("/updateCaroussel", upload.none(), async (req, res) => {
 });
 
 // Delete article
-app.post("/deleteCaroussel", upload.none(), async (req, res) => {
+app.post("/deleteCaroussel", async (req, res) => {
   try {
     const articleId = req.body._id;
+    if (!articleId) {
+      return res.status(400).send("Article name is required");
+    }
     const collection = client.db("Caroussel").collection("articles");
-    collection.deleteOne({ _id: articleId });
+    const filePath = `caroussel/${articleId}.png`;
+
+    await bucket.file(filePath).delete();
+    console.log(`File ${filePath} deleted from Firebase Storage`);
+
+    await collection.deleteOne({ _id: articleId });
     res.status(200).send("Article deleted successfully");
   } catch (err) {
     console.error("Error deleting article:", err);
@@ -315,7 +345,7 @@ app.post("/deleteCaroussel", upload.none(), async (req, res) => {
 });
 
 // Delete photo caroussel
-app.post("/deletePhotoCaroussel", upload.none(), async (req, res) => {
+app.post("/deletePhotoCaroussel", async (req, res) => {
   try {
     const photoID = req.body._id;
     const collection = client.db("Caroussel").collection("articles");

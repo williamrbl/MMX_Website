@@ -33,8 +33,14 @@
         <div class="col" style="margin-bottom: 5px">
           {{ article.description }}
           <q-popup-edit v-model="article.description" auto-save v-slot="scope">
-        <q-input v-model="scope.value" dense autofocus counter @keyup.enter="handleEnter(scope)" />
-      </q-popup-edit>
+            <q-input
+              v-model="scope.value"
+              dense
+              autofocus
+              counter
+              @keyup.enter="handleEnter(scope)"
+            />
+          </q-popup-edit>
         </div>
         <div class="col" style="margin-bottom: 5px">
           <q-btn
@@ -55,6 +61,7 @@
     </div>
   </div>
 
+  <!-- Add Article Dialog -->
   <q-dialog v-model="addingArticle">
     <q-card style="width: 50%">
       <div class="q-pa-md">
@@ -64,9 +71,10 @@
           <div class="centered q-py-md">
             <q-file
               outlined
-              v-model="newArticleFile"
+              ref="fileInput"
               label="Photo"
               style="width: 50%"
+              @input="handleFileUpload"
             >
               <template v-slot:prepend>
                 <q-icon name="attach_file" />
@@ -82,6 +90,7 @@
     </q-card>
   </q-dialog>
 
+  <!-- Modify Photo Dialog -->
   <q-dialog v-model="isPhotoModif">
     <q-card style="width: 60%; height: 50%">
       <div style="display: flex; justify-content: end">
@@ -90,7 +99,7 @@
           dense
           icon="eva-close"
           @click="
-            {
+            () => {
               isPhotoModif = false;
               modifPhoto = '';
             }
@@ -103,7 +112,7 @@
           style="width: 60%; height: 60%"
           v-if="modifPhoto"
         />
-        <q-file outlined v-model="file" v-else>
+        <q-file outlined ref="photoInput" v-else @input="handleFileSelection">
           <template v-slot:prepend>
             <q-icon name="attach_file" />
           </template>
@@ -114,7 +123,7 @@
           flat
           dense
           icon="eva-trash-outline"
-          @click="deletePhotoCaroussel(currentArticle)"
+          @click="deletePhotoCaroussel"
           v-if="modifPhoto"
         />
         <q-btn
@@ -148,7 +157,7 @@ export default {
     };
   },
   methods: {
-    handleRefresh(){
+    handleRefresh() {
       this.getArticles();
     },
 
@@ -174,13 +183,20 @@ export default {
     async addArticle() {
       if (this.articles.length >= 4) {
         utils.alert("Vous avez atteint le nombre maximal de pages");
-      } else if (this.inputName == "" || this.inputDescription == "") {
+      } else if (
+        this.inputName === "" ||
+        this.inputDescription === "" ||
+        this.file === ""
+      ) {
         utils.alert("Veuillez remplir toutes les informations");
       } else {
         const formData = new FormData();
         formData.append("_id", this.inputName);
         formData.append("type", "article");
         formData.append("description", this.inputDescription);
+        if (this.file) {
+          formData.append("photo", this.file);
+        }
 
         try {
           const response = await fetch(`${process.env.API}/addCaroussel`, {
@@ -193,6 +209,7 @@ export default {
           }
           this.inputName = "";
           this.inputDescription = "";
+          this.file = null;
           await this.getArticles();
           utils.validate("La page a bien été ajoutée");
           this.addingArticle = false;
@@ -203,8 +220,7 @@ export default {
       }
     },
 
-    async updateArticle(){
-      console.log(this.articles)
+    async updateArticle() {
       try {
         const response = await fetch(`${process.env.API}/updateCaroussel`, {
           method: "POST",
@@ -218,21 +234,21 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getArticles();
-        utils.validate("L'article à été mis à jour !");
+        utils.validate("L'article a été mis à jour !");
       } catch (error) {
         console.error("Error updating article:", error);
         utils.alert("Erreur lors de la MAJ de l'article");
       }
     },
 
-    async deleteArticle() {
+    async deleteArticle(article) {
       try {
         const response = await fetch(`${process.env.API}/deleteCaroussel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.articles),
+          body: JSON.stringify(article),
         });
 
         if (!response.ok) {
@@ -280,44 +296,27 @@ export default {
       }
     },
 
-    async addPhotoCarrousel() {
-      if (!this.file || !this.currentArticle) {
-        utils.alert(
-          "Please select a file and make sure you have an article selected."
-        );
-        return;
-      }
+    async addPhotoCarrousel() {},
 
-      const formData = new FormData();
-      formData.append("photo", this.file);
-      formData.append("_id", this.currentArticle._id);
-
-      try {
-        const response = await fetch(`${process.env.API}/addPhotoCaroussel`, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        utils.validate("Photo added successfully");
-        this.isPhotoModif = false;
-        this.file = null;
-        this.modifPhoto = "";
-        await this.getArticles();
-      } catch (error) {
-        console.error("Error adding photo to carousel:", error);
-        utils.alert("Error adding photo to carousel");
+    handleFileSelection(event) {
+      const fileInput = event.target.files[0];
+      if (fileInput) {
+        this.file = fileInput;
       }
     },
 
-    async handleEnter(scope){
+    handleFileUpload(event) {
+      const fileInput = event.target.files[0];
+      if (fileInput) {
+        this.file = fileInput;
+      }
+    },
+
+    async handleEnter(scope) {
       scope.set();
       await nextTick();
-      console.log(this.articles)
       this.updateArticle();
-    }
+    },
   },
   mounted() {
     this.getArticles();

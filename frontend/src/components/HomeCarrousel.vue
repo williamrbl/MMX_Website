@@ -10,15 +10,12 @@
       style="background-color: purple"
       @click="handleCarouselClick"
     >
-
-        <q-carousel-slide
+      <q-carousel-slide
         v-for="(slideName, index) in slides"
         :key="index"
         :name="slideName"
         class="column flex-center"
       >
-
-
         <q-img
           :src="articles[index].photo"
           class="carousel-img"
@@ -28,16 +25,8 @@
           <div class="description-container">
             <div class="annonce-font">{{ articles[index].description }}</div>
           </div>
-          <div
-            v-if="isHovered"
-            class="hover-overlay"
-            @click="changePage('arena2024')"
-          >
-            Voir plus
-          </div>
         </q-img>
       </q-carousel-slide>
-
     </q-carousel>
     <div class="row justify-center q-mt-md">
       <q-btn-toggle
@@ -49,7 +38,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import trio from "src/assets/trioarena.jpg";
@@ -98,10 +86,6 @@ export default {
 
     handleButtonToggleClick() {
       this.restartAutoAdvance();
-    },
-
-    changePage(page) {
-      this.$router.push(`/${page}`);
     },
 
     async getArticles() {
