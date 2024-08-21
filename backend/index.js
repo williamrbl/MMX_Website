@@ -6,7 +6,7 @@ const cors = require("cors")
 const multer = require("multer")
 const mongoose = require("mongoose")
 const path = require("path")
-const crypto = require("crypto")
+
 const fs = require("fs")
 const {
 	MongoClient,
@@ -14,7 +14,9 @@ const {
 	GridFSBucket,
 	ObjectId,
 } = require("mongodb")
-const {GridFsStorage} = require("multer-gridfs-storage")
+const { v4: UUID } = require('uuid');
+const busboy = require("busboy")
+const os = require("os")
 
 // Express setup
 const app = express()
@@ -72,6 +74,31 @@ const storage = multer.diskStorage({
 	}
   });
 
+// Firestorage setup
+
+const serviceAccount = JSON.parse(process.env.VUE_APP_serviceAccountKey)
+const admin = require("firebase-admin")
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	storageBucket: process.env.VUE_APP_STORAGE_BUCKET,
+})
+
+const firebase_db = admin.firestore()
+let bucket = admin.storage().bucket()
+
+
+
+
+
+
+
+
+
+
+
+
+//COLLECTION SETUP-------------------------------------------------------------------------------------------------------
+
 // Get list of collections
 app.get("/listCollections", async (req, res) => {
 	try {
@@ -95,48 +122,128 @@ app.get("/photos/:name", async (req, res) => {
 	}
 })
 
-// Create a new collection
-app.post("/createCollection", upload.single("cover"), async (req, res) => {
-	try {
-		const database = client.db(process.env.DATABASE)
-		const {name, date} = req.body
-		const cover = req.file
+// Create collection
+app.post("/createCollection", (req, res) => {
+    // Set CORS headers to allow requests from any origin
+    res.set("Access-Control-Allow-Origin", "*");
 
-		if (!cover) {
-			return res.status(400).json({message: "Cover image is required"})
-		}
+    const uuid = UUID();
+    const bb = busboy({ headers: req.headers });
 
-		// Construct image URL
-		const imgURL = `${req.protocol}://${req.get("host")}/uploads/${
-			cover.filename
-		}`
+    const fields = {};
+    let fileData = {};
+    let collectionName = ''; // To store the collection name
 
-		const newCollection = {
-			_id: "Titre",
-			date: new Date(date),
-			img: imgURL,
-			nom: name,
-		}
+    // Handle file upload
+    bb.on("file", (name, file, info) => {
+        const { mimeType } = info;  // We no longer need the original filename
+        console.log(`File [${name}]: mimeType: %j`, mimeType);
+        
+        // Use collection name for filename
+        if (!collectionName) {
+            console.error('Collection name not provided');
+            return res.status(400).send('Collection name is required');
+        }
 
-		await database.collection(name.toLowerCase()).insertOne(newCollection)
-		res.status(201).send(`Collection ${name} created successfully with data`)
-	} catch (err) {
-		res.status(500).send(err.message)
-	}
-})
+        const filepath = path.join(os.tmpdir(), `${collectionName}.png`);  // Use collection name
+        const writeStream = fs.createWriteStream(filepath);
+
+        file.pipe(writeStream);
+
+        fileData = { filepath, mimeType, filename: `${collectionName}.png` };  // Use the collection name
+
+        writeStream.on("close", () => {
+            console.log(`File [${collectionName}.png] written to ${filepath}`);
+        });
+    });
+
+    bb.on("field", (fieldname, val) => {
+        fields[fieldname] = val;
+        if (fieldname === 'name') {
+            collectionName = val;  // Capture the collection name from the form field
+        }
+    });
+
+    bb.on("close", async () => {
+        try {
+            if (!collectionName) {
+                console.error('Collection name is not provided');
+                return res.status(400).send('Collection name is required');
+            }
+
+            const [uploadedFile] = await bucket.upload(fileData.filepath, {
+                destination: `collections/${collectionName}.png`,  // Use collection name
+                uploadType: "media",
+                metadata: {
+                    contentType: fileData.mimeType,
+                    metadata: {
+                        firebaseStorageDownloadTokens: uuid,
+                    },
+                },
+            });
+            await createCollection(uploadedFile);
+
+            res.status(201).send(`Collection ${fields.name} created successfully with data`);
+        } catch (err) {
+            console.error("Error during file upload or database operation:", err);
+            res.status(500).send(err.message);
+        } finally {
+            if (fs.existsSync(fileData.filepath)) {
+                fs.unlinkSync(fileData.filepath);
+            }
+        }
+    });
+
+    req.pipe(bb);
+
+    async function createCollection(uploadedFile) {
+        try {
+            const database = client.db(process.env.DATABASE);
+            const { name, date } = fields;
+            const imgURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(`collections/${collectionName}.png`)}?alt=media&token=${uuid}`;
+
+            const newCollection = {
+                _id: "Titre",
+                date: new Date(date),
+                img: imgURL,
+                nom: name,
+            };
+
+            await database.collection(name.toLowerCase()).insertOne(newCollection);
+        } catch (err) {
+            throw new Error("Error inserting collection into database: " + err.message);
+        }
+    }
+});
+
 
 // Delete a collection
 app.post("/deleteCollection", async (req, res) => {
-	try {
-		console.log(req.body.name)
-		const database = client.db(process.env.DATABASE)
-		await database.collection(req.body.name).drop()
-		res.status(201).send(`Collection ${req.body.name} removed successfully`)
-	} catch (err) {
-		res.status(500).send(err.message)
-	}
-})
+    try {
+        const collectionName = req.body.name;
+        
+        if (!collectionName) {
+            return res.status(400).send('Collection name is required');
+        }
 
+        const filePath = `collections/${collectionName}.png`;
+
+        await bucket.file(filePath).delete();
+        console.log(`File ${filePath} deleted from Firebase Storage`);
+
+        const database = client.db(process.env.DATABASE);
+        await database.collection(collectionName).drop();
+        console.log(`Collection ${collectionName} removed from database`);
+
+        res.status(200).send(`Collection ${collectionName} and its image removed successfully`);
+    } catch (err) {
+        console.error("Error deleting collection or file:", err);
+        res.status(500).send(err.message);
+    }
+});
+
+
+//CAROUSSEL SETUP -----------------------------------------------------------------------------------------------------------
 // Get articles
 app.get("/articles", async (req, res) => {
 	try {
@@ -222,26 +329,10 @@ app.post("/deletePhotoCaroussel", upload.none(), async (req, res) => {
 	}
 })
 
-// add photo to caroussel
-app.post("/addPhotoCaroussel", upload.single("photo"), async (req, res) => {})
 
-// Listen
+
+// Listen-----------------------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
-
-// Debugging and error handling for GridFS
-GridFSBucket.prototype.emitFile = function (f) {
-	if (!f) {
-		console.error("File object is undefined")
-		return
-	}
-	console.log("File object:", f)
-	this.emit("file", {
-		id: f._id,
-		filename: f.filename,
-		metadata: f.metadata,
-		bucketName: this.bucketName,
-	})
-}
