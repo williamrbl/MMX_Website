@@ -12,6 +12,7 @@
 
     <!-- Section for the list of locations -->
     <div class="locations q-pa-md">
+      <div class="texte">Locations à venir</div>
       <div
         v-for="location in filteredLocations"
         :key="location._id"
@@ -211,5 +212,12 @@ export default {
 
 .locations-text {
   color: white;
+}
+
+.texte {
+  color: white;
+  font-size: 15px;
+  font-weight: 300;
+  font-family: "calibri";
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="q-pa-sm"
+    class="q-pa-sm row"
     style="display: flex; flex-direction: column; height: 100vh"
   >
     <div
@@ -55,16 +55,68 @@
       <q-btn outline label="Valider" @click="checkConnection" color="purple" />
     </div>
 
-    <div v-else>
-      <q-separator />
-      <EditLocations ref="locationsComponent" />
-      <q-separator />
-      <EditPhotos ref="photosComponent" />
-      <div style="height: 30px" />
-      <q-separator />
-      <EditCaroussel ref="carousselComponent" />
-      <div style="height: 30px" />
-      <q-separator />
+    <div v-else class="row">
+      <div class="col-2">
+        <q-list
+          class="q-pa-md"
+          padding
+          style="height: 100%; border-right: 2px solid purple"
+        >
+          <q-item
+            class="item"
+            clickable
+            v-ripple
+            :class="{ 'selected-item': selectedPage === 'locations' }"
+            @click="selectedPage = 'locations'"
+          >
+            <q-item-section>
+              <q-item-label>Locations</q-item-label>
+              <q-item-label caption
+                >Gérez les locations de SoundBoks</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            class="item"
+            clickable
+            v-ripple
+            :class="{ 'selected-item': selectedPage === 'photos' }"
+            @click="selectedPage = 'photos'"
+          >
+            <q-item-section>
+              <q-item-label>Photos</q-item-label>
+              <q-item-label caption>Mettez à jour l'album photo</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item
+            class="item"
+            clickable
+            v-ripple
+            :class="{ 'selected-item': selectedPage === 'caroussel' }"
+            @click="selectedPage = 'caroussel'"
+          >
+            <q-item-section>
+              <q-item-label>Caroussel</q-item-label>
+              <q-item-label caption
+                >Mettez à jour le caroussel de la page d'accueil</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+      <div class="col-10 q-pa-md">
+        <EditLocations
+          ref="locationsComponent"
+          v-if="selectedPage === 'locations'"
+        />
+        <EditPhotos ref="photosComponent" v-if="selectedPage === 'photos'" />
+        <EditCaroussel
+          ref="carousselComponent"
+          v-if="selectedPage === 'caroussel'"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +135,7 @@ export default {
       isConnected: false,
       inputPassword: "",
       isPwd: true,
+      selectedPage: "",
     };
   },
   methods: {
@@ -142,5 +195,17 @@ export default {
 
 .inputPassword {
   width: 30vw;
+}
+
+.item {
+  color: white;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.selected-item {
+  background-color: rgba(128, 0, 128, 0.3);
+  color: white;
+  border-radius: 5px;
 }
 </style>
