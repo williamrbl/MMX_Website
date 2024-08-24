@@ -37,6 +37,9 @@
           <div class="date-format">03 - March - 2022</div>
         </div>
       </div>
+      <div class="date-time-format" style="color: black">
+        {{ locations }}
+      </div>
       <div class="calendar-footer">
         <div class="day-text-format">Légende</div>
         <div class="legend-item">
@@ -54,6 +57,25 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+
+const locations = ref([]); // Define a ref to store location data
+
+const getLocations = async () => {
+  try {
+    const response = await fetch(`${process.env.API}/locations`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    locations.value = await response.json();
+  } catch (error) {
+    console.error("Error getting locations:", error);
+    // Handle error appropriately, for example:
+    alert("Erreur lors de la récupération des locations");
+  }
+};
 
 // Functions for leap year and February days
 const isLeapYear = (year) => {
@@ -132,7 +154,7 @@ const generateCalendar = (month, year) => {
 
 onMounted(() => {
   calendar.value = document.querySelector(".calendar");
-
+  getLocations();
   // Generate initial calendar
   generateCalendar(currentMonth.value, currentYear.value);
 
@@ -314,6 +336,7 @@ body {
   gap: 2px;
   color: #0a0921;
   min-height: 300px; /* Keeps the height consistent */
+  font-family: "Calibri";
 }
 
 .calendar-days div {

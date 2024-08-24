@@ -28,7 +28,7 @@
       :key="article._id"
       style="display: flex; flex-direction: column; margin-bottom: 10px"
     >
-      <div class="row" style="display: flex; align-items: center">
+      <div class="row q-px-md" style="display: flex; align-items: center">
         <div class="col" style="margin-bottom: 5px">{{ article._id }}</div>
         <div class="col" style="margin-bottom: 5px">
           {{ article.description }}

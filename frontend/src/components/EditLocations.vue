@@ -11,15 +11,23 @@
     </div>
 
     <!-- Section for the list of locations -->
-    <div
-      v-for="location in filteredLocations"
-      :key="location._id"
-      class="row items-center q-mb-md"
-    >
-      <div class="col">{{ location.association }}</div>
-      <div class="col">{{ location.start }}</div>
-      <div class="col">{{ location.end }}</div>
-      <q-btn flat dense icon="eva-trash-outline" class="col" />
+    <div class="locations q-pa-md">
+      <div
+        v-for="location in filteredLocations"
+        :key="location._id"
+        class="row items-center q-mb-md"
+      >
+        <div class="col locations-text">{{ location.association }}</div>
+        <div class="col locations-text">{{ location.start }}</div>
+        <div class="col locations-text">{{ location.end }}</div>
+        <q-btn
+          flat
+          dense
+          icon="eva-trash-outline"
+          class="col"
+          style="color: white"
+        />
+      </div>
     </div>
   </div>
 
@@ -193,6 +201,15 @@ export default {
   font-family: "calibri";
   font-size: 30px;
   font-weight: 200;
+  color: white;
+}
+
+.locations {
+  border: 1px solid purple;
+  border-radius: 5px;
+}
+
+.locations-text {
   color: white;
 }
 </style>

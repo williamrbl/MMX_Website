@@ -31,7 +31,29 @@ export default {
   name: "LocationPage",
   components: { CalendarComponent },
   data() {
-    return {};
+    return {
+      locations: {},
+    };
+  },
+  methods: {
+    async getLocations() {
+      try {
+        const response = await fetch(`${process.env.API}/locations`, {
+          method: "GET",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        this.locations = await response.json();
+      } catch (error) {
+        console.error("Error getting renting:", error);
+        utils.alert("Erreur lors de la récupétation des locations");
+      }
+    },
+  },
+  mounted() {
+    this.getLocations();
   },
 };
 </script>

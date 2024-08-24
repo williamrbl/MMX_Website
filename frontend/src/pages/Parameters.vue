@@ -32,46 +32,40 @@
       </div>
     </div>
 
-    <q-scroll-area style="flex: 1; overflow: auto">
-      <div v-if="!isConnected" class="q-pa-lg">
-        <div class="login-label">Connexion</div>
+    <div v-if="!isConnected" class="q-pa-lg">
+      <div class="login-label">Connexion</div>
 
-        <q-input
-          v-model="inputPassword"
-          class="inputPassword q-py-md"
-          outlined
-          @keyup.enter="checkConnection"
-          :type="isPwd ? 'password' : 'text'"
-          label="Password"
-        >
-          <template v-slot:append>
-            <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="togglePasswordVisibility"
-            />
-          </template>
-        </q-input>
+      <q-input
+        v-model="inputPassword"
+        class="inputPassword q-py-md"
+        outlined
+        @keyup.enter="checkConnection"
+        :type="isPwd ? 'password' : 'text'"
+        label="Password"
+      >
+        <template v-slot:append>
+          <q-icon
+            :name="isPwd ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="togglePasswordVisibility"
+          />
+        </template>
+      </q-input>
 
-        <q-btn
-          outline
-          label="Valider"
-          @click="checkConnection"
-          color="purple"
-        />
-      </div>
+      <q-btn outline label="Valider" @click="checkConnection" color="purple" />
+    </div>
 
-      <div v-else>
-        <EditLocations ref="locationsComponent" />
-        <q-separator />
-        <EditPhotos ref="photosComponent" />
-        <div style="height: 30px" />
-        <q-separator />
-        <EditCaroussel ref="carousselComponent" />
-        <div style="height: 30px" />
-        <q-separator />
-      </div>
-    </q-scroll-area>
+    <div v-else>
+      <q-separator />
+      <EditLocations ref="locationsComponent" />
+      <q-separator />
+      <EditPhotos ref="photosComponent" />
+      <div style="height: 30px" />
+      <q-separator />
+      <EditCaroussel ref="carousselComponent" />
+      <div style="height: 30px" />
+      <q-separator />
+    </div>
   </div>
 </template>
 
@@ -136,6 +130,7 @@ export default {
   font-family: "calibri";
   font-size: 40px;
   color: white;
+  margin-bottom: 10px;
 }
 
 .login-label {
