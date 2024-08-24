@@ -16,7 +16,7 @@ const routes = [
       },
       {
         path: "/parameters",
-        component: () => import("src/pages/Connexion.vue"),
+        component: () => import("src/pages/Parameters.vue"),
       },
     ],
   },

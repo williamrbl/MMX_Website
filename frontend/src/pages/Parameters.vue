@@ -62,6 +62,7 @@
       </div>
 
       <div v-else>
+        <EditLocations ref="locationsComponent" />
         <q-separator />
         <EditPhotos ref="photosComponent" />
         <div style="height: 30px" />
@@ -77,11 +78,12 @@
 <script>
 import EditPhotos from "src/components/EditPhotos.vue";
 import EditCaroussel from "src/components/EditCaroussel.vue";
+import EditLocations from "src/components/EditLocations.vue";
 import utils from "src/helpers/utils.ts";
 
 export default {
   name: "PageConnexion",
-  components: { EditPhotos, EditCaroussel },
+  components: { EditPhotos, EditCaroussel, EditLocations },
   data() {
     return {
       isConnected: false,
@@ -109,7 +111,12 @@ export default {
     },
 
     refreshPage() {
-      if (this.$refs.photosComponent && this.$refs.carousselComponent) {
+      if (
+        this.$refs.photosComponent &&
+        this.$refs.carousselComponent &&
+        this.$refs.locationsComponent
+      ) {
+        this.$refs.locationsComponent.handleRefresh();
         this.$refs.photosComponent.handleRefresh();
         this.$refs.carousselComponent.handleRefresh();
       } else {

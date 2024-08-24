@@ -18,6 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB setup
 const uri = process.env.URI;
@@ -52,6 +53,10 @@ admin.initializeApp({
 
 const firebase_db = admin.firestore();
 let bucket = admin.storage().bucket();
+
+//Multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 //COLLECTION SETUP-------------------------------------------------------------------------------------------------------
 
@@ -353,6 +358,55 @@ app.post("/deletePhotoCaroussel", async (req, res) => {
     res.status(200).send("Article deleted successfully");
   } catch (err) {
     console.error("Error deleting article:", err);
+  }
+});
+
+//Locations---------------------------------------------------------------------------------------------------
+app.get("/locations", async (req, res) => {
+  try {
+    const collection = client.db("Locations").collection("locations");
+    const objects = await collection.find({}).toArray();
+    res.json(objects);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching objects");
+  }
+});
+
+app.post("/addLocation", upload.none(), async (req, res) => {
+  try {
+    console.log("Arrived at endpoint");
+
+    const { _id, association, start, end } = req.body;
+
+    if (!_id || !association || !start || !end) {
+      return res.status(400).send("Missing required fields");
+    }
+
+    const collection = client.db("Locations").collection("locations");
+
+    // Create the update document
+    const updateDoc = {
+      $set: {
+        association: association,
+        start: start,
+        end: end,
+      },
+    };
+
+    // Update the document, create if not exists
+    const result = await collection.updateOne({ _id: _id }, updateDoc, {
+      upsert: true,
+    });
+
+    if (result.matchedCount > 0) {
+      res.status(200).send("Location updated successfully");
+    } else {
+      res.status(201).send("Location added successfully");
+    }
+  } catch (err) {
+    console.error("Error adding/updating location: ", err);
+    res.status(500).send("Internal server error");
   }
 });
 
