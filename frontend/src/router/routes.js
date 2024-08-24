@@ -15,10 +15,6 @@ const routes = [
         component: () => import("src/pages/articles/ArenaDeux.vue"),
       },
       {
-        path: "/displayparameters",
-        component: () => import("src/pages/DisplayParameters.vue"),
-      },
-      {
         path: "/parameters",
         component: () => import("src/pages/Connexion.vue"),
       },

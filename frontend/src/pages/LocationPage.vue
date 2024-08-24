@@ -1,49 +1,64 @@
 <template>
-  <q-page class="flex flex-center">
-    <q-img src="src/assets/Fond.jpg">
-      <div
-        class="row q-px-xl"
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-        "
-      >
-        <q-card style="background: #800b95">
-          <h6>Tarifs</h6>
+  <q-img src="src/assets/Fond.jpg">
+    <div
+      style="display: flex; flex-direction: column; width: 100%; height: 100%"
+    >
+      <div class="centered row">
+        <CalendarComponent />
+        <q-card
+          class="q-pa-md"
+          style="width: 30%; background-color: purple; margin-left: 5%"
+        >
+          <div class="title">Prix</div>
+          <div class="item">SoundBoks</div>
+          <div class="type">1 weekend : 40 euros</div>
+          <div class="type">1 journée : 40 euros</div>
+          <div class="title">Conditions</div>
+          <div class="texte">
+            Le matériel est loué pour une période définie. Tout retard sera
+            facturé à hauteur de 10 euros par jour de retard sur le retour
+          </div>
         </q-card>
-        <q-card class="q-pa-md col" style="background: #800b95">
-          <q-input
-            color="white"
-            label="Locataire"
-            label-color="white"
-            style="color: white; color-scheme: white"
-          />
-          <br /><br />
-          <q-input
-            color="white"
-            label-color="white"
-            style="color: white; color-scheme: white"
-            label="Date Début"
-          />
-          <br /><br />
-          <q-input
-            label="Date Fin"
-            color="white"
-            label-color="white"
-            style="color: white; color-scheme: white"
-          />
-          <q-btn label="Envoyer la demande" />
-        </q-card>
-        <q-date v-model="days" range multiple />
       </div>
-    </q-img>
-  </q-page>
+      <div class="centered"></div>
+    </div>
+  </q-img>
 </template>
 
-<script setup>
-defineOptions({
+<script>
+import CalendarComponent from "src/components/CalendarComponent.vue";
+export default {
   name: "LocationPage",
-});
+  components: { CalendarComponent },
+  data() {
+    return {};
+  },
+};
 </script>
+
+<style scoped>
+.title {
+  color: white;
+  font-size: 40px;
+  font-family: calibri;
+}
+.item {
+  color: white;
+  font-size: 30px;
+  font-family: calibri;
+  margin-left: 5px;
+}
+.type {
+  color: white;
+  font-size: 20px;
+  font-family: calibri;
+  margin-left: 10px;
+}
+.texte {
+  color: white;
+  font-size: 10px;
+  font-family: calibri;
+  margin-left: 10px;
+  font-weight: 200;
+}
+</style>

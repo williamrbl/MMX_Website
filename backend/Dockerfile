@@ -9,24 +9,20 @@ COPY package*.json ./
 
 # Install project dependencies
 RUN npm install
+RUN npm install dotenv
+RUN npm install cors
 
 # Copy the rest of the application code to the working directory
 COPY . .
 
 # Build the Quasar project for production
-RUN npx quasar build
+RUN node index.js
 
 # Install serve globally
 RUN npm install -g serve
 
-# Change the working directory to the build output directory
-WORKDIR /app/dist/spa
-
-# Ensure static assets are included
-COPY src/assets /app/dist/spa/assets
-
 # Expose the port the app runs on
-EXPOSE 9000
+EXPOSE 3000
 
 # Start the app
 CMD ["serve", "-s", ".", "-l", "3000"]

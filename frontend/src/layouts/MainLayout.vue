@@ -27,11 +27,7 @@
         <q-tabs v-model="tab" indicator-color="transparent" no-caps>
           <q-btn flat icon="eva-home-outline" to="/" />
           <q-route-tab name="photos" label="Photos" to="/photos" />
-          <q-route-tab
-            name="locations"
-            label="Location SOUNDBOKS"
-            to="/locations"
-          />
+          <q-route-tab name="locations" label="Locations" to="/locations" />
           <q-route-tab name="devis" label="Devis" to="/devis" />
         </q-tabs>
       </q-toolbar>
