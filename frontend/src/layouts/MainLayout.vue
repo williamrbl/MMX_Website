@@ -3,7 +3,7 @@
     <!-- LARGE SCREEN -->
     <q-header
       elevated
-      class="shadow-2 text-white"
+      class="text-white"
       style="background-color: primary; height: 10vh"
     >
       <q-toolbar
@@ -24,7 +24,14 @@
           </q-toolbar-title>
         </div>
 
-        <q-tabs v-model="tab" indicator-color="transparent" no-caps>
+        <q-tabs
+          v-model="tab"
+          no-caps
+          class="q-mr-md"
+          inline-label
+          align="right"
+          style="min-width: 200px"
+        >
           <q-btn flat icon="eva-home-outline" to="/" />
           <q-route-tab name="photos" label="Photos" to="/photos" />
           <q-route-tab name="locations" label="Locations" to="/locations" />
@@ -33,11 +40,11 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer
-      elevated
-      class="q-px-lg"
-      style="background-color: primary; height: 5vh"
-    >
+    <q-page-container class="bg-purple-3" style="flex-grow: 1">
+      <router-view />
+    </q-page-container>
+
+    <q-footer class="q-px-lg" style="background-color: primary; height: 5vh">
       <div
         style="
           display: flex;
@@ -73,10 +80,6 @@
         </div>
       </div>
     </q-footer>
-
-    <q-page-container class="bg-purple-3" style="height: 100%">
-      <router-view />
-    </q-page-container>
   </q-layout>
 </template>
 
@@ -96,7 +99,6 @@ export default {
 </script>
 
 <style lang="sass">
-
 .toolbar-title-font
   font-size: 25px
   font-family: "CALIBRI"

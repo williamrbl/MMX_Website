@@ -1,42 +1,32 @@
 <template>
-  <div class="bg-purple q-pa-xl row">
-    <div class="col-6">
-      <div style="color: white; font-size: 20px; font-family: 'calibri'">
-        Contact :
+  <div class="contact-container q-pa-xl row">
+    <div class="contact-details col-6">
+      <div class="contact-title">Contact:</div>
+      <div class="spacer" />
+      <div class="contact-row">
+        <q-icon name="eva-email-outline" color="white" class="contact-icon" />
+        <div class="contact-text">musiquemix@edu.devinci.fr</div>
       </div>
-      <div style="height: 10px" />
-      <div class="row" style="display: flex; align-items: center">
-        <q-icon
-          name="eva-email-outline"
-          color="white"
-          style="margin-right: 10px"
-        />
-        <div style="color: white">musiquemix@edu.devinci.fr</div>
-      </div>
-      <div class="row" style="display: flex; align-items: center">
-        <q-icon name="la la-youtube" color="white" style="margin-right: 10px" />
-        <div
-          clickable
-          style="color: white"
-          class="cursor-pointer"
+      <div class="contact-row">
+        <q-icon name="la la-youtube" color="white" class="contact-icon" />
+        <a
+          class="contact-link cursor-pointer"
           href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
           target="_blank"
         >
-          https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag
-        </div>
+          Chaîne YouTube
+        </a>
       </div>
     </div>
-    <div
-      style="display: flex; align-items: center; justify-content: end"
-      class="col-6"
-    >
-      <q-img style="width: 10%" :src="pole" />
+    <div class="contact-logo col-6">
+      <q-img class="logo-img" :src="pole" />
     </div>
   </div>
 </template>
 
 <script>
 import pole from "../assets/Pole.png";
+
 export default {
   name: "ContactsDiv",
   data() {
@@ -46,3 +36,64 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.contact-container {
+  background-color: #800b95;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 200px;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-title {
+  font-size: 20px;
+  font-family: "Calibri", sans-serif;
+  font-weight: bold;
+}
+
+.spacer {
+  margin-bottom: 10px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.contact-icon {
+  margin-right: 10px;
+}
+
+.contact-text,
+.contact-link {
+  font-size: 16px;
+  font-family: "Calibri", sans-serif;
+}
+
+.contact-link {
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+  color: #d1c4e9; /* Light purple for hover */
+}
+
+.contact-logo {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logo-img {
+  width: 80px; /* Adjust the size as needed */
+}
+</style>

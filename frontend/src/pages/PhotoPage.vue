@@ -1,23 +1,27 @@
 <template>
-  <div class="collection-container">
-    <div v-for="(collection, idx) in data" :key="idx">
-      <q-card
-        class="collection-card"
-        v-if="collection._id === 'Titre'"
-        flat
-        bordered
-      >
-        <q-img :src="collection.img" class="collection-image" />
-        <q-card-section>
-          <h3 class="collection-name">{{ collection.nom }}</h3>
-          <p class="collection-date">{{ utils.formatDate(collection.date) }}</p>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn outline label="Voir les photos" class="view-photos-button" />
-        </q-card-actions>
-      </q-card>
+  <q-img src="src/assets/Fond.jpg">
+    <div class="collection-container">
+      <div v-for="(collection, idx) in data" :key="idx">
+        <q-card
+          class="collection-card"
+          v-if="collection._id === 'Titre'"
+          flat
+          bordered
+        >
+          <q-img :src="collection.img" class="collection-image" />
+          <q-card-section>
+            <h3 class="collection-name">{{ collection.nom }}</h3>
+            <p class="collection-date">
+              {{ utils.formatDate(collection.date) }}
+            </p>
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn outline label="Voir les photos" class="view-photos-button" />
+          </q-card-actions>
+        </q-card>
+      </div>
     </div>
-  </div>
+  </q-img>
 </template>
 
 <script>

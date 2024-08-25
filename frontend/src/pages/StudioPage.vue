@@ -1,6 +1,8 @@
 <template>
   <q-page>
-    <q-card>STUDIO PAGE</q-card>
+    <q-img src="src/assets/Fond.jpg">
+      <q-card>STUDIO PAGE</q-card>
+    </q-img>
   </q-page>
 </template>
 

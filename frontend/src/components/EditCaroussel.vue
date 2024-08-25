@@ -1,8 +1,6 @@
 <template>
-  <div class="row q-pa-lg">
-    <div class="section-title col-4">
-      Gérer l'affichage du caroussel d'accueil
-    </div>
+  <div class="row q-px-lg">
+    <div class="section-title col-4">Caroussel</div>
     <q-btn
       outline
       color="primary"

@@ -7,12 +7,12 @@
   >
     <div class="col locations-text">{{ location.association }}</div>
 
-    <div
-      class="col row locations-text"
-      style="display: flex; align-items: center"
-    >
+    <div class="col locations-text">{{ utils.formatDate(location.start) }}</div>
+    <div class="col locations-text">{{ utils.formatDate(location.end) }}</div>
+
+    <div class="col row items-center locations-text">
       <q-checkbox
-        class="col-2"
+        class="col-3"
         v-model="location.paye"
         @click="updateLocation(location)"
       />
@@ -21,12 +21,9 @@
       </div>
     </div>
 
-    <div
-      class="col row locations-text"
-      style="display: flex; align-items: center"
-    >
+    <div class="col row items-center locations-text">
       <q-checkbox
-        class="col-2"
+        class="col-3"
         v-model="location.caution"
         @click="updateLocation(location)"
       />
@@ -35,22 +32,26 @@
       </div>
     </div>
 
-    <div class="col locations-text">{{ location.start }}</div>
-    <div class="col locations-text">{{ location.end }}</div>
-
-    <q-file
-      class="col"
-      v-if="!location.contrat"
-      outlined
-      v-model="location.contrat"
-      label="Contrat"
-      @input="uploadContrat(location, $event)"
-    >
-      <template v-slot:prepend>
-        <q-icon name="attach_file" />
-      </template>
-    </q-file>
-    <q-btn v-else outline label="Voir Contrat" @click="viewContrat(location)" />
+    <div class="col">
+      <q-file
+        v-if="!location.contrat"
+        outlined
+        v-model="location.contrat"
+        label="Contrat"
+        @input="uploadContrat(location, $event)"
+      >
+        <template v-slot:prepend>
+          <q-icon name="attach_file" />
+        </template>
+      </q-file>
+      <q-btn
+        v-else
+        outline
+        label="Voir Contrat"
+        @click="viewContrat(location)"
+        style="color: purple"
+      />
+    </div>
 
     <q-btn
       flat
@@ -62,15 +63,14 @@
     />
   </div>
 
+  <!-- Dialog de confirmation de suppression -->
   <q-dialog v-model="isDeleting">
     <q-card style="width: 40%; height: 20%">
       <div class="dialog-text">
         Voulez-vous supprimer la location de
         {{ selectedLocation?.association }} ?
       </div>
-      <div
-        style="display: flex; align-items: center; justify-content: flex-end"
-      >
+      <div class="dialog-actions">
         <q-btn
           outline
           label="Non"
@@ -87,9 +87,10 @@
     </q-card>
   </q-dialog>
 
+  <!-- Dialog de visualisation du contrat -->
   <q-dialog v-model="isVisuContrat">
     <q-card class="pdf-viewer-card">
-      <div style="display: flex; justify-content: space-between">
+      <div class="dialog-header">
         <q-btn
           flat
           dense
@@ -115,7 +116,11 @@ import utils from "src/helpers/utils.ts";
 
 export default {
   name: "ComponentAvenir",
-
+  setup() {
+    return {
+      utils,
+    };
+  },
   props: {
     locations: {
       type: Array,
@@ -237,6 +242,15 @@ export default {
 };
 </script>
 
+<style>
+.texte {
+  margin-bottom: 20px;
+  font-size: 25px;
+  font-weight: 200;
+  color: white;
+}
+</style>
+
 <style scoped>
 .pdf-viewer-card {
   width: 80%;
@@ -251,7 +265,8 @@ export default {
   height: 100%;
 }
 
-.close-btn {
+.close-btn,
+.delete-contrat {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -260,12 +275,20 @@ export default {
   color: white;
 }
 
-.delete-contrat {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
 .delete-contrat:hover {
   background-color: orange;
   color: white;
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

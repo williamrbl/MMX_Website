@@ -6,7 +6,7 @@ function alert(arg: string | Error) {
   Notify.create({
     message: message,
     type: "negative",
-    position: "top-right",
+    position: "bottom",
     actions: [
       {
         icon: "close",
@@ -22,7 +22,7 @@ function validate(arg: string | Error) {
   Notify.create({
     message: message,
     type: "positive",
-    position: "top-right",
+    position: "bottom",
     actions: [
       {
         icon: "close",

@@ -1,6 +1,6 @@
 <template>
-  <div class="row q-pa-lg">
-    <div class="section-title col-4">Gérer les collections de photos</div>
+  <div class="row q-px-lg">
+    <div class="section-title col-4">Photos</div>
 
     <q-btn
       outline

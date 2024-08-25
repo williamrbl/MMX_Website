@@ -37,9 +37,7 @@
           <div class="date-format">03 - March - 2022</div>
         </div>
       </div>
-      <div class="date-time-format" style="color: black">
-        {{ locations }}
-      </div>
+
       <div class="calendar-footer">
         <div class="day-text-format">Légende</div>
         <div class="legend-item">

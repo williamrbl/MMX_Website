@@ -1,16 +1,21 @@
 <template>
-  <div class="q-pa-lg">
+  <div class="q-px-lg">
     <div class="row items-center">
-      <div class="section-title q-mr-md">Gérer les locations</div>
+      <div class="section-title q-mr-md">Locations</div>
       <q-btn
         outline
-        style="color: purple"
+        style="color: purple; margin-left: 10%"
         label="Ajouter une location"
         @click="isAjoutLocation = true"
       />
     </div>
 
-    <q-tabs v-model="tab" no-caps class="bg-purple text-white shadow-2">
+    <q-tabs
+      v-model="tab"
+      no-caps
+      class="bg-purple text-white shadow-2"
+      style="margin-top: 3%"
+    >
       <q-tab name="avenir" label="A venir" />
       <q-tab name="afinaliser" label="A finaliser" />
       <q-tab name="alllocations" label="Toutes les locations" />
@@ -95,9 +100,9 @@
 <script>
 import utils from "src/helpers/utils.ts";
 import { v4 as uuidv4 } from "uuid";
-import ComponentAvenir from "./LocationComponents/ComponentAvenir.vue";
-import ComponentAfinaliser from "./LocationComponents/ComponentAfinaliser.vue";
-import ComponentLocations from "./LocationComponents/ComponentLocations.vue";
+import ComponentAvenir from "./LocationComponents/LocationAvenir.vue";
+import ComponentAfinaliser from "./LocationComponents/LocationAfinaliser.vue";
+import ComponentLocations from "./LocationComponents/AllLocations.vue";
 
 export default {
   name: "EditLocations",
@@ -230,22 +235,21 @@ export default {
   },
 };
 </script>
-
 <style>
+.locations-text {
+  color: white;
+}
 .section-title {
   font-family: "calibri";
   font-size: 30px;
   font-weight: 200;
   color: white;
 }
-
+</style>
+<style scoped>
 .locations {
   border: 1px solid purple;
   border-radius: 5px;
-}
-
-.locations-text {
-  color: white;
 }
 
 .texte {
