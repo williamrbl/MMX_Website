@@ -10,23 +10,34 @@
       />
     </div>
 
-    <!-- Section for the list of locations -->
+    <q-tabs v-model="tab" no-caps class="bg-purple text-white shadow-2">
+      <q-tab name="avenir" label="A venir" />
+      <q-tab name="afinaliser" label="A finaliser" />
+      <q-tab name="alllocations" label="Toutes les locations" />
+    </q-tabs>
+
     <div class="locations q-pa-md">
-      <div class="texte">Locations à venir</div>
-      <div
-        v-for="location in filteredLocations"
-        :key="location._id"
-        class="row items-center q-mb-md"
-      >
-        <div class="col locations-text">{{ location.association }}</div>
-        <div class="col locations-text">{{ location.start }}</div>
-        <div class="col locations-text">{{ location.end }}</div>
-        <q-btn
-          flat
-          dense
-          icon="eva-trash-outline"
-          class="col"
-          style="color: white"
+      <div v-if="tab == 'avenir'">
+        <ComponentAvenir
+          :locations="locations"
+          :getLocations="getLocations"
+          :updateLocation="updateLocation"
+        />
+      </div>
+
+      <div v-if="tab == 'afinaliser'">
+        <ComponentAfinaliser
+          :locations="locations"
+          :getLocations="getLocations"
+          :updateLocation="updateLocation"
+        />
+      </div>
+
+      <div v-if="tab == 'alllocations'">
+        <ComponentLocations
+          :locations="locations"
+          :getLocations="getLocations"
+          :updateLocation="updateLocation"
         />
       </div>
     </div>
@@ -84,8 +95,13 @@
 <script>
 import utils from "src/helpers/utils.ts";
 import { v4 as uuidv4 } from "uuid";
+import ComponentAvenir from "./LocationComponents/ComponentAvenir.vue";
+import ComponentAfinaliser from "./LocationComponents/ComponentAfinaliser.vue";
+import ComponentLocations from "./LocationComponents/ComponentLocations.vue";
+
 export default {
   name: "EditLocations",
+  components: { ComponentAvenir, ComponentAfinaliser, ComponentLocations },
   setup() {
     return { utils };
   },
@@ -96,6 +112,9 @@ export default {
       inputAsso: "",
       locationDates: {},
       isDay: false,
+      tab: "avenir",
+      isDeleting: false,
+      selectedLocation: null,
     };
   },
   methods: {
@@ -151,13 +170,15 @@ export default {
       ) {
         utils.alert("Veuillez entrer des dates correctes");
       } else {
-        console.log("Validé : ", this.inputAsso, this.locationDates);
         const uuid = uuidv4();
         const formData = new FormData();
         formData.append("_id", uuid);
         formData.append("association", this.inputAsso);
         formData.append("start", this.locationDates.from);
         formData.append("end", this.locationDates.to);
+        formData.append("paye", false);
+        formData.append("caution", false);
+        formData.append("contrat", null);
         try {
           const response = await fetch(`${process.env.API}/addLocation`, {
             method: "POST",
@@ -169,7 +190,6 @@ export default {
           }
           this.inputName = "";
           this.inputDescription = "";
-          this.file = null;
           this.isDay = false;
           this.getLocations();
           utils.validate("La location a bien été ajoutée");
@@ -182,22 +202,36 @@ export default {
         this.isAjoutLocation = false;
       }
     },
-  },
-  computed: {
-    filteredLocations() {
-      const today = new Date().setHours(0, 0, 0, 0);
-      return Object.entries(this.locations)
-        .filter(([key, location]) => new Date(location.end) >= today)
-        .map(([key, location]) => location);
+
+    async updateLocation() {
+      try {
+        const response = await fetch(`${process.env.API}/updateLocation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.locations),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getLocations();
+        utils.validate("La location a été mise à jour !");
+      } catch (error) {
+        console.error("Error updating renting:", error);
+        utils.alert("Erreur lors de la MAJ de la location");
+      }
     },
   },
+
   mounted() {
     this.getLocations();
   },
 };
 </script>
 
-<style scoped>
+<style>
 .section-title {
   font-family: "calibri";
   font-size: 30px;
@@ -219,5 +253,11 @@ export default {
   font-size: 15px;
   font-weight: 300;
   font-family: "calibri";
+}
+
+.dialog-text {
+  color: black;
+  font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
 }
 </style>

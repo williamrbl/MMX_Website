@@ -375,22 +375,24 @@ app.get("/locations", async (req, res) => {
 
 app.post("/addLocation", upload.none(), async (req, res) => {
   try {
-    console.log("Arrived at endpoint");
-
-    const { _id, association, start, end } = req.body;
+    const { _id, association, start, end, paye, caution, contrat } = req.body;
 
     if (!_id || !association || !start || !end) {
       return res.status(400).send("Missing required fields");
     }
 
     const collection = client.db("Locations").collection("locations");
-
+    const payeBool = paye === "true";
+    const cautionBool = caution === "true";
     // Create the update document
     const updateDoc = {
       $set: {
         association: association,
         start: start,
         end: end,
+        paye: payeBool,
+        caution: cautionBool,
+        contrat: null,
       },
     };
 
@@ -407,6 +409,136 @@ app.post("/addLocation", upload.none(), async (req, res) => {
   } catch (err) {
     console.error("Error adding/updating location: ", err);
     res.status(500).send("Internal server error");
+  }
+});
+
+app.post("/updateLocation", async (req, res) => {
+  try {
+    const locations = req.body;
+    if (!Array.isArray(locations)) {
+      return res
+        .status(400)
+        .send("Invalid input format. 'locations' should be an array.");
+    }
+    const collection = client.db("Locations").collection("locations");
+    await collection.deleteMany({});
+    await collection.insertMany(locations);
+    res.status(200).send("Renting updated successfully");
+  } catch (err) {
+    console.error("Error updating renting:", err);
+    res.status(500).send("Error updating renting");
+  }
+});
+
+app.post("/deleteLocation", async (req, res) => {
+  try {
+    const locationId = req.body._id;
+    if (!locationId) {
+      return res.status(400).send("Location name is required");
+    }
+    const collection = client.db("Locations").collection("locations");
+
+    await collection.deleteOne({ _id: locationId });
+    res.status(200).send("Location deleted successfully");
+  } catch (err) {
+    console.error("Error deleting renting:", err);
+    res.status(500).send("Error deleting renting");
+  }
+});
+
+app.post("/uploadContrat", upload.single("contrat"), async (req, res) => {
+  try {
+    // Check if the file and other required fields are present
+    if (!req.file || !req.body._id || !req.body.association) {
+      return res
+        .status(400)
+        .send("File, location ID, and association are required");
+    }
+
+    const file = req.file; // Use req.file to access the uploaded file
+    const locationId = req.body._id;
+    const asso = req.body.association;
+
+    const fileName = `contrats/${asso}-${locationId}.pdf`;
+    const fileUpload = bucket.file(fileName);
+
+    const stream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
+
+    stream.on("error", (err) => {
+      console.error("Error uploading file to Firebase Storage:", err);
+      res.status(500).send("Error uploading file");
+    });
+
+    stream.on("finish", async () => {
+      try {
+        await fileUpload.makePublic();
+        const fileUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
+        await client.connect();
+        const db = client.db("Locations");
+        const collection = db.collection("locations");
+
+        const result = await collection.updateOne(
+          { _id: locationId },
+          { $set: { contrat: fileUrl } }
+        );
+
+        if (result.modifiedCount === 0) {
+          return res.status(404).send("Location not found");
+        }
+
+        res
+          .status(200)
+          .send("Contract uploaded and location updated successfully");
+      } catch (err) {
+        console.error("Error updating database:", err);
+        res.status(500).send("Error updating database");
+      }
+    });
+
+    stream.end(file.buffer);
+  } catch (err) {
+    console.error("Error in /uploadContrat endpoint:", err);
+    res.status(500).send("Error processing request");
+  }
+});
+
+app.post("/removeContract", upload.none(), async (req, res) => {
+  try {
+    const { _id, association } = req.body;
+
+    if (!_id || !association) {
+      return res.status(400).send("Location ID and association are required");
+    }
+
+    const fileName = `contrats/${association}-${_id}.pdf`;
+    const file = bucket.file(fileName);
+
+    await file.delete();
+
+    await client.connect();
+    const db = client.db("Locations");
+    const collection = db.collection("locations");
+
+    const result = await collection.updateOne(
+      { _id: _id },
+      { $set: { contrat: null } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res
+        .status(404)
+        .send("Location not found or contract was already null");
+    }
+
+    res.status(200).send("Contract removed and location updated successfully");
+  } catch (err) {
+    console.error("Error in /removeContract endpoint:", err);
+    res.status(500).send("Error processing request");
   }
 });
 

@@ -28,7 +28,7 @@
           <q-btn flat icon="eva-home-outline" to="/" />
           <q-route-tab name="photos" label="Photos" to="/photos" />
           <q-route-tab name="locations" label="Locations" to="/locations" />
-          <q-route-tab name="devis" label="Devis" to="/devis" />
+          <q-route-tab name="studio" label="Studio" to="/studio" />
         </q-tabs>
       </q-toolbar>
     </q-header>

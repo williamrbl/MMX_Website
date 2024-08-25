@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <q-card>DEVIS PAGE</q-card>
+    <q-card>STUDIO PAGE</q-card>
   </q-page>
 </template>
 

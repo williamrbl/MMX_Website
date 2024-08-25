@@ -9,11 +9,7 @@ const routes = [
         path: "/locations",
         component: () => import("src/pages/LocationPage.vue"),
       },
-      { path: "/devis", component: () => import("src/pages/DevisPage.vue") },
-      {
-        path: "/arena2024",
-        component: () => import("src/pages/articles/ArenaDeux.vue"),
-      },
+      { path: "/studio", component: () => import("src/pages/StudioPage.vue") },
       {
         path: "/parameters",
         component: () => import("src/pages/Parameters.vue"),
