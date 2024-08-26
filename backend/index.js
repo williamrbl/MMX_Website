@@ -375,7 +375,20 @@ app.get("/locations", async (req, res) => {
 
 app.post("/addLocation", upload.none(), async (req, res) => {
   try {
-    const { _id, association, start, end, paye, caution, contrat } = req.body;
+    const {
+      _id,
+      association,
+      start,
+      end,
+      paye,
+      caution,
+      contrat,
+      pret,
+      rendu,
+      prix,
+      isRetard,
+      suppRetard,
+    } = req.body;
 
     if (!_id || !association || !start || !end) {
       return res.status(400).send("Missing required fields");
@@ -384,6 +397,10 @@ app.post("/addLocation", upload.none(), async (req, res) => {
     const collection = client.db("Locations").collection("locations");
     const payeBool = paye === "true";
     const cautionBool = caution === "true";
+    const pretBool = pret === "true";
+    const renduBool = rendu === "true";
+    const isRetardBool = isRetard === "true";
+
     // Create the update document
     const updateDoc = {
       $set: {
@@ -393,6 +410,11 @@ app.post("/addLocation", upload.none(), async (req, res) => {
         paye: payeBool,
         caution: cautionBool,
         contrat: null,
+        prete: pretBool,
+        rendu: renduBool,
+        prix: prix,
+        isRetard: isRetardBool,
+        suppRetard: suppRetard,
       },
     };
 
@@ -414,19 +436,39 @@ app.post("/addLocation", upload.none(), async (req, res) => {
 
 app.post("/updateLocation", async (req, res) => {
   try {
-    const locations = req.body;
-    if (!Array.isArray(locations)) {
+    let locations = req.body;
+
+    // Ensure locations is an array
+    if (Array.isArray(locations)) {
+      // If it is an array, use it as-is
+    } else if (typeof locations === "object" && locations !== null) {
+      // If it is a single object, wrap it in an array
+      locations = [locations];
+    } else {
       return res
         .status(400)
-        .send("Invalid input format. 'locations' should be an array.");
+        .send(
+          "Invalid input format. 'locations' should be an array or a single object."
+        );
     }
+
+    // Prepare bulk operations for MongoDB
+    const bulkOps = locations.map((location) => ({
+      updateOne: {
+        filter: { _id: location._id },
+        update: { $set: location },
+        upsert: true,
+      },
+    }));
+
+    // Perform bulk write
     const collection = client.db("Locations").collection("locations");
-    await collection.deleteMany({});
-    await collection.insertMany(locations);
-    res.status(200).send("Renting updated successfully");
+    await collection.bulkWrite(bulkOps);
+
+    res.status(200).send("Locations updated successfully");
   } catch (err) {
-    console.error("Error updating renting:", err);
-    res.status(500).send("Error updating renting");
+    console.error("Error updating locations:", err);
+    res.status(500).send("Error updating locations");
   }
 });
 

@@ -13,12 +13,17 @@
     <q-tabs
       v-model="tab"
       no-caps
-      class="bg-purple text-white shadow-2"
+      class="bg-purple text-white shadow-2 custom-tabs"
       style="margin-top: 3%"
     >
-      <q-tab name="avenir" label="A venir" />
-      <q-tab name="afinaliser" label="A finaliser" />
-      <q-tab name="alllocations" label="Toutes les locations" />
+      <div class="tab-container">
+        <q-tab name="avenir" label="A venir" />
+        <q-tab name="afinaliser" label="A finaliser" />
+        <q-tab name="alllocations" label="Toutes les locations" />
+      </div>
+      <q-btn flat dense class="far-right-btn" @click="exportExcel()">
+        <i class="las la-file-excel" style="font-size: 30px" />
+      </q-btn>
     </q-tabs>
 
     <div class="locations q-pa-md">
@@ -26,7 +31,11 @@
         <ComponentAvenir
           :locations="locations"
           :getLocations="getLocations"
-          :updateLocation="updateLocation"
+          @update-location="
+            (location) => {
+              handleUpdateLocation(location);
+            }
+          "
         />
       </div>
 
@@ -39,11 +48,7 @@
       </div>
 
       <div v-if="tab == 'alllocations'">
-        <ComponentLocations
-          :locations="locations"
-          :getLocations="getLocations"
-          :updateLocation="updateLocation"
-        />
+        <ComponentLocations :locations="locations" />
       </div>
     </div>
   </div>
@@ -184,6 +189,11 @@ export default {
         formData.append("paye", false);
         formData.append("caution", false);
         formData.append("contrat", null);
+        formData.append("pret", false);
+        formData.append("rendu", false);
+        formData.append("prix", 0);
+        formData.append("isRetard", false);
+        formData.append("suppRetard", 0);
         try {
           const response = await fetch(`${process.env.API}/addLocation`, {
             method: "POST",
@@ -208,14 +218,22 @@ export default {
       }
     },
 
-    async updateLocation() {
+    handleUpdateLocation(updatedLocation) {
+      const updatedLocations = this.locations.map((location) =>
+        location._id === updatedLocation._id ? updatedLocation : location
+      );
+      this.locations = updatedLocations;
+      this.updateLocation(updatedLocation);
+    },
+
+    async updateLocation(location) {
       try {
         const response = await fetch(`${process.env.API}/updateLocation`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.locations),
+          body: JSON.stringify(location),
         });
 
         if (!response.ok) {
@@ -227,6 +245,10 @@ export default {
         console.error("Error updating renting:", error);
         utils.alert("Erreur lors de la MAJ de la location");
       }
+    },
+
+    exportExcel() {
+      console.log("Exporting Excel file");
     },
   },
 
@@ -263,5 +285,21 @@ export default {
   color: black;
   font-weight: 400;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.custom-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab-container {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.far-right-btn {
+  margin-left: auto;
 }
 </style>

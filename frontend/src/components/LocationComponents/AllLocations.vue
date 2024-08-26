@@ -20,14 +20,6 @@ export default {
       type: Object,
       required: true,
     },
-    getLocations: {
-      type: Function,
-      required: true,
-    },
-    updateLocation: {
-      type: Function,
-      required: true,
-    },
   },
 };
 </script>

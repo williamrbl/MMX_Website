@@ -5,7 +5,7 @@
       <div class="spacer" />
       <div class="contact-row">
         <q-icon name="eva-email-outline" color="white" class="contact-icon" />
-        <div class="contact-text">musiquemix@edu.devinci.fr</div>
+        <div class="contact-text">musiquemix@devinci.fr</div>
       </div>
       <div class="contact-row">
         <q-icon name="la la-youtube" color="white" class="contact-icon" />
