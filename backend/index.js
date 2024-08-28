@@ -6,7 +6,7 @@ const cors = require("cors");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const path = require("path");
-
+const ExcelJS = require("exceljs");
 const fs = require("fs");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const { v4: UUID } = require("uuid");
@@ -385,6 +385,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
       contrat,
       pret,
       rendu,
+      daterendu,
       prix,
       isRetard,
       suppRetard,
@@ -400,6 +401,8 @@ app.post("/addLocation", upload.none(), async (req, res) => {
     const pretBool = pret === "true";
     const renduBool = rendu === "true";
     const isRetardBool = isRetard === "true";
+    const prixInt = parseInt(prix, 10) || 0;
+    const suppRetardInt = parseInt(suppRetard, 10) || 0;
 
     // Create the update document
     const updateDoc = {
@@ -412,9 +415,10 @@ app.post("/addLocation", upload.none(), async (req, res) => {
         contrat: null,
         prete: pretBool,
         rendu: renduBool,
-        prix: prix,
+        daterendu: daterendu,
+        prix: prixInt,
         isRetard: isRetardBool,
-        suppRetard: suppRetard,
+        suppRetard: suppRetardInt,
       },
     };
 
@@ -437,12 +441,8 @@ app.post("/addLocation", upload.none(), async (req, res) => {
 app.post("/updateLocation", async (req, res) => {
   try {
     let locations = req.body;
-
-    // Ensure locations is an array
     if (Array.isArray(locations)) {
-      // If it is an array, use it as-is
     } else if (typeof locations === "object" && locations !== null) {
-      // If it is a single object, wrap it in an array
       locations = [locations];
     } else {
       return res
@@ -451,8 +451,6 @@ app.post("/updateLocation", async (req, res) => {
           "Invalid input format. 'locations' should be an array or a single object."
         );
     }
-
-    // Prepare bulk operations for MongoDB
     const bulkOps = locations.map((location) => ({
       updateOne: {
         filter: { _id: location._id },
@@ -460,11 +458,8 @@ app.post("/updateLocation", async (req, res) => {
         upsert: true,
       },
     }));
-
-    // Perform bulk write
     const collection = client.db("Locations").collection("locations");
     await collection.bulkWrite(bulkOps);
-
     res.status(200).send("Locations updated successfully");
   } catch (err) {
     console.error("Error updating locations:", err);
@@ -580,6 +575,36 @@ app.post("/removeContract", upload.none(), async (req, res) => {
     res.status(200).send("Contract removed and location updated successfully");
   } catch (err) {
     console.error("Error in /removeContract endpoint:", err);
+    res.status(500).send("Error processing request");
+  }
+});
+
+app.post("/exportExcel", async (req, res) => {
+  try {
+    const db = client.db("Locations");
+    const collection = db.collection("locations");
+
+    const data = await collection.find().toArray();
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Locations");
+
+    if (data.length > 0) {
+      const columns = Object.keys(data[0]).map((key) => ({
+        header: key,
+        key: key,
+      }));
+      worksheet.columns = columns;
+
+      data.forEach((item) => worksheet.addRow(item));
+    }
+
+    const excelFilePath = "Locations.xlsx";
+    await workbook.xlsx.writeFile(excelFilePath);
+
+    res.status(200).send("Data exported to Excel successfully");
+  } catch (err) {
+    console.error("Error in /exportExcel endpoint:", err);
     res.status(500).send("Error processing request");
   }
 });

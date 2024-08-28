@@ -1,45 +1,48 @@
 <template>
   <div class="texte">Locations à venir</div>
-  <div
-    v-for="location in filteredLocations"
-    :key="location._id"
-    class="row items-center q-mb-md"
-  >
-    <div class="col locations-text">{{ location.association }}</div>
+  <q-separator style="margin-bottom: 20px" />
+  <q-scroll-area style="height: 29vh">
+    <div
+      v-for="location in filteredLocations"
+      :key="location._id"
+      class="row items-center q-mb-md"
+    >
+      <div class="col locations-text">{{ location.association }}</div>
 
-    <div class="col locations-text">
-      {{ utils.formatDate(location.start) }}
-    </div>
-    <div class="col locations-text">
-      {{
-        utils.formatDate(location.start) == utils.formatDate(location.end)
-          ? "-"
-          : utils.formatDate(location.end)
-      }}
-    </div>
+      <div class="col locations-text">
+        {{ utils.formatDate(location.start) }}
+      </div>
+      <div class="col locations-text">
+        {{
+          utils.formatDate(location.start) == utils.formatDate(location.end)
+            ? "-"
+            : utils.formatDate(location.end)
+        }}
+      </div>
 
-    <div class="col">
-      <BoutonDetails
-        :location="location"
-        :getLocations="getLocations"
-        @update-location="
-          (location) => {
-            console.log('Updating : ', location);
-            this.$emit('update-location', location);
-          }
-        "
+      <div class="col">
+        <BoutonDetails
+          :location="location"
+          :getLocations="getLocations"
+          @update-location="
+            (location) => {
+              console.log('Updating : ', location);
+              this.$emit('update-location', location);
+            }
+          "
+        />
+      </div>
+
+      <q-btn
+        flat
+        dense
+        icon="eva-trash-outline"
+        class="col-1"
+        style="color: white"
+        @click="confirmDelete(location)"
       />
     </div>
-
-    <q-btn
-      flat
-      dense
-      icon="eva-trash-outline"
-      class="col-1"
-      style="color: white"
-      @click="confirmDelete(location)"
-    />
-  </div>
+  </q-scroll-area>
 
   <q-dialog v-model="isDeleting">
     <q-card class="q-pa-md" style="width: 40%; height: 20%">

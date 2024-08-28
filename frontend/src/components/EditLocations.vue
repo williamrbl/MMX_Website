@@ -44,48 +44,105 @@
           :locations="locations"
           :getLocations="getLocations"
           :updateLocation="updateLocation"
+          @update-location="
+            (location) => {
+              handleUpdateLocation(location);
+            }
+          "
         />
       </div>
 
       <div v-if="tab == 'alllocations'">
-        <ComponentLocations :locations="locations" />
+        <ComponentLocations
+          :locations="locations"
+          :getLocations="getLocations"
+          :updateLocation="updateLocation"
+          @update-location="
+            (location) => {
+              handleUpdateLocation(location);
+            }
+          "
+        />
       </div>
     </div>
   </div>
 
   <q-dialog v-model="isAjoutLocation">
-    <q-card style="width: 50%">
+    <q-card class="card">
+      <div>{{ this.locationDates }}</div>
+      <div class="header">
+        <div class="header-text">Ajout d'une location</div>
+        <q-btn
+          flat
+          dense
+          icon="eva-close-outline"
+          style="color: white"
+          @click="
+            {
+              isAjoutLocation = false;
+              inputAsso = '';
+              locationDates = {};
+              isDay = false;
+            }
+          "
+        />
+      </div>
+
       <div class="q-pa-md">
-        <div>
-          <q-input v-model="inputAsso" label="Nom de l'association" />
-          <div class="row">
+        <div class="row q-mt-md">
+          <div
+            class="col"
+            style="
+              display: flex;
+              justify-content: center;
+              flex-direction: column;
+            "
+          >
+            <q-input
+              v-model="inputAsso"
+              label="Nom de l'association"
+              style="width: 80%"
+              outlined
+            />
             <q-toggle
               v-model="isDay"
               label="Location sur une journée"
-              color="purple"
-              class="col"
               @click="locationDates = {}"
-            />
-            <q-date
-              class="col"
-              v-model="locationDates"
-              :range="!isDay"
-              @input="updateDateDisplay"
-              first-day-of-week="1"
+              style="margin-top: 5%"
             />
           </div>
-          <div v-if="!isDay">
-            <div>Date de début : {{ locationDates.from }}</div>
-            <div>Date de fin : {{ locationDates.to }}</div>
+          <q-date
+            class="col"
+            v-model="locationDates"
+            :range="!isDay"
+            @input="updateDateDisplay"
+            first-day-of-week="1"
+            style="color: purple"
+          />
+        </div>
+
+        <div class="q-mt-md">
+          <div
+            class="row"
+            v-if="!isDay"
+            style="display: flex; flex-direction: row"
+          >
+            <div class="col">Date de début : {{ locationDates.from }}</div>
+            <div class="col">Date de fin : {{ locationDates.to }}</div>
           </div>
           <div v-else>
             <div>Date sélectionnée : {{ locationDates }}</div>
           </div>
         </div>
-        <div class="q-pt-md" style="display: flex; justify-content: end">
+
+        <div
+          class="q-pt-md q-mt-md"
+          style="display: flex; justify-content: end"
+        >
           <q-btn
             outline
             label="Cancel"
+            style="color: purple"
             @click="
               {
                 isAjoutLocation = false;
@@ -95,7 +152,13 @@
               }
             "
           />
-          <q-btn outline label="Ok" @click="addLocation()" />
+          <q-btn
+            outline
+            label="Ok"
+            style="color: purple"
+            class="q-ml-sm"
+            @click="addLocation()"
+          />
         </div>
       </div>
     </q-card>
@@ -172,7 +235,11 @@ export default {
       if (typeof this.locationDates == "string") {
         this.locationDates = this.transformDate(this.locationDates);
       }
-      if (this.locationDates == {} || this.inputAsso == "") {
+      if (
+        (Object.keys(this.locationDates).length === 0 &&
+          this.locationDates.constructor === Object) ||
+        this.inputAsso == ""
+      ) {
         utils.alert("Veuillez entrer toutes les informations");
       } else if (
         new Date(this.locationDates.from) < new Date().setHours(0, 0, 0, 0) ||
@@ -191,6 +258,7 @@ export default {
         formData.append("contrat", null);
         formData.append("pret", false);
         formData.append("rendu", false);
+        formData.append("daterendu", "");
         formData.append("prix", 0);
         formData.append("isRetard", false);
         formData.append("suppRetard", 0);
@@ -247,8 +315,25 @@ export default {
       }
     },
 
-    exportExcel() {
-      console.log("Exporting Excel file");
+    async exportExcel() {
+      try {
+        const response = await fetch(`${process.env.API}/exportExcel`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.locations),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getLocations();
+        utils.validate("La location a été mise à jour !");
+      } catch (error) {
+        console.error("Error updating renting:", error);
+        utils.alert("Erreur lors de la MAJ de la location");
+      }
     },
   },
 
@@ -301,5 +386,33 @@ export default {
 
 .far-right-btn {
   margin-left: auto;
+}
+
+.header {
+  background-color: purple;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  height: 7vh;
+  position: relative;
+}
+
+.header-text {
+  color: white;
+  font-family: "calibri";
+  font-size: large;
+  flex: 1;
+  text-align: center;
+}
+
+.close-btn {
+  position: absolute;
+  right: 16px;
+  color: white;
+}
+
+.card {
+  border-radius: 15px;
 }
 </style>

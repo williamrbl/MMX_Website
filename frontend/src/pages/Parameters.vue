@@ -151,7 +151,7 @@ export default {
       isConnected: false,
       inputPassword: "",
       isPwd: true,
-      selectedPage: "",
+      selectedPage: "locations",
     };
   },
   methods: {

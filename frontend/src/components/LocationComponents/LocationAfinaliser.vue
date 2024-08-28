@@ -1,50 +1,44 @@
 <template>
   <div class="texte">Locations à finaliser</div>
-  <div
-    v-for="location in filteredLocationsARegler"
-    :key="location._id"
-    class="row items-center justify-between q-mb-md"
-  >
-    <div class="col locations-text">
-      {{ location.association }}
-    </div>
-    <div class="col locations-text">{{ utils.formatDate(location.start) }}</div>
-    <!-- <div class="col locations-text">{{ utils.formatDate(location.end) }}</div> -->
-    <div class="col locations-text row items-center">
-      <q-checkbox
-        class="col-auto q-mr-sm"
-        v-model="location.paye"
-        @click="updateLocation()"
-      />
-      <div class="col">
-        {{ location.paye ? "Location réglée" : "Location non réglée" }}
+  <q-separator style="margin-bottom: 20px" />
+  <q-scroll-area style="height: 29vh">
+    <div
+      v-for="location in filteredLocationsARegler"
+      :key="location._id"
+      class="row items-center justify-between q-mb-md"
+    >
+      <div class="col locations-text">
+        {{ location.association }}
       </div>
-    </div>
-    <div class="col locations-text row items-center justify-between">
-      <q-checkbox
-        class="col-auto q-mr-sm"
-        v-model="location.caution"
-        @click="updateLocation()"
-      />
-      <div class="col">
-        {{ location.caution ? "Caution reçue" : "Caution non reçue" }}
+      <div class="col locations-text">
+        {{ utils.formatDate(location.start) }}
       </div>
+      <div class="col locations-text">
+        {{ utils.formatDate(location.end) }}
+      </div>
+      <!-- <div class="col locations-text">{{ utils.formatDate(location.end) }}</div> -->
+
+      <BoutonDetails
+        :location="location"
+        :getLocations="getLocations"
+        @update-location="
+          (location) => {
+            console.log('Updating : ', location);
+            this.$emit('update-location', location);
+          }
+        "
+      />
     </div>
-    <BoutonContrat
-      :location="location"
-      @add-contrat="(location, event) => uploadContrat(location, event)"
-      @delete-contrat="(location) => deleteContrat(location)"
-      class="col"
-    />
-  </div>
+  </q-scroll-area>
 </template>
 
 <script>
 import utils from "src/helpers/utils.ts";
-import BoutonContrat from "./BoutonContrat.vue";
+import BoutonDetails from "./BoutonDetails.vue";
 export default {
   name: "ComponentAfinaliser",
-  components: { BoutonContrat },
+  components: { BoutonDetails },
+  emits: ["update-location"],
   setup() {
     return {
       utils,
