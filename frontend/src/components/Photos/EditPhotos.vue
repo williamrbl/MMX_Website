@@ -161,30 +161,28 @@
 
   <q-dialog v-model="addingPhotos">
     <q-card class="q-pa-md" style="width: 30%">
-      <div>Adding pictures to : {{ this.selectedCollection }}</div>
+      <div style="margin-bottom: 15px; font-weight: 400">
+        Adding pictures to : {{ selectedCollection }}
+      </div>
       <q-file
         outlined
+        multiple
         v-model="selectedFiles"
-        accept="image/png, image/jpeg, image/jpg"
-        @input="handleFileUpload"
+        accept=".jpg, .png, image/* "
+        label="Photos"
       >
-        <template>
-          <div class="row" style="display: flex; align-items: center">
-            <q-icon name="attach_file" class="col-1" />
-            <div
-              style="opacity: 0.5; font-size: medium; margin-left: 3px"
-              class="col-11"
-            >
-              Select files to add to collection
-            </div>
-          </div>
+        <template v-slot:prepend>
+          <q-icon name="attach_file" />
         </template>
-        <div>{{ this.selectedFiles }}</div>
       </q-file>
 
       <div class="q-pt-md" style="display: flex; justify-content: end">
         <q-btn outline label="Cancel" @click="addingPhotos = false" />
-        <q-btn outline label="Ok" @click="addPhotos()" />
+        <q-btn
+          outline
+          label="Ok"
+          @click="handleFileUpload(selectedCollection)"
+        />
       </div>
     </q-card>
   </q-dialog>
@@ -231,19 +229,29 @@ export default {
       this.getCollections();
     },
 
-    handleFileUpload(event) {
-      const files = event.target.files;
-      if (files.length > 0) {
-        const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-        const invalidFiles = Array.from(files).filter(
-          (file) => !allowedTypes.includes(file.type)
-        );
+    async handleFileUpload(collection) {
+      try {
+        const requestBody = {
+          selectedFiles: this.selectedFiles,
+          collection: collection,
+        };
+        const response = await fetch(`${process.env.API}/uploadPhotos`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-        if (invalidFiles.length > 0) {
-          utils.alert("Mauvais type de fichier pour les photos");
-          return;
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
         }
-        this.selectedFiles = files;
+        this.addingPhotos = false;
+        this.selectedFiles = [];
+        utils.validate("Photos ajoutées avec succès");
+      } catch (error) {
+        console.error("Error getting collections:", error);
+        utils.alert("Erreur lors de la récupération des collections");
       }
     },
 
@@ -331,42 +339,6 @@ export default {
       } catch (error) {
         console.error("Error deleting collection:", error);
         utils.alert("Erreur lors de la suppression de la collection");
-      }
-    },
-
-    async addPhotos() {
-      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-      const invalidFiles = Array.from(this.selectedFiles).filter(
-        (file) => !allowedTypes.includes(file.type)
-      );
-
-      if (invalidFiles.length > 0) {
-        utils.alert("Mauvais type de fichier pour les photos");
-        return;
-      }
-
-      const formData = new FormData();
-      Array.from(this.selectedFiles).forEach((file) =>
-        formData.append("photos", file)
-      );
-      formData.append("collection", this.selectedCollection);
-
-      try {
-        const response = await fetch(`${process.env.API}/addPhotos`, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-
-        this.addingPhotos = false;
-        this.selectedFiles = [];
-        utils.validate("Les photos ont bien été ajoutées");
-      } catch (error) {
-        console.error("Error adding photos:", error);
-        utils.alert("Erreur lors de l'ajout des photos");
       }
     },
 

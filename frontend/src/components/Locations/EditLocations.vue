@@ -69,7 +69,6 @@
 
   <q-dialog v-model="isAjoutLocation">
     <q-card class="card">
-      <div>{{ this.locationDates }}</div>
       <div class="header">
         <div class="header-text">Ajout d'une location</div>
         <q-btn
@@ -168,9 +167,9 @@
 <script>
 import utils from "src/helpers/utils.ts";
 import { v4 as uuidv4 } from "uuid";
-import ComponentAvenir from "./LocationComponents/LocationAvenir.vue";
-import ComponentAfinaliser from "./LocationComponents/LocationAfinaliser.vue";
-import ComponentLocations from "./LocationComponents/AllLocations.vue";
+import ComponentAvenir from "./LocationAvenir.vue";
+import ComponentAfinaliser from "./LocationAfinaliser.vue";
+import ComponentLocations from "./AllLocations.vue";
 
 export default {
   name: "EditLocations",
@@ -308,7 +307,7 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
-        utils.validate("La location a été mise à jour !");
+        // utils.validate("La location a été mise à jour !");
       } catch (error) {
         console.error("Error updating renting:", error);
         utils.alert("Erreur lors de la MAJ de la location");
@@ -329,7 +328,6 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
-        utils.validate("La location a été mise à jour !");
       } catch (error) {
         console.error("Error updating renting:", error);
         utils.alert("Erreur lors de la MAJ de la location");

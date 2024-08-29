@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import CalendarComponent from "src/components/CalendarComponent.vue";
+import CalendarComponent from "src/components/LocationComponents/CalendarComponent.vue";
 export default {
   name: "LocationPage",
   components: { CalendarComponent },

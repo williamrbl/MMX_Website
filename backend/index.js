@@ -184,7 +184,6 @@ app.post("/createCollection", (req, res) => {
   }
 });
 
-// Delete a collection
 app.post("/deleteCollection", async (req, res) => {
   try {
     const collectionName = req.body.name;
@@ -193,18 +192,27 @@ app.post("/deleteCollection", async (req, res) => {
       return res.status(400).send("Collection name is required");
     }
 
-    const filePath = `collections/${collectionName}.png`;
+    const collectionFolderPath = `photos/${collectionName}/`;
+    const collectionFilePath = `collections/${collectionName}.png`;
 
-    await bucket.file(filePath).delete();
-    console.log(`File ${filePath} deleted from Firebase Storage`);
+    const [files] = await bucket.getFiles({ prefix: collectionFolderPath });
+    const deletePromises = files.map((file) => file.delete());
 
+    deletePromises.push(bucket.file(collectionFilePath).delete());
+
+    await Promise.all(deletePromises);
+    console.log(
+      `All files and ${collectionFilePath} deleted from Firebase Storage`
+    );
+
+    // Delete the MongoDB collection
     const database = client.db(process.env.DATABASE);
     await database.collection(collectionName).drop();
     console.log(`Collection ${collectionName} removed from database`);
 
     res
       .status(200)
-      .send(`Collection ${collectionName} and its image removed successfully`);
+      .send(`Collection ${collectionName} and its images removed successfully`);
   } catch (err) {
     console.error("Error deleting collection or file:", err);
     res.status(500).send(err.message);

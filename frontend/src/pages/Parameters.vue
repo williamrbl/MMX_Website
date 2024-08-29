@@ -137,10 +137,10 @@
 </template>
 
 <script>
-import EditPhotos from "src/components/EditPhotos.vue";
-import EditCaroussel from "src/components/EditCaroussel.vue";
-import EditLocations from "src/components/EditLocations.vue";
-import EditStudio from "src/components/EditStudio.vue";
+import EditPhotos from "src/components/Photos/EditPhotos.vue";
+import EditCaroussel from "src/components/Caroussel/EditCaroussel.vue";
+import EditLocations from "src/components/Locations/EditLocations.vue";
+import EditStudio from "src/components/Studio/EditStudio.vue";
 import utils from "src/helpers/utils.ts";
 
 export default {
