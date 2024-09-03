@@ -19,6 +19,7 @@
       label="Collection"
       class="col"
       style="width: 30%"
+      @update:modelValue="getCollection()"
     />
     <q-btn
       outline
@@ -46,6 +47,18 @@
         }
       "
     />
+  </div>
+  <div v-for="photo in photos" :key="photo._id" class="photo-container">
+    <div v-if="photo._id != 'Titre'">
+      <q-img :src="photo.photo" class="photo">
+        <q-btn
+          icon="eva-trash-outline"
+          class="btn-hovered"
+          flat
+          @click="deletePhoto(photo)"
+        />
+      </q-img>
+    </div>
   </div>
 
   <q-dialog v-model="addingCollection">
@@ -222,6 +235,7 @@ export default {
       selectedFiles: [],
       cover: null,
       file: null,
+      photos: [],
     };
   },
   methods: {
@@ -278,6 +292,25 @@ export default {
       } catch (error) {
         console.error("Error getting collections:", error);
         utils.alert("Erreur lors de la récupération des collections");
+      }
+    },
+
+    async getCollection() {
+      try {
+        const response = await fetch(
+          `${process.env.API}/photos/${this.selectedCollection.toLowerCase()}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+        const photos = await response.json();
+        this.photos.push(...photos);
+        console.log(this.photos);
+      } catch (error) {
+        console.error("Error getting photos:", error);
+        utils.alert("Erreur lors de la récupération des photos");
       }
     },
 
@@ -373,6 +406,10 @@ export default {
 
       this.addCollection(this.nameCollection, this.date, this.cover);
     },
+
+    deletePhoto(photo) {
+      console.log("Deleting photo : ", photo);
+    },
   },
 
   mounted() {
@@ -411,5 +448,31 @@ export default {
 .titre-popup {
   font-size: 20px;
   color: black;
+}
+
+.photo-container {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.photo {
+  height: 100px;
+  width: 300px;
+  border: 3px solid black;
+  object-fit: cover;
+}
+
+.btn-hovered {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: none;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+}
+
+.photo-container:hover .btn-hovered {
+  display: block;
 }
 </style>

@@ -1,6 +1,10 @@
 <template>
   <div>Album Photo {{ collectionName }}</div>
-  <div>{{ photos }}</div>
+  <div v-for="photo in photos" :key="photo">
+    <div v-if="photo._id != 'Titre'">
+      <q-img :src="photo.photo" class="photo" />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -10,14 +14,14 @@ export default {
   props: { collectionName: { type: String, required: true } },
   data() {
     return {
-      photos: [], // Initialize photos as an empty array
+      photos: [],
     };
   },
   methods: {
     async getCollection() {
       try {
         const response = await fetch(
-          `${process.env.API}/photos/${this.collectionName}`,
+          `${process.env.API}/photos/${this.collectionName.toLowerCase()}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -37,3 +41,11 @@ export default {
   },
 };
 </script>
+
+<style>
+.photo {
+  height: 100px;
+  width: 300px;
+  border: 3px solid black;
+}
+</style>
