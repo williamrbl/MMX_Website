@@ -30,6 +30,7 @@
               this.$emit('update-location', location);
             }
           "
+          :deleteContrat="deleteContrat"
         />
       </div>
 
@@ -126,13 +127,16 @@ export default {
       this.isDeleting = true;
     },
     async deleteLocation() {
+      if (this.selectedLocation.contrat) {
+        await this.deleteContrat();
+      }
       try {
         const response = await fetch(`${process.env.API}/deleteLocation`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.selectedLocation),
+          body: JSON.stringify(this.selectedLocation._id),
         });
 
         if (!response.ok) {
@@ -144,6 +148,37 @@ export default {
       } catch (error) {
         console.error("Error deleting location:", error);
         utils.alert("Erreur lors de la suppression de la location");
+      }
+    },
+
+    async deleteContrat() {
+      const formData = new FormData();
+      formData.append("_id", this.selectedLocation._id);
+      formData.append("contract", this.selectedLocation.contract);
+      formData.append("association", this.selectedLocation.association);
+
+      try {
+        const response = await fetch(`${process.env.API}/removeContract`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getLocations();
+        utils.validate("Le contrat a bien été supprimé");
+
+        if (this.timelineItems) {
+          this.timelineItems[0].value = false;
+          this.timelineItems[0].isUploaded = false;
+          this.handleUpdate();
+        }
+      } catch (error) {
+        console.error("Error deleting contract:", error);
+        utils.alert(
+          `Erreur lors de la suppression du contrat: ${error.message}`
+        );
       }
     },
   },

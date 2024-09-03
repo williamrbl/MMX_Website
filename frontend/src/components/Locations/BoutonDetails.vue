@@ -112,6 +112,10 @@ export default {
       type: Function,
       required: true,
     },
+    deleteContrat: {
+      type: Function,
+      required: true,
+    },
   },
   setup() {
     return { utils };
@@ -213,35 +217,6 @@ export default {
       } catch (error) {
         console.error("Error importing contract:", error);
         utils.alert(`Erreur lors de l'import du contrat: ${error.message}`);
-      }
-    },
-
-    async deleteContrat() {
-      const formData = new FormData();
-      formData.append("_id", this.location._id);
-      formData.append("contract", this.location.contract);
-      formData.append("association", this.location.association);
-
-      try {
-        const response = await fetch(`${process.env.API}/removeContract`, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        await this.getLocations();
-        utils.validate("Le contrat a bien été supprimé");
-
-        this.timelineItems[0].value = false;
-        this.timelineItems[0].isUploaded = false;
-        this.handleUpdate();
-      } catch (error) {
-        console.error("Error deleting contract:", error);
-        utils.alert(
-          `Erreur lors de la suppression du contrat: ${error.message}`
-        );
       }
     },
 

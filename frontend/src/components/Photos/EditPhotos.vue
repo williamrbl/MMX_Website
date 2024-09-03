@@ -231,27 +231,28 @@ export default {
 
     async handleFileUpload(collection) {
       try {
-        const requestBody = {
-          selectedFiles: this.selectedFiles,
-          collection: collection,
-        };
+        const formData = new FormData();
+        formData.append("collection", collection);
+
+        this.selectedFiles.forEach((file, index) => {
+          formData.append(`file_${index}`, file);
+        });
+
         const response = await fetch(`${process.env.API}/uploadPhotos`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
+          body: formData,
         });
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
+
         this.addingPhotos = false;
         this.selectedFiles = [];
         utils.validate("Photos ajoutées avec succès");
       } catch (error) {
-        console.error("Error getting collections:", error);
-        utils.alert("Erreur lors de la récupération des collections");
+        console.error("Error uploading photos:", error);
+        utils.alert("Erreur lors du téléchargement des photos");
       }
     },
 

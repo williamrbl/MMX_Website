@@ -85,7 +85,6 @@ app.get("/photos/:name", async (req, res) => {
 
 // Create collection
 app.post("/createCollection", (req, res) => {
-  // Set CORS headers to allow requests from any origin
   res.set("Access-Control-Allow-Origin", "*");
 
   const uuid = UUID();
@@ -215,6 +214,68 @@ app.post("/deleteCollection", async (req, res) => {
       .send(`Collection ${collectionName} and its images removed successfully`);
   } catch (err) {
     console.error("Error deleting collection or file:", err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.post("/uploadPhotos", upload.any(), async (req, res) => {
+  try {
+    const { collection } = req.body;
+    const files = req.files;
+
+    if (!collection || !files || files.length === 0) {
+      return res.status(400).send("Collection and files are required");
+    }
+
+    await client.connect();
+    const db = client.db(process.env.DATABASE);
+    const mongoCollection = db.collection(collection);
+
+    const uploadPromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const uuid = UUID();
+        const fileName = `photos/${collection}/${collection}-${uuid}.jpg`;
+        const fileUpload = bucket.file(fileName);
+
+        const stream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+
+        stream.on("error", (err) => {
+          console.error("Error uploading file to Firebase Storage:", err);
+          reject(err);
+        });
+
+        stream.on("finish", async () => {
+          try {
+            await fileUpload.makePublic();
+            const fileUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+            const photo = {
+              _id: uuid,
+              photo: fileUrl,
+            };
+            const result = await mongoCollection.insertOne(photo);
+
+            if (result.insertedCount === 0) {
+              reject(new Error("Failed to insert document into MongoDB"));
+            } else {
+              resolve();
+            }
+          } catch (err) {
+            reject(err);
+          }
+        });
+
+        stream.end(file.buffer);
+      });
+    });
+
+    await Promise.all(uploadPromises);
+    res.status(200).send("Photos uploaded successfully");
+  } catch (err) {
+    console.error("Error in /uploadPhotos route:", err);
     res.status(500).send(err.message);
   }
 });
@@ -477,14 +538,15 @@ app.post("/updateLocation", async (req, res) => {
 
 app.post("/deleteLocation", async (req, res) => {
   try {
-    const locationId = req.body._id;
-    if (!locationId) {
-      return res.status(400).send("Location name is required");
-    }
-    const collection = client.db("Locations").collection("locations");
+    const locationId = req.body;
+    console.log("id : ", locationId);
+    //   if (!locationId) {
+    //     return res.status(400).send("Location name is required");
+    //   }
+    //   const collection = client.db("Locations").collection("locations");
 
-    await collection.deleteOne({ _id: locationId });
-    res.status(200).send("Location deleted successfully");
+    //   await collection.deleteOne({ _id: locationId });
+    //   res.status(200).send("Location deleted successfully");
   } catch (err) {
     console.error("Error deleting renting:", err);
     res.status(500).send("Error deleting renting");
@@ -560,7 +622,7 @@ app.post("/removeContract", upload.none(), async (req, res) => {
       return res.status(400).send("Location ID and association are required");
     }
 
-    const fileName = `contrats/${association}-${_id}.pdf`;
+    const fileName = `contrats/${association}-${_id}.png`;
     const file = bucket.file(fileName);
 
     await file.delete();

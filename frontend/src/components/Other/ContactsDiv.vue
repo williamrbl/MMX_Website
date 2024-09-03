@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import pole from "../assets/Pole.png";
+import pole from "src/assets/Pole.png";
 
 export default {
   name: "ContactsDiv",

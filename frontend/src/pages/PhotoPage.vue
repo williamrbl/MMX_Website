@@ -16,7 +16,12 @@
             </p>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn outline label="Voir les photos" class="view-photos-button" />
+            <q-btn
+              outline
+              label="Voir les photos"
+              class="view-photos-button"
+              @click="viewPhotos(collection)"
+            />
           </q-card-actions>
         </q-card>
       </div>
@@ -78,6 +83,10 @@ export default {
       for (const collection of this.collections) {
         await this.getPhotos(collection); // Fetch photos sequentially
       }
+    },
+
+    viewPhotos(collection) {
+      this.$router.push(`/photos/${collection.nom}`);
     },
   },
 

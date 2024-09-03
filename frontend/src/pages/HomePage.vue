@@ -36,7 +36,7 @@
 <script>
 import fond from "src/assets/Fond.jpg";
 import HomeCarrousel from "../components/Caroussel/HomeCarrousel.vue";
-import ContactsDiv from "../components/OtherComponents/ContactsDiv.vue";
+import ContactsDiv from "../components/Other/ContactsDiv.vue";
 
 export default {
   name: "HomePage",

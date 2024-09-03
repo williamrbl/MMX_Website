@@ -14,6 +14,11 @@ const routes = [
         path: "/parameters",
         component: () => import("src/pages/Parameters.vue"),
       },
+      {
+        path: "/photos/:collectionName",
+        component: () => import("src/components/Photos/DisplayPhotos.vue"),
+        props: true,
+      },
     ],
   },
 
