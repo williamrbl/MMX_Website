@@ -48,18 +48,21 @@
       "
     />
   </div>
-  <div v-for="photo in photos" :key="photo._id" class="photo-container">
-    <div v-if="photo._id != 'Titre'">
-      <q-img :src="photo.photo" class="photo">
-        <q-btn
-          icon="eva-trash-outline"
-          class="btn-hovered"
-          flat
-          @click="deletePhoto(photo)"
-        />
-      </q-img>
+  <q-scroll-area style="height: 350px">
+    <div v-for="photo in photos" :key="photo._id" class="photo-container">
+      <div v-if="photo._id != 'Titre'">
+        <q-img :src="photo.photo" class="photo">
+          <q-btn
+            icon="eva-trash-outline"
+            class="btn-hovered"
+            flat
+            @click="deletePhoto(photo)"
+            style="z-index: 1"
+          />
+        </q-img>
+      </div>
     </div>
-  </div>
+  </q-scroll-area>
 
   <q-dialog v-model="addingCollection">
     <q-card class="q-pa-md" style="width: 40%">
@@ -264,6 +267,7 @@ export default {
         this.addingPhotos = false;
         this.selectedFiles = [];
         utils.validate("Photos ajoutées avec succès");
+        this.getCollection();
       } catch (error) {
         console.error("Error uploading photos:", error);
         utils.alert("Erreur lors du téléchargement des photos");
@@ -296,6 +300,7 @@ export default {
     },
 
     async getCollection() {
+      this.photos = [];
       try {
         const response = await fetch(
           `${process.env.API}/photos/${this.selectedCollection.toLowerCase()}`,
@@ -459,7 +464,6 @@ export default {
 .photo {
   height: 100px;
   width: 300px;
-  border: 3px solid black;
   object-fit: cover;
 }
 

@@ -538,15 +538,14 @@ app.post("/updateLocation", async (req, res) => {
 
 app.post("/deleteLocation", async (req, res) => {
   try {
-    const locationId = req.body;
-    console.log("id : ", locationId);
-    //   if (!locationId) {
-    //     return res.status(400).send("Location name is required");
-    //   }
-    //   const collection = client.db("Locations").collection("locations");
+    const locationId = req.body._id;
+    if (!locationId) {
+      return res.status(400).send("Location name is required");
+    }
+    const collection = client.db("Locations").collection("locations");
 
-    //   await collection.deleteOne({ _id: locationId });
-    //   res.status(200).send("Location deleted successfully");
+    await collection.deleteOne({ _id: locationId });
+    res.status(200).send("Location deleted successfully");
   } catch (err) {
     console.error("Error deleting renting:", err);
     res.status(500).send("Error deleting renting");
@@ -622,7 +621,7 @@ app.post("/removeContract", upload.none(), async (req, res) => {
       return res.status(400).send("Location ID and association are required");
     }
 
-    const fileName = `contrats/${association}-${_id}.png`;
+    const fileName = `contrats/${association}-${_id}.pdf`;
     const file = bucket.file(fileName);
 
     await file.delete();

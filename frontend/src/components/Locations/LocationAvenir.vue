@@ -25,9 +25,9 @@
           :location="location"
           :getLocations="getLocations"
           @update-location="
-            (location) => {
-              console.log('Updating : ', location);
-              this.$emit('update-location', location);
+            (updatedLocation) => {
+              console.log('Updating : ', updatedLocation);
+              this.$emit('update-location', updatedLocation);
             }
           "
           :deleteContrat="deleteContrat"
@@ -96,7 +96,7 @@ export default {
   emits: ["update-location"],
   props: {
     locations: {
-      type: Object,
+      type: Array, // Changed to Array since locations is an array
       required: true,
     },
     getLocations: {
@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       isDeleting: false,
-      selectedLocation: null,
+      selectedLocation: null, // Changed to match the usage
     };
   },
 
@@ -126,17 +126,19 @@ export default {
       this.selectedLocation = location;
       this.isDeleting = true;
     },
+
     async deleteLocation() {
-      if (this.selectedLocation.contrat) {
-        await this.deleteContrat();
+      if (this.selectedLocation && this.selectedLocation.contrat) {
+        await this.deleteContrat(this.selectedLocation);
       }
+      console.log(this.selectedLocation);
       try {
         const response = await fetch(`${process.env.API}/deleteLocation`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.selectedLocation._id),
+          body: JSON.stringify(this.selectedLocation),
         });
 
         if (!response.ok) {
@@ -151,11 +153,11 @@ export default {
       }
     },
 
-    async deleteContrat() {
+    async deleteContrat(location) {
       const formData = new FormData();
-      formData.append("_id", this.selectedLocation._id);
-      formData.append("contract", this.selectedLocation.contract);
-      formData.append("association", this.selectedLocation.association);
+      formData.append("_id", location._id);
+      formData.append("contract", location.contrat); // Ensure contract field exists
+      formData.append("association", location.association);
 
       try {
         const response = await fetch(`${process.env.API}/removeContract`, {
