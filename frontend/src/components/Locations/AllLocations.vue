@@ -3,12 +3,11 @@
   <q-separator style="margin-bottom: 20px" />
   <q-scroll-area style="height: 29vh">
     <div
-      v-for="location in this.locations"
+      v-for="location in filteredLocations"
       :key="location._id"
       class="row items-center q-mb-md"
     >
       <div class="col locations-text">{{ location.association }}</div>
-
       <div class="col locations-text">
         {{ utils.formatDate(location.start) }}
       </div>
@@ -52,6 +51,11 @@ export default {
   },
   setup() {
     return { utils };
+  },
+  computed: {
+    filteredLocations() {
+      return this.locations.filter((location) => !location.demande);
+    },
   },
   methods: {
     async uploadContrat(location, event) {

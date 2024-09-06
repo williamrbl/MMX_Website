@@ -96,7 +96,7 @@ export default {
   emits: ["update-location"],
   props: {
     locations: {
-      type: Array, // Changed to Array since locations is an array
+      type: Array,
       required: true,
     },
     getLocations: {
@@ -108,7 +108,7 @@ export default {
   data() {
     return {
       isDeleting: false,
-      selectedLocation: null, // Changed to match the usage
+      selectedLocation: null,
     };
   },
 
@@ -116,7 +116,9 @@ export default {
     filteredLocations() {
       const today = new Date().setHours(0, 0, 0, 0);
       return Array.isArray(this.locations)
-        ? this.locations.filter((location) => new Date(location.end) >= today)
+        ? this.locations.filter(
+            (location) => !location.demande && new Date(location.end) >= today
+          )
         : [];
     },
   },
@@ -131,7 +133,6 @@ export default {
       if (this.selectedLocation && this.selectedLocation.contrat) {
         await this.deleteContrat(this.selectedLocation);
       }
-      console.log(this.selectedLocation);
       try {
         const response = await fetch(`${process.env.API}/deleteLocation`, {
           method: "POST",

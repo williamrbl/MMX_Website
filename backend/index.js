@@ -445,6 +445,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
   try {
     const {
       _id,
+      typeLocataire,
       association,
       start,
       end,
@@ -458,6 +459,8 @@ app.post("/addLocation", upload.none(), async (req, res) => {
       isRetard,
       suppRetard,
       materiel,
+      demande,
+      description,
     } = req.body;
 
     if (!_id || !association || !start || !end) {
@@ -482,6 +485,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
 
     const updateDoc = {
       $set: {
+        typeLocataire: typeLocataire,
         association: association,
         start: start,
         end: end,
@@ -495,6 +499,8 @@ app.post("/addLocation", upload.none(), async (req, res) => {
         isRetard: isRetardBool,
         suppRetard: suppRetardInt,
         materiel: parsedMateriel,
+        demande: demande === "true",
+        description: description,
       },
     };
 
@@ -681,6 +687,30 @@ app.post("/exportExcel", async (req, res) => {
     res.status(200).send("Data exported to Excel successfully");
   } catch (err) {
     console.error("Error in /exportExcel endpoint:", err);
+    res.status(500).send("Error processing request");
+  }
+});
+
+app.post("/accepterDemande", async (req, res) => {
+  try {
+    id = req.body._id;
+
+    if (!id) {
+      return res.status(400).send("ID is required");
+    }
+    const db = client.db("Locations");
+
+    const result = await db
+      .collection("locations")
+      .updateOne({ _id: id }, { $unset: { demande: "" } });
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).send("No document found with the given ID");
+    }
+
+    res.status(200).send("Demande validée");
+  } catch (err) {
+    console.error("Erreur lors de la validation de la demande", err);
     res.status(500).send("Error processing request");
   }
 });

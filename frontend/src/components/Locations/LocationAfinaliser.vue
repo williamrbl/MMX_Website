@@ -60,14 +60,17 @@ export default {
   },
   computed: {
     filteredLocationsARegler() {
+      const today = new Date().setHours(0, 0, 0, 0);
       return Object.entries(this.locations)
         .filter(
           ([key, location]) =>
-            location.paye === false ||
-            location.caution === false ||
-            location.contrat == null ||
-            location.pret == false ||
-            location.rendu == false
+            (location.paye === false ||
+              location.caution === false ||
+              location.contrat == null ||
+              location.pret === false ||
+              location.rendu === false) &&
+            new Date(location.end) >= today &&
+            !location.demande
         )
         .map(([key, location]) => location);
     },

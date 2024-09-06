@@ -52,7 +52,7 @@
 
       <div class="calendar-footer">
         <div style="display: flex; justify-content: center">
-          <FaireDemande />
+          <AjouterLocation @get-locations="getLocations()" />
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import FaireDemande from "./FaireDemande.vue";
+import AjouterLocation from "./AjouterLocation.vue";
 
 import { ref, onMounted } from "vue";
 
