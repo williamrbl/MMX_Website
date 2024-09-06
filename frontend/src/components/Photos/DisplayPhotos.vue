@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       photos: [],
-      isPhotoViewerOpen: false, // For controlling the photo viewer modal
+      isPhotoViewerOpen: false,
       currentPhoto: "",
     };
   },

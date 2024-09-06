@@ -8,6 +8,7 @@
         label="Ajouter une location"
         @click="isAjoutLocation = true"
       />
+      <DemandesLocations />
     </div>
 
     <q-tabs
@@ -82,6 +83,7 @@
               inputAsso = '';
               locationDates = {};
               isDay = false;
+              this.materiel = {};
             }
           "
         />
@@ -103,12 +105,46 @@
               style="width: 80%"
               outlined
             />
+
             <q-toggle
               v-model="isDay"
               label="Location sur une journée"
               @click="locationDates = {}"
               style="margin-top: 5%"
             />
+
+            <SelectionMateriel
+              :locationDates="locationDates"
+              @add-materiel="
+                (mat) => {
+                  prix = prix;
+                  materiel = mat;
+                }
+              "
+            />
+
+            <div v-if="Object.keys(materiel).length > 0">
+              <div style="font-weight: 500; margin-bottom: 5px">
+                Matériel loué :
+              </div>
+              <div class="q-px-md">
+                <div v-if="materiel.nbSB && materiel.nbSB != 0">
+                  SoundBoks : {{ materiel.nbSB }}
+                </div>
+                <div v-if="materiel.nbSatellite && materiel.nbSatellite != 0">
+                  Satellites : {{ materiel.nbSatellite }}
+                </div>
+                <div v-if="materiel.isCaisson !== false">
+                  Caisson : {{ materiel.isCaisson ? 1 : 0 }}
+                </div>
+                <div v-if="materiel.isScarlett !== false">
+                  Carte Son : {{ materiel.isScarlett ? 1 : 0 }}
+                </div>
+                <div v-if="materiel.nbMicro && materiel.nbMicro != 0">
+                  Micro : {{ materiel.nbMicro }}
+                </div>
+              </div>
+            </div>
           </div>
           <q-date
             class="col"
@@ -148,6 +184,7 @@
                 inputAsso = '';
                 locationDates = {};
                 isDay = false;
+                this.materiel = {};
               }
             "
           />
@@ -170,10 +207,18 @@ import { v4 as uuidv4 } from "uuid";
 import ComponentAvenir from "./LocationAvenir.vue";
 import ComponentAfinaliser from "./LocationAfinaliser.vue";
 import ComponentLocations from "./AllLocations.vue";
+import SelectionMateriel from "./SelectionMateriel.vue";
+import DemandesLocations from "./DemandesLocations.vue";
 
 export default {
   name: "EditLocations",
-  components: { ComponentAvenir, ComponentAfinaliser, ComponentLocations },
+  components: {
+    ComponentAvenir,
+    ComponentAfinaliser,
+    ComponentLocations,
+    SelectionMateriel,
+    DemandesLocations,
+  },
   setup() {
     return { utils };
   },
@@ -187,6 +232,8 @@ export default {
       tab: "avenir",
       isDeleting: false,
       selectedLocation: null,
+      materiel: {},
+      prix: 0,
     };
   },
   methods: {
@@ -231,13 +278,14 @@ export default {
     },
 
     async addLocation() {
-      if (typeof this.locationDates == "string") {
+      if (typeof this.locationDates === "string") {
         this.locationDates = this.transformDate(this.locationDates);
       }
       if (
-        (Object.keys(this.locationDates).length === 0 &&
-          this.locationDates.constructor === Object) ||
-        this.inputAsso == ""
+        !this.locationDates.from ||
+        !this.locationDates.to ||
+        this.inputAsso === "" ||
+        Object.keys(this.materiel).length === 0
       ) {
         utils.alert("Veuillez entrer toutes les informations");
       } else if (
@@ -246,21 +294,16 @@ export default {
       ) {
         utils.alert("Veuillez entrer des dates correctes");
       } else {
+        this.calculatePrice();
         const uuid = uuidv4();
         const formData = new FormData();
         formData.append("_id", uuid);
         formData.append("association", this.inputAsso);
         formData.append("start", this.locationDates.from);
         formData.append("end", this.locationDates.to);
-        formData.append("paye", false);
-        formData.append("caution", false);
-        formData.append("contrat", null);
-        formData.append("pret", false);
-        formData.append("rendu", false);
-        formData.append("daterendu", "");
-        formData.append("prix", 0);
-        formData.append("isRetard", false);
-        formData.append("suppRetard", 0);
+        formData.append("prix", this.prix);
+        formData.append("materiel", JSON.stringify(this.materiel));
+
         try {
           const response = await fetch(`${process.env.API}/addLocation`, {
             method: "POST",
@@ -270,17 +313,15 @@ export default {
           if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
           }
-          this.inputName = "";
-          this.inputDescription = "";
-          this.isDay = false;
           this.getLocations();
           utils.validate("La location a bien été ajoutée");
-          this.addingArticle = false;
+          this.materiel = {};
         } catch (error) {
           console.error("Error adding renting:", error);
           utils.alert("Erreur lors de l'ajout de la location");
         }
-        (this.inputAsso = ""), (this.locationDates = {});
+        this.inputAsso = "";
+        this.locationDates = {};
         this.isAjoutLocation = false;
       }
     },
@@ -332,6 +373,53 @@ export default {
         console.error("Error updating renting:", error);
         utils.alert("Erreur lors de la MAJ de la location");
       }
+    },
+
+    calculatePrice() {
+      const materiel = this.materiel;
+      console.log(this.locationDates);
+      const dateDebut = new Date(this.locationDates.from);
+      const dateFin = new Date(this.locationDates.to);
+
+      if (isNaN(dateDebut) || isNaN(dateFin)) {
+        console.error("Invalid dates");
+        return;
+      }
+
+      const nbSoundBoks = materiel.nbSB || 0;
+      const nbSatellite = materiel.nbSatellite || 0;
+      const caisson = materiel.isCaisson || false;
+      const scarlett = materiel.isScarlett || false;
+      const nbMicros = materiel.nbMicro || 0;
+
+      const rates = {
+        soundBoks: { weekDay: 10, weekEnd: 40 },
+        satellite: { weekDay: 40, weekEnd: 80 },
+        caisson: { weekDay: 40, weekEnd: 80 },
+        scarlett: { weekDay: 10, weekEnd: 20 },
+      };
+
+      let prix = 0;
+
+      const isWeekend = (date) => date.getDay() === 6 || date.getDay() === 0;
+
+      let currentDate = new Date(dateDebut);
+      while (currentDate <= dateFin) {
+        if (isWeekend(currentDate)) {
+          prix += (nbSoundBoks * rates.soundBoks.weekEnd) / 2;
+          prix += (nbSatellite * rates.satellite.weekEnd) / 2;
+          if (caisson) prix += rates.caisson.weekEnd / 2;
+          if (scarlett) prix += rates.scarlett.weekEnd / 2;
+        } else {
+          prix += nbSoundBoks * rates.soundBoks.weekDay;
+          prix += nbSatellite * rates.satellite.weekDay;
+          if (caisson) prix += rates.caisson.weekDay;
+          if (scarlett) prix += rates.scarlett.weekDay;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      this.prix = prix;
     },
   },
 

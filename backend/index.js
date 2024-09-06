@@ -309,7 +309,6 @@ app.post("/addCaroussel", async (req, res) => {
   // Handle file upload
   bb.on("file", (name, file, info) => {
     const { mimeType } = info;
-    console.log(`File [${name}]: mimeType: %j`, mimeType);
 
     const tempFilePath = path.join(os.tmpdir(), name);
     const writeStream = fs.createWriteStream(tempFilePath);
@@ -458,6 +457,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
       prix,
       isRetard,
       suppRetard,
+      materiel,
     } = req.body;
 
     if (!_id || !association || !start || !end) {
@@ -473,7 +473,13 @@ app.post("/addLocation", upload.none(), async (req, res) => {
     const prixInt = parseInt(prix, 10) || 0;
     const suppRetardInt = parseInt(suppRetard, 10) || 0;
 
-    // Create the update document
+    let parsedMateriel;
+    try {
+      parsedMateriel = JSON.parse(materiel);
+    } catch (err) {
+      return res.status(400).send("Invalid materiel format");
+    }
+
     const updateDoc = {
       $set: {
         association: association,
@@ -488,6 +494,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
         prix: prixInt,
         isRetard: isRetardBool,
         suppRetard: suppRetardInt,
+        materiel: parsedMateriel,
       },
     };
 

@@ -49,14 +49,22 @@
           <div class="legend">Pas de SB disponible</div>
         </div>
       </div>
+
+      <div class="calendar-footer">
+        <div style="display: flex; justify-content: center">
+          <FaireDemande />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import FaireDemande from "./FaireDemande.vue";
+
 import { ref, onMounted } from "vue";
 
-const locations = ref([]); // Define a ref to store location data
+const locations = ref([]);
 
 const getLocations = async () => {
   try {

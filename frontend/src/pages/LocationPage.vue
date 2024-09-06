@@ -5,6 +5,7 @@
     >
       <div class="centered row">
         <CalendarComponent />
+
         <q-card
           class="q-pa-md"
           style="width: 30%; background-color: purple; margin-left: 5%"

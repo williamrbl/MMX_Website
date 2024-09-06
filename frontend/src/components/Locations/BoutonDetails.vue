@@ -75,6 +75,27 @@
                 @delete-contrat="deleteContrat"
               />
             </div>
+            <div class="checklist-title">Matériel loué</div>
+
+            <div>
+              <div class="q-px-md">
+                <div v-if="locationTemp.materiel.nbSB != 0">
+                  SoundBoks : {{ locationTemp.materiel.nbSB }}
+                </div>
+                <div v-if="locationTemp.materiel.nbSatellite != 0">
+                  Satellites : {{ locationTemp.materiel.nbSatellite }}
+                </div>
+                <div v-if="locationTemp.materiel.isCaisson != false">
+                  Caisson : {{ locationTemp.materiel.isCaisson ? 1 : 0 }}
+                </div>
+                <div v-if="locationTemp.materiel.isScarlett != false">
+                  Carte Son : {{ locationTemp.materiel.isScarlett ? 1 : 0 }}
+                </div>
+                <div v-if="locationTemp.materiel.nbMicro != 0">
+                  Carte Son : {{ locationTemp.materiel.nbMicro }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="row" style="display: flex; align-items: center">
@@ -220,28 +241,6 @@ export default {
       }
     },
 
-    calculatePrice() {
-      const startDate = new Date(this.location.start);
-      const endDate = new Date(this.location.end);
-      if (endDate <= startDate) return 0;
-
-      let totalPrice = 0;
-      let currentDate = new Date(startDate);
-      while (currentDate <= endDate) {
-        const dayOfWeek = currentDate.getDay();
-        totalPrice += dayOfWeek === 6 || dayOfWeek === 0 ? 20 : 10;
-        if (
-          dayOfWeek === 0 &&
-          currentDate.getTime() + 86400000 <= endDate.getTime()
-        ) {
-          totalPrice += 20;
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      this.locationTemp.prix = totalPrice;
-      this.handleUpdate();
-    },
-
     calculateRetard() {
       const penaltyPerDay = 10;
       let penalty = penaltyPerDay;
@@ -272,7 +271,6 @@ export default {
     },
   },
   mounted() {
-    this.calculatePrice();
     this.calculateRetard();
   },
 };
