@@ -22,11 +22,13 @@
           style="color: white"
           @click="
             {
+              typeLocataire = null;
               isAjoutLocation = false;
               inputAsso = '';
               locationDates = {};
               isDay = false;
-              this.materiel = {};
+              materiel = {};
+              description = '';
             }
           "
         />
@@ -141,7 +143,9 @@
                 inputAsso = '';
                 locationDates = {};
                 isDay = false;
-                this.materiel = {};
+                materiel = {};
+                description = '';
+                typeLocataire = null;
               }
             "
           />
@@ -180,6 +184,7 @@ export default {
       prix: 0,
       typeLocataire: null,
       description: "",
+      isDemande: false,
     };
   },
   setup() {
@@ -199,9 +204,13 @@ export default {
           return "Nom du locataire";
       }
     },
+
     async addLocation() {
       if (typeof this.locationDates === "string") {
-        this.locationDates = this.transformDate(this.locationDates);
+        this.locationDates = utils.transformDate(this.locationDates);
+      }
+      if (this.access != "admin") {
+        this.isDemande = true;
       }
       if (
         !this.locationDates.from ||
@@ -211,16 +220,22 @@ export default {
         !this.typeLocataire
       ) {
         utils.alert("Veuillez entrer toutes les informations");
+        return;
       } else if (this.access != "admin" && this.description == "") {
         utils.alert("Veuillez entrer toutes les informations");
+        return;
       } else if (
         new Date(this.locationDates.from) < new Date().setHours(0, 0, 0, 0) ||
         new Date(this.locationDates.to) < new Date().setHours(0, 0, 0, 0)
       ) {
         utils.alert("Veuillez entrer des dates correctes");
-      } else {
-        this.calculatePrice();
-        const uuid = uuidv4();
+        return;
+      }
+
+      this.calculatePrice();
+      const uuid = uuidv4();
+
+      const createFormData = () => {
         const formData = new FormData();
         formData.append("_id", uuid);
         formData.append("typeLocataire", this.typeLocataire);
@@ -229,36 +244,59 @@ export default {
         formData.append("end", this.locationDates.to);
         formData.append("prix", this.prix);
         formData.append("materiel", JSON.stringify(this.materiel));
-        if (this.access != "admin") {
+        if (this.isDemande) {
           formData.append("demande", true);
         }
         formData.append("description", this.description);
-        try {
-          const response = await fetch(`${process.env.API}/addLocation`, {
-            method: "POST",
-            body: formData,
-          });
+        return formData;
+      };
 
-          if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
-          }
-          this.$emit("get-locations");
-          if (this.access) {
-            utils.validate("La location a bien été ajoutée");
-          } else {
-            utils.validate("La demande a bien été prise en compte");
-          }
+      try {
+        const response = await fetch(`${process.env.API}/addLocation`, {
+          method: "POST",
+          body: createFormData(),
+        });
 
-          this.materiel = {};
-        } catch (error) {
-          console.error("Error adding renting:", error);
-          utils.alert("Erreur lors de l'ajout de la location");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        this.$emit("get-locations");
+        if (this.access) {
+          utils.validate("La location a bien été ajoutée");
+        } else {
+          utils.validate("La demande a bien été prise en compte");
+        }
+        if (this.access != "admin") {
+          try {
+            const response = await fetch(`${process.env.API}/sendMailDemande`, {
+              method: "POST",
+              body: createFormData(),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Error: ${response.statusText}`);
+            }
+            this.$emit("get-locations");
+            //utils.validate("Le mail a bien été envoyé");
+          } catch (error) {
+            console.error("Error sending mail:", error);
+            utils.alert("Erreur lors de l'envoi du mail");
+          }
         }
         this.inputAsso = "";
         this.locationDates = {};
         this.isAjoutLocation = false;
+        this.description = "";
+        this.materiel = {};
+        this.isDemande = false;
+        this.typeLocataire = null;
+      } catch (error) {
+        console.error("Error adding renting:", error);
+        utils.alert("Erreur lors de l'ajout de la location");
+        return;
       }
     },
+
     calculatePrice() {
       const materiel = this.materiel;
       console.log(this.locationDates);

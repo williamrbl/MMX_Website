@@ -1,18 +1,22 @@
 <template>
-  <q-img src="src/assets/Fond.jpg">
-    <div class="album-text">Album Photo {{ collectionName }}</div>
+  <q-img src="src/assets/Fond.jpg" style="height: 100%">
     <div class="page-container" v-if="photos.length > 1">
-      <div class="photo-flex">
-        <div v-for="photo in photos" :key="photo._id">
-          <div v-if="photo._id !== 'Titre'">
-            <q-img
-              :src="photo.photo"
-              class="photo"
-              @click="openPhotoViewer(photo.photo)"
-            />
+      <div class="album-text">{{ collectionName }}</div>
+      <div style="height: 200%" />
+      <q-scroll-area class="scroll-area">
+        <div class="parallax-background"></div>
+        <div class="photo-flex">
+          <div v-for="photo in photos" :key="photo._id">
+            <div v-if="photo._id !== 'Titre'">
+              <q-img
+                :src="photo.photo"
+                class="photo"
+                @click="openPhotoViewer(photo.photo)"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </q-scroll-area>
     </div>
 
     <q-dialog v-model="isPhotoViewerOpen" class="dialog-container">
@@ -84,6 +88,7 @@ export default {
   font-size: 30px;
   color: white;
   z-index: 1;
+  margin-bottom: 20px;
 }
 
 .page-container {
@@ -94,6 +99,12 @@ export default {
   min-height: 100%;
   width: 100%;
   text-align: center;
+}
+
+.scroll-area {
+  width: 100%;
+  height: 80vh;
+  overflow: auto;
 }
 
 .photo-flex {

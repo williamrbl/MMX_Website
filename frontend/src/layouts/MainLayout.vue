@@ -1,6 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <!-- LARGE SCREEN -->
+  <q-layout view="lHh Lpr lFf" class="full-height-layout">
     <q-header
       elevated
       class="text-white"
@@ -8,7 +7,12 @@
     >
       <q-toolbar
         class="constrain"
-        style="display: flex; justify-content: space-between; height: 100%"
+        style="
+          display: flex;
+          justify-content: space-between;
+          height: 100%;
+          padding: 0;
+        "
       >
         <div
           style="display: flex; align-items: center"
@@ -41,7 +45,10 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container class="bg-purple-3" style="flex-grow: 1">
+    <q-page-container
+      class="bg-purple-3"
+      style="flex-grow: 1; min-height: calc(100vh - 15vh)"
+    >
       <router-view />
     </q-page-container>
 
@@ -100,6 +107,11 @@ export default {
 </script>
 
 <style lang="sass">
+.full-height-layout
+  display: flex
+  flex-direction: column
+  height: 100vh
+
 .toolbar-title-font
   font-size: 25px
   font-family: "CALIBRI"
@@ -108,7 +120,7 @@ export default {
   display: flex
   align-items: center
   justify-content: left
-  height: 50px
+  height: 5vh
 
 .footer-text
   text-align: center

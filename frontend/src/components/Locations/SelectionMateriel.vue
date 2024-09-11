@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div>
+      <div style="display: flex; justify-content: end">
         <q-btn
           outline
           style="color: purple"

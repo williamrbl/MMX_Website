@@ -12,6 +12,8 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const { v4: UUID } = require("uuid");
 const busboy = require("busboy");
 const os = require("os");
+const nodemailer = require("nodemailer");
+const utils = require("./utils.ts");
 
 // Express setup
 const app = express();
@@ -518,6 +520,230 @@ app.post("/addLocation", upload.none(), async (req, res) => {
     console.error("Error adding/updating location: ", err);
     res.status(500).send("Internal server error");
   }
+});
+
+let transporter = nodemailer.createTransport({
+  host: process.env.HOST,
+  port: process.env.MAIL_PORT,
+  secure: false,
+  auth: {
+    user: process.env.USER,
+    pass: process.env.PASSWORD,
+  },
+});
+
+app.post("/sendMailDemande", upload.none(), async (req, res) => {
+  const data = req.body;
+  const materiel = JSON.parse(data.materiel);
+
+  const generateEmailContent = (data, materiel) => {
+    let materialList = [];
+    if (materiel.nbSB != 0) {
+      materialList.push(`<li>Soundboks : ${materiel.nbSB}</li>`);
+    }
+    if (materiel.nbSatellite != 0) {
+      materialList.push(
+        `<li>FBT X-LITE 115A (Satellites) : ${materiel.nbSatellite}</li>`
+      );
+    }
+    if (materiel.isCaisson) {
+      materialList.push(
+        `<li>FBT X-SUB 118SA (Caisson de basses) : ${utils.boolToNumber(
+          materiel.isCaisson
+        )}</li>`
+      );
+    }
+    if (materiel.isScarlett) {
+      materialList.push(
+        `<li>Focusrite Scarlett 18i20 (Carte Son) : ${utils.boolToNumber(
+          materiel.isScarlett
+        )}</li>`
+      );
+    }
+    if (materiel.nbMicro != 0) {
+      materialList.push(`<li>Micro + Câble XLR : ${materiel.nbMicro}</li>`);
+    }
+
+    const materialListHtml =
+      materialList.length > 0 ? `<ul>${materialList.join("")}</ul>` : "";
+
+    return `
+    <html>
+      <body>
+        <h1>Hello ${data.association}!</h1>
+        <p>Vous venez de faire une demande de location du ${utils.formatDate(
+          data.start
+        )} jusqu'au ${utils.formatDate(data.end)} pour le matériel suivant :</p>
+        ${materialListHtml}
+        <p>Nous avons bien pris en compte la demande et nous vous répondrons sous les plus brefs délais.</p>
+        <p>A bientôt !<br>Musique Mix</p>
+        <img src="${process.env.LOGO_URL}" alt="Logo" />    
+      </body>
+    </html>
+  `;
+  };
+
+  const emailContent = generateEmailContent(data, materiel);
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: process.env.TOTEST,
+    subject: "Demande de location MMX",
+    html: emailContent,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error: " + error);
+      return res.status(500).send("Error sending email");
+    }
+    console.log("Email sent: " + info.response);
+    res.status(200).send("Mail envoyé");
+  });
+});
+
+app.post("/sendMailAccepte", upload.none(), async (req, res) => {
+  const data = req.body;
+  const materiel = data.materiel;
+
+  const generateMaterialList = (materiel) => {
+    let materialList = [];
+    if (materiel.nbSB != 0) {
+      materialList.push(`<li>Soundboks : ${materiel.nbSB}</li>`);
+    }
+    if (materiel.nbSatellite != 0) {
+      materialList.push(
+        `<li>FBT X-LITE 115A (Satellites) : ${materiel.nbSatellite}</li>`
+      );
+    }
+    if (materiel.isCaisson) {
+      materialList.push(
+        `<li>FBT X-SUB 118SA (Caisson de basses) : ${utils.boolToNumber(
+          materiel.isCaisson
+        )}</li>`
+      );
+    }
+    if (materiel.isScarlett) {
+      materialList.push(
+        `<li>Focusrite Scarlett 18i20 (Carte Son) : ${utils.boolToNumber(
+          materiel.isScarlett
+        )}</li>`
+      );
+    }
+    if (materiel.nbMicro != 0) {
+      materialList.push(`<li>Micro + Câble XLR : ${materiel.nbMicro}</li>`);
+    }
+
+    return materialList.length > 0 ? `<ul>${materialList.join("")}</ul>` : "";
+  };
+
+  const materialListHtml = generateMaterialList(materiel);
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: process.env.TOTEST,
+    subject: "Demande de location MMX - Acceptée",
+    html: `
+    <html>
+      <body>
+        <h1>Hello ${data.association}!</h1>
+        <p>Vous avez fait une demande de location du ${utils.formatDate(
+          data.start
+        )} jusqu'au ${utils.formatDate(data.end)} pour le matériel suivant :</p>
+        ${materialListHtml}
+        <p>Cette demande à été acceptée. Le prix à régler est de ${
+          data.prix
+        } euros avec une caution de 1000 euros à déposer par chèque. Vous trouverez aussi ci-joint le contrat à remplir et à nous faire parvenir lors de la récupération du matériel. Pour récupérer le matériel, envoyez-nous un message sur Instagram pour que nous fixions un horaire !</p>
+        <p>A bientôt !<br>Musique Mix</p>
+         <img src="${process.env.LOGO_URL}" alt="Logo" />    
+      </body>
+    </html>
+  `,
+    attachments: [
+      {
+        filename: "contrat.pdf",
+        path: process.env.CONTRAT_URL,
+        contentType: "application/pdf",
+      },
+    ],
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log("Error: " + error);
+    }
+    console.log("Email sent: " + info.response);
+  });
+  res.status(200).send("Mail envoyé");
+});
+
+app.post("/sendMailRefus", upload.none(), async (req, res) => {
+  const { location, justification } = req.body;
+  const materiel = location.materiel;
+
+  const generateMaterialList = (materiel) => {
+    let materialList = [];
+    if (materiel.nbSB != 0) {
+      materialList.push(`<li>Soundboks : ${materiel.nbSB}</li>`);
+    }
+    if (materiel.nbSatellite != 0) {
+      materialList.push(
+        `<li>FBT X-LITE 115A (Satellites) : ${materiel.nbSatellite}</li>`
+      );
+    }
+    if (materiel.isCaisson) {
+      materialList.push(
+        `<li>FBT X-SUB 118SA (Caisson de basses) : ${utils.boolToNumber(
+          materiel.isCaisson
+        )}</li>`
+      );
+    }
+    if (materiel.isScarlett) {
+      materialList.push(
+        `<li>Focusrite Scarlett 18i20 (Carte Son) : ${utils.boolToNumber(
+          materiel.isScarlett
+        )}</li>`
+      );
+    }
+    if (materiel.nbMicro != 0) {
+      materialList.push(`<li>Micro + Câble XLR : ${materiel.nbMicro}</li>`);
+    }
+
+    return materialList.length > 0 ? `<ul>${materialList.join("")}</ul>` : "";
+  };
+
+  const materialListHtml = generateMaterialList(materiel);
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: process.env.TOTEST,
+    subject: "Demande de location MMX - Refusée",
+    html: `
+    <html>
+      <body>
+        <h1>Hello ${location.association}!</h1>
+        <p>Vous aviez fait une demande de location du ${utils.formatDate(
+          location.start
+        )} jusqu'au ${utils.formatDate(
+      location.end
+    )} pour le matériel suivant :</p>
+        ${materialListHtml}
+        <p>Malheureusement, nous ne pouvons pas y donner suite pour la raison suivante :</p>
+        <p>${justification}</p>
+        <p>Désolé et à bientôt !<br>Musique Mix</p>
+         <img src="${process.env.LOGO_URL}" alt="Logo" />    
+      </body>
+    </html>
+  `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log("Error: " + error);
+    }
+    console.log("Email sent: " + info.response);
+  });
+  res.status(200).send("Mail envoyé");
 });
 
 app.post("/updateLocation", async (req, res) => {

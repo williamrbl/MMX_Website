@@ -327,7 +327,7 @@ export default {
       }
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("date", date.toISOString());
+      formData.append("date", date);
       if (cover) {
         formData.append("cover", cover);
       }
@@ -375,6 +375,7 @@ export default {
         this.selectedCollection = "";
         utils.validate("La collection a bien été supprimée");
         this.getCollections();
+        this.photos = [];
       } catch (error) {
         console.error("Error deleting collection:", error);
         utils.alert("Erreur lors de la suppression de la collection");

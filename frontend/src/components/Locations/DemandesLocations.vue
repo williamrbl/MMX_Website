@@ -24,15 +24,19 @@
         <div
           v-for="(location, index) in filteredLocations"
           :key="index"
-          class="row"
-          style="display: flex; align-items: center"
+          class="row q-pa-md"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
         >
           <div>{{ location.association }}</div>
           <VoirDemande
             :location="location"
             @rejeter-demande="
-              (location) => {
-                rejeterDemande(location);
+              (location, justification) => {
+                rejeterDemande(location, justification);
               }
             "
             @get-locations="this.$emit('get-locations')"
@@ -67,7 +71,7 @@ export default {
     return { utils };
   },
   methods: {
-    async rejeterDemande(location) {
+    async rejeterDemande(location, justification) {
       try {
         const response = await fetch(`${process.env.API}/deleteLocation`, {
           method: "POST",
@@ -80,8 +84,24 @@ export default {
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
+        try {
+          const response = await fetch(`${process.env.API}/sendMailRefus`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ location, justification }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+        } catch (error) {
+          console.error("Error deleting location:", error);
+          utils.alert("Erreur lors de la suppression de la location");
+        }
         this.$emit("get-locations");
-        //utils.validate("La demande a été supprimée !");
+        utils.validate("La demande a été refusée");
       } catch (error) {
         console.error("Error deleting location:", error);
         utils.alert("Erreur lors de la suppression de la location");

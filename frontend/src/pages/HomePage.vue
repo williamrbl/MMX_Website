@@ -1,5 +1,10 @@
 <template>
-  <q-img :src="fond" style="width: 100%; height: 120dvh" class="q-py-xl">
+  <q-parallax
+    :src="fond"
+    style="width: 100%; height: 120dvh"
+    class="q-py-xl"
+    :speed="0.8"
+  >
     <div style="width: 100%; height: 100%">
       <div
         style="
@@ -28,7 +33,7 @@
 
       <div class="spacer" />
     </div>
-  </q-img>
+  </q-parallax>
 
   <ContactsDiv />
 </template>

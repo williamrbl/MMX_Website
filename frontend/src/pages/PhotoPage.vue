@@ -1,5 +1,9 @@
 <template>
-  <q-img src="src/assets/Fond.jpg">
+  <q-img
+    :src="parallaxSrc"
+    :speed="parallaxSpeed"
+    style="height: 100%; width: 100%"
+  >
     <div class="collection-container">
       <div v-for="(collection, idx) in data" :key="idx">
         <q-card
@@ -36,8 +40,16 @@ export default {
   data() {
     return {
       collections: [],
-      data: [], // Array of photo objects
+      data: [],
+      parallaxSrc: "src/assets/Fond.jpg",
     };
+  },
+  computed: {
+    parallaxSpeed() {
+      const numberOfCards = this.data.length;
+
+      return numberOfCards > 10 ? 0.5 : 1.0;
+    },
   },
   setup() {
     return {
@@ -104,21 +116,22 @@ export default {
 .collection-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 2px;
   justify-content: center;
   padding: 16px;
 }
 
 .collection-card {
   background-color: purple;
-  width: 300px;
+  width: 280px;
+  margin: 8px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .collection-image {
-  height: 200px;
+  height: 180px;
   object-fit: cover;
 }
 

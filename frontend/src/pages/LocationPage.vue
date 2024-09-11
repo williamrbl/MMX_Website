@@ -1,5 +1,5 @@
 <template>
-  <q-img src="src/assets/Fond.jpg">
+  <q-img src="src/assets/Fond.jpg" style="height: 100%">
     <div
       style="display: flex; flex-direction: column; width: 100%; height: 100%"
     >
