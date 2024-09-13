@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB setup
-const uri = process.env.URI;
+const uri = process.env.connectionString;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -463,6 +463,7 @@ app.post("/addLocation", upload.none(), async (req, res) => {
       materiel,
       demande,
       description,
+      email,
     } = req.body;
 
     if (!_id || !association || !start || !end) {
@@ -506,7 +507,10 @@ app.post("/addLocation", upload.none(), async (req, res) => {
       },
     };
 
-    // Update the document, create if not exists
+    if (email && email.trim() !== "") {
+      updateDoc.$set.email = email;
+    }
+
     const result = await collection.updateOne({ _id: _id }, updateDoc, {
       upsert: true,
     });
@@ -587,7 +591,7 @@ app.post("/sendMailDemande", upload.none(), async (req, res) => {
 
   let mailOptions = {
     from: process.env.USER,
-    to: process.env.TOTEST,
+    to: data.email,
     subject: "Demande de location MMX",
     html: emailContent,
   };
@@ -641,7 +645,7 @@ app.post("/sendMailAccepte", upload.none(), async (req, res) => {
 
   let mailOptions = {
     from: process.env.USER,
-    to: process.env.TOTEST,
+    to: data.email,
     subject: "Demande de location MMX - Acceptée",
     html: `
     <html>
@@ -716,7 +720,7 @@ app.post("/sendMailRefus", upload.none(), async (req, res) => {
 
   let mailOptions = {
     from: process.env.USER,
-    to: process.env.TOTEST,
+    to: location.email,
     subject: "Demande de location MMX - Refusée",
     html: `
     <html>

@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:14
+FROM node:20
 
 # Set the working directory in the container
 WORKDIR /app
@@ -8,15 +8,18 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install project dependencies
-RUN npm install
-RUN npm install dotenv
-RUN npm install cors
+RUN npm install --force
+RUN npm install dotenv --force
+RUN npm install cors --force
+RUN npm install exceljs --force
+RUN npm install nodemailer --force
+RUN npm install firebase-admin --force
 
 # Copy the rest of the application code to the working directory
 COPY . .
 
 # Build the Quasar project for production
-RUN node index.js
+
 
 # Install serve globally
 RUN npm install -g serve
@@ -25,4 +28,4 @@ RUN npm install -g serve
 EXPOSE 3000
 
 # Start the app
-CMD ["serve", "-s", ".", "-l", "3000"]
+CMD  node index.js
