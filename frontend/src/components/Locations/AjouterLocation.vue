@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: purple; margin-left: 10%"
+    style="color: purple"
     :label="
       access === 'admin' ? 'Ajout d\'une location' : 'Demande de location'
     "
@@ -29,6 +29,7 @@
               isDay = false;
               materiel = {};
               description = '';
+              email = '';
             }
           "
         />
@@ -56,6 +57,13 @@
               :label="getLabel()"
               style="width: 80%"
               outlined
+            />
+            <q-input
+              v-model="email"
+              label="Email"
+              style="width: 80%"
+              outlined
+              v-if="access != 'admin'"
             />
 
             <q-input label="Description de l'événement" v-model="description" />
@@ -104,7 +112,6 @@
             class="col"
             v-model="locationDates"
             :range="!isDay"
-            @input="updateDateDisplay"
             first-day-of-week="1"
             style="color: purple"
           />
@@ -146,6 +153,7 @@
                 materiel = {};
                 description = '';
                 typeLocataire = null;
+                email = '';
               }
             "
           />
@@ -185,6 +193,7 @@ export default {
       typeLocataire: null,
       description: "",
       isDemande: false,
+      email: "",
     };
   },
   setup() {
@@ -211,8 +220,14 @@ export default {
       }
       if (this.access != "admin") {
         this.isDemande = true;
-      }
-      if (
+        if (this.email === "") {
+          utils.alert("Veuillez entrer toutes les informations");
+        }
+
+        if (!(this.email.includes("@") && this.email.includes("."))) {
+          utils.alert("Veuillez entrer un email valide");
+        }
+      } else if (
         !this.locationDates.from ||
         !this.locationDates.to ||
         this.inputAsso === "" ||
@@ -245,6 +260,7 @@ export default {
         formData.append("prix", this.prix);
         formData.append("materiel", JSON.stringify(this.materiel));
         if (this.isDemande) {
+          formData.append("email", this.email);
           formData.append("demande", true);
         }
         formData.append("description", this.description);

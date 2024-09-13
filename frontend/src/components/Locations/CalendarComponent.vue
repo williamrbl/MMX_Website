@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <div class="calendar-info-wrapper">
-      <div class="calendar">
+      <div class="calendar" ref="calendar">
         <div class="titre">Disponibilités</div>
         <div class="calendar-header">
           <span class="month-change" id="prev-month">&#8249;</span>
-          <span class="month-picker" id="month-picker">May</span>
+          <span class="month-picker" id="month-picker">Mai</span>
           <span class="month-change" id="next-month">&#8250;</span>
           <div class="year-picker" id="year-picker">
             <span class="year-change" id="pre-year">&#8249;</span>
@@ -16,13 +16,13 @@
 
         <div class="calendar-body">
           <div class="calendar-week-days">
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
-            <div>Sun</div>
+            <div>Lun</div>
+            <div>Mar</div>
+            <div>Mer</div>
+            <div>Jeu</div>
+            <div>Ven</div>
+            <div>Sam</div>
+            <div>Dim</div>
           </div>
           <div class="calendar-days"></div>
         </div>
@@ -31,10 +31,10 @@
 
     <div class="info-sidebar">
       <div class="date-time-format">
-        <div class="day-text-format">TODAY</div>
+        <div class="day-text-format">AUJOURD'HUI</div>
         <div class="date-time-value">
           <div class="time-format">01:41:20</div>
-          <div class="date-format">03 - March - 2022</div>
+          <div class="date-format">03 - Mars - 2022</div>
         </div>
       </div>
 
@@ -52,7 +52,7 @@
 
       <div class="calendar-footer">
         <div style="display: flex; justify-content: center">
-          <AjouterLocation @get-locations="getLocations()" />
+          <AjouterLocation @get-locations="getLocations" />
         </div>
       </div>
     </div>
@@ -61,38 +61,9 @@
 
 <script setup>
 import AjouterLocation from "./AjouterLocation.vue";
-
 import { ref, onMounted } from "vue";
 
 const locations = ref([]);
-
-const getLocations = async () => {
-  try {
-    const response = await fetch(`${process.env.API}/locations`, {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-    locations.value = await response.json();
-  } catch (error) {
-    console.error("Error getting locations:", error);
-    // Handle error appropriately, for example:
-    alert("Erreur lors de la récupération des locations");
-  }
-};
-
-// Functions for leap year and February days
-const isLeapYear = (year) => {
-  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-};
-
-const getFebDays = (year) => {
-  return isLeapYear(year) ? 29 : 28;
-};
-
-// Calendar variables
 const calendar = ref(null);
 const month_names = [
   "Janvier",
@@ -110,6 +81,31 @@ const month_names = [
 ];
 const currentMonth = ref(new Date().getMonth());
 const currentYear = ref(new Date().getFullYear());
+
+const getLocations = async () => {
+  try {
+    const response = await fetch(`${process.env.API}/locations`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    locations.value = await response.json();
+    updateCalendar();
+  } catch (error) {
+    console.error("Error getting locations:", error);
+    alert("Erreur lors de la récupération des locations");
+  }
+};
+
+const isLeapYear = (year) => {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+};
+
+const getFebDays = (year) => {
+  return isLeapYear(year) ? 29 : 28;
+};
 
 const generateCalendar = (month, year) => {
   const calendar_days = calendar.value.querySelector(".calendar-days");
@@ -130,16 +126,13 @@ const generateCalendar = (month, year) => {
     31,
   ];
 
-  // Adjust first_day to start with Monday (0=Monday, 6=Sunday)
   let first_day = new Date(year, month, 1).getDay();
   first_day = first_day === 0 ? 6 : first_day - 1;
 
-  // Populate days
   for (let i = 0; i < first_day + days_of_month[month]; i++) {
     const day = document.createElement("div");
     if (i >= first_day) {
       day.innerHTML = i - first_day + 1;
-      // Highlight current date
       const currentDate = new Date();
       if (
         i - first_day + 1 === currentDate.getDate() &&
@@ -158,6 +151,25 @@ const generateCalendar = (month, year) => {
   calendar_header_year.innerText = year;
 };
 
+const updateCalendar = () => {
+  generateCalendar(currentMonth.value, currentYear.value);
+
+  const calendar_days = calendar.value.querySelector(".calendar-days").children;
+  for (let day of calendar_days) {
+    const date = new Date(currentYear.value, currentMonth.value, day.innerText);
+    const formattedDate = date.toISOString().split("T")[0];
+
+    const locs = locations.value.filter((loc) => loc.date === formattedDate);
+    let sbCount = locs.reduce((count, loc) => count + loc.nbSB, 0);
+
+    if (sbCount >= 2) {
+      day.classList.add("red");
+    } else if (sbCount === 1) {
+      day.classList.add("orange");
+    }
+  }
+};
+
 onMounted(() => {
   calendar.value = document.querySelector(".calendar");
   getLocations();
@@ -172,7 +184,7 @@ onMounted(() => {
     } else {
       currentMonth.value--;
     }
-    generateCalendar(currentMonth.value, currentYear.value);
+    updateCalendar();
   };
 
   document.querySelector("#next-month").onclick = () => {
@@ -182,18 +194,18 @@ onMounted(() => {
     } else {
       currentMonth.value++;
     }
-    generateCalendar(currentMonth.value, currentYear.value);
+    updateCalendar();
   };
 
   // Year navigation
   document.querySelector("#pre-year").onclick = () => {
     currentYear.value--;
-    generateCalendar(currentMonth.value, currentYear.value);
+    updateCalendar();
   };
 
   document.querySelector("#next-year").onclick = () => {
     currentYear.value++;
-    generateCalendar(currentMonth.value, currentYear.value);
+    updateCalendar();
   };
 
   // Show time
@@ -206,7 +218,7 @@ onMounted(() => {
     weekday: "long",
   };
   const currentDateFormat = new Intl.DateTimeFormat(
-    "en-US",
+    "fr-FR",
     showCurrentDateOption
   ).format(new Date());
   todayShowDate.textContent = currentDateFormat;
@@ -219,7 +231,7 @@ onMounted(() => {
       second: "2-digit",
     };
     todayShowTime.textContent = new Intl.DateTimeFormat(
-      "en-US",
+      "fr-FR",
       options
     ).format(timer);
   }, 1000);
@@ -368,12 +380,20 @@ body {
   color: #ffffff;
   background-color: #4b0082;
   border-radius: 50%;
-  width: 37px; /* Match the width of the calendar day cell */
-  height: 37px; /* Match the height of the calendar day cell */
+  width: 37px;
+  height: 37px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold; /* Optional: Makes the text stand out */
+  font-weight: bold;
+}
+
+.calendar-days div.red {
+  background-color: #ff4c4c;
+}
+
+.calendar-days div.orange {
+  background-color: #ff9c4c;
 }
 
 .date-time-format {
@@ -382,7 +402,7 @@ body {
   padding: 20px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 7px 29px 0px;
   width: 300px;
-  margin-left: 20px; /* Adjusted to create space between calendar and date-time info */
+  margin-left: 20px;
 }
 
 .day-text-format {

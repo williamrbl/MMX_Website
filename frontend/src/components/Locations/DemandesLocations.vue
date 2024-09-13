@@ -43,7 +43,7 @@
           />
         </div>
       </div>
-      <div v-else>Aucune demande de location</div>
+      <div v-else class="q-pa-md">Aucune demande de location</div>
     </q-card>
   </q-dialog>
 </template>

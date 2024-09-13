@@ -11,7 +11,10 @@ const routes = [
       },
       { path: "/studio", component: () => import("src/pages/StudioPage.vue") },
 
-      { path: "/devis", component: () => import("src/pages/DevisPage.vue") },
+      {
+        path: "/demandes",
+        component: () => import("src/pages/DemandesPage.vue"),
+      },
       {
         path: "/parameters",
         component: () => import("src/pages/Parameters.vue"),

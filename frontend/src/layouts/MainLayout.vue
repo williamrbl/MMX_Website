@@ -39,7 +39,7 @@
           <q-btn flat icon="eva-home-outline" to="/" />
           <q-route-tab name="photos" label="Photos" to="/photos" />
           <q-route-tab name="locations" label="Locations" to="/locations" />
-          <q-route-tab name="devis" label="Devis" to="/devis" />
+          <q-route-tab name="demandes" label="Demandes" to="/demandes" />
           <q-route-tab name="studio" label="Studio" to="/studio" />
         </q-tabs>
       </q-toolbar>
@@ -47,12 +47,17 @@
 
     <q-page-container
       class="bg-purple-3"
-      style="flex-grow: 1; min-height: calc(100vh - 15vh)"
+      style="flex-grow: 1; min-height: calc(100vh - 15vh - 5vh)"
     >
       <router-view />
     </q-page-container>
 
-    <q-footer class="q-px-lg" style="background-color: primary; height: 5vh">
+    <q-footer
+      elevated
+      bordered
+      class="q-px-lg"
+      style="background-color: primary; height: 5vh"
+    >
       <div
         style="
           display: flex;
