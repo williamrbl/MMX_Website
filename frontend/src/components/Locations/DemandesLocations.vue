@@ -73,25 +73,31 @@ export default {
   methods: {
     async rejeterDemande(location, justification) {
       try {
-        const response = await fetch(`${process.env.API}/deleteLocation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(location),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/deleteLocation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(location),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         try {
-          const response = await fetch(`${process.env.API}/sendMailRefus`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ location, justification }),
-          });
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/sendMailRefus`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ location, justification }),
+            }
+          );
 
           if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);

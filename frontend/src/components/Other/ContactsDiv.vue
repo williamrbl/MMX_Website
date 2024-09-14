@@ -3,19 +3,31 @@
     <div class="contact-details col-6">
       <div class="contact-title">Contact:</div>
       <div class="spacer" />
-      <div class="contact-row">
-        <q-icon name="eva-email-outline" color="white" class="contact-icon" />
-        <div class="contact-text">musiquemix@devinci.fr</div>
-      </div>
-      <div class="contact-row">
-        <q-icon name="la la-youtube" color="white" class="contact-icon" />
-        <a
-          class="contact-link cursor-pointer"
-          href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
-          target="_blank"
-        >
-          Chaîne YouTube
-        </a>
+      <div>
+        <div class="contact-row">
+          <q-icon name="eva-email-outline" color="white" class="contact-icon" />
+          <div class="contact-text">musiquemix@devinci.fr</div>
+        </div>
+        <div class="contact-row">
+          <q-icon name="la la-youtube" color="white" class="contact-icon" />
+          <a
+            class="contact-link cursor-pointer"
+            href="https://www.youtube.com/channel/UC0rRdwDiwU8Cnsun4EfiLag"
+            target="_blank"
+          >
+            Chaîne YouTube
+          </a>
+        </div>
+        <div class="contact-row">
+          <q-icon name="la la-instagram" color="white" class="contact-icon" />
+          <a
+            class="contact-link cursor-pointer"
+            href="https://www.instagram.com/musiquemix_/"
+            target="_blank"
+          >
+            Instagram
+          </a>
+        </div>
       </div>
     </div>
     <div class="contact-logo col-6">
@@ -69,13 +81,13 @@ export default {
 }
 
 .contact-icon {
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 .contact-text,
 .contact-link {
   font-size: 16px;
-  font-family: "Calibri", sans-serif;
+  font-family: Aileron Light;
 }
 
 .contact-link {

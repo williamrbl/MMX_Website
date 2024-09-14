@@ -31,3 +31,11 @@ yarn-error.log*
 
 # local .env files
 .env
+fly.toml
+
+.env*
+.flaskenv*
+!.env.project
+
+
+!.env.vault

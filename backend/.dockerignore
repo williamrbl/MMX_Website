@@ -2,3 +2,7 @@
 fly.toml
 .env
 .env.json
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

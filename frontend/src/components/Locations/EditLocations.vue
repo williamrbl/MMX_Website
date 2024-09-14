@@ -123,7 +123,7 @@ export default {
 
     async getLocations() {
       try {
-        const response = await fetch(`${process.env.API}/locations`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/locations`, {
           method: "GET",
         });
 
@@ -147,13 +147,16 @@ export default {
 
     async updateLocation(location) {
       try {
-        const response = await fetch(`${process.env.API}/updateLocation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(location),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/updateLocation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(location),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -168,7 +171,7 @@ export default {
 
     async exportExcel() {
       try {
-        const response = await fetch(`${process.env.API}/exportExcel`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/exportExcel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

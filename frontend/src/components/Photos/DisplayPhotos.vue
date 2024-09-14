@@ -1,8 +1,7 @@
 <template>
-  <q-img src="src/assets/Fond.jpg" style="height: 100%">
-    <div class="page-container" v-if="photos.length > 1">
+  <q-img src="src/assets/Fond.jpg" style="height: 80vh">
+    <div class="page-container" v-if="photos.length > 1" style="height: 80vh">
       <div class="album-text">{{ collectionName }}</div>
-      <div style="height: 200%" />
       <q-scroll-area class="scroll-area">
         <div class="parallax-background"></div>
         <div class="photo-flex">
@@ -52,7 +51,9 @@ export default {
     async getCollection() {
       try {
         const response = await fetch(
-          `${process.env.API}/photos/${this.collectionName.toLowerCase()}`,
+          `${
+            process.env.VUE_APP_API
+          }/photos/${this.collectionName.toLowerCase()}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -89,6 +90,7 @@ export default {
   color: white;
   z-index: 1;
   margin-bottom: 20px;
+  font-family: Arupala Grotesk Ultra;
 }
 
 .page-container {

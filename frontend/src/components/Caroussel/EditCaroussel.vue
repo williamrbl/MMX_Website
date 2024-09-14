@@ -162,7 +162,7 @@ export default {
 
     async getArticles() {
       try {
-        const response = await fetch(`${process.env.API}/articles`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -201,10 +201,13 @@ export default {
         }
 
         try {
-          const response = await fetch(`${process.env.API}/addCaroussel`, {
-            method: "POST",
-            body: formData,
-          });
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/addCaroussel`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
 
           if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);
@@ -224,13 +227,16 @@ export default {
 
     async updateArticle() {
       try {
-        const response = await fetch(`${process.env.API}/updateCaroussel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(this.articles),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/updateCaroussel`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.articles),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -245,13 +251,16 @@ export default {
 
     async deleteArticle(article) {
       try {
-        const response = await fetch(`${process.env.API}/deleteCaroussel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(article),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/deleteCaroussel`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(article),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -275,7 +284,7 @@ export default {
 
       try {
         const response = await fetch(
-          `${process.env.API}/deletePhotoCaroussel`,
+          `${process.env.VUE_APP_API}/deletePhotoCaroussel`,
           {
             method: "POST",
             headers: {

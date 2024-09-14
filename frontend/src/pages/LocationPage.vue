@@ -1,5 +1,5 @@
 <template>
-  <q-img src="src/assets/Fond.jpg" style="height: 100%">
+  <q-img src="src/assets/Fond.jpg" style="height: 80vh">
     <div
       style="
         display: flex;
@@ -79,7 +79,7 @@ export default {
   methods: {
     async getLocations() {
       try {
-        const response = await fetch(`${process.env.API}/locations`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/locations`, {
           method: "GET",
         });
 
@@ -144,8 +144,6 @@ export default {
 
     getEventColor(date) {
       const formattedDate = date.split("T")[0].replace(/-/g, "/");
-      console.log(formattedDate);
-      console.log(this.events);
       const event = this.events.find((event) => event.date === formattedDate);
 
       if (!event) {

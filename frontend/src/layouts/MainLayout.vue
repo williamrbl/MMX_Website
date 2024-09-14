@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf" class="full-height-layout">
     <q-header
       elevated
-      class="text-white"
+      class="text-white large-screen-only"
       style="background-color: primary; height: 10vh"
     >
       <q-toolbar
@@ -37,26 +37,61 @@
           style="min-width: 200px"
         >
           <q-btn flat icon="eva-home-outline" to="/" />
-          <q-route-tab name="photos" label="Photos" to="/photos" />
-          <q-route-tab name="locations" label="Locations" to="/locations" />
-          <q-route-tab name="demandes" label="Demandes" to="/demandes" />
-          <q-route-tab name="studio" label="Studio" to="/studio" />
+          <q-route-tab
+            name="photos"
+            label="Photos"
+            to="/photos"
+            style="font-family: Aileron Bold"
+          />
+          <q-route-tab
+            name="locations"
+            label="Locations"
+            to="/locations"
+            style="font-family: Aileron Bold"
+          />
+          <q-route-tab
+            name="demandes"
+            label="Demandes"
+            to="/demandes"
+            style="font-family: Aileron Bold"
+          />
+          <q-route-tab
+            name="studio"
+            label="Studio"
+            to="/studio"
+            style="font-family: Aileron Bold"
+          />
         </q-tabs>
       </q-toolbar>
     </q-header>
 
-    <q-page-container
-      class="bg-purple-3"
-      style="flex-grow: 1; min-height: calc(100vh - 15vh - 5vh)"
-    >
+    <q-header class="centered small-screen-only">
+      <div
+        @click="$router.push('/')"
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+      >
+        <q-avatar>
+          <q-img :src="logo" fit="cover" />
+        </q-avatar>
+        <div style="font-family: Arupala Grotesk Ultra">Musique Mix</div>
+      </div>
+    </q-header>
+
+    <q-page-container style="background-color: #800b95">
       <router-view />
     </q-page-container>
 
     <q-footer
       elevated
       bordered
-      class="q-px-lg"
-      style="background-color: primary; height: 5vh"
+      class="q-px-lg large-screen-only"
+      style="background-color: primary; height: 10vh"
     >
       <div
         style="
@@ -71,7 +106,7 @@
           Association de musique du Pôle Léonard de Vinci
         </h6>
         <div class="row" style="display: flex; align-items: center">
-          <div style="opacity: 0.5">Hot Blood, love is gonna get ya</div>
+          <div class="hot-blood">Hot Blood, love is gonna get ya</div>
           <div class="q-px-md">
             <q-btn
               flat
@@ -92,6 +127,47 @@
           </div>
         </div>
       </div>
+    </q-footer>
+
+    <q-footer class="small-screen-only" style="height: 10vh">
+      <q-tabs
+        v-model="tab"
+        no-caps
+        class="q-mr-md"
+        inline-label
+        style="
+          min-width: 200px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          border-radius: 5%;
+        "
+      >
+        <q-route-tab
+          name="photos"
+          label="Photos"
+          to="/photos"
+          style="font-family: Aileron Bold"
+        />
+        <q-route-tab
+          name="locations"
+          label="Locations"
+          to="/locations"
+          style="font-family: Aileron Bold"
+        />
+        <q-route-tab
+          name="demandes"
+          label="Demandes"
+          to="/demandes"
+          style="font-family: Aileron Bold"
+        />
+        <q-route-tab
+          name="studio"
+          label="Studio"
+          to="/studio"
+          style="font-family: Aileron Bold"
+        />
+      </q-tabs>
     </q-footer>
   </q-layout>
 </template>
@@ -119,7 +195,7 @@ export default {
 
 .toolbar-title-font
   font-size: 25px
-  font-family: "CALIBRI"
+  font-family: Arupala Grotesk Ultra
 
 .q-footer
   display: flex
@@ -129,6 +205,11 @@ export default {
 
 .footer-text
   text-align: center
-  font-size: 15px
-  font-family: "CALIBRI"
+  font-size: 10px
+  font-family: Aileron Bold
+
+.hot-blood
+  opacity: 0.5
+  font-size:15px
+  font-family: Arupala Grotesk Ultra
 </style>

@@ -255,10 +255,13 @@ export default {
           formData.append(`file_${index}`, file);
         });
 
-        const response = await fetch(`${process.env.API}/uploadPhotos`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/uploadPhotos`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -276,12 +279,15 @@ export default {
 
     async getCollections() {
       try {
-        const response = await fetch(`${process.env.API}/listCollections`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/listCollections`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -303,7 +309,9 @@ export default {
       this.photos = [];
       try {
         const response = await fetch(
-          `${process.env.API}/photos/${this.selectedCollection.toLowerCase()}`,
+          `${
+            process.env.VUE_APP_API
+          }/photos/${this.selectedCollection.toLowerCase()}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -333,10 +341,13 @@ export default {
       }
 
       try {
-        const response = await fetch(`${process.env.API}/createCollection`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/createCollection`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -358,13 +369,16 @@ export default {
     async deleteCollection(name) {
       name = name.toLowerCase();
       try {
-        const response = await fetch(`${process.env.API}/deleteCollection`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name }),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/deleteCollection`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

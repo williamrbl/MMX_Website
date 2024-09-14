@@ -144,25 +144,31 @@ export default {
 
     async accepterDemande(selectedDemande) {
       try {
-        const response = await fetch(`${process.env.API}/accepterDemande`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(selectedDemande),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        try {
-          const response = await fetch(`${process.env.API}/sendMailAccepte`, {
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/accepterDemande`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(selectedDemande),
-          });
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        try {
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/sendMailAccepte`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(selectedDemande),
+            }
+          );
 
           if (!response.ok) {
             throw new Error(`Error: ${response.statusText}`);

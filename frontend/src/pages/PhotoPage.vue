@@ -1,34 +1,43 @@
 <template>
   <q-img
     :src="parallaxSrc"
-    :speed="parallaxSpeed"
-    style="height: 100%; width: 100%"
+    style="
+      height: 80vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    "
   >
     <div class="collection-container">
-      <div v-for="(collection, idx) in data" :key="idx">
-        <q-card
-          class="collection-card"
-          v-if="collection._id === 'Titre'"
-          flat
-          bordered
-        >
-          <q-img :src="collection.img" class="collection-image" />
-          <q-card-section>
-            <h3 class="collection-name">{{ collection.nom }}</h3>
-            <p class="collection-date">
-              {{ utils.formatDate(collection.date) }}
-            </p>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn
-              outline
-              label="Voir les photos"
-              class="view-photos-button"
-              @click="viewPhotos(collection)"
-            />
-          </q-card-actions>
-        </q-card>
-      </div>
+      <q-scroll-area class="scroll-area">
+        <div class="card-wrapper">
+          <div v-for="(collection, idx) in data" :key="idx">
+            <q-card
+              class="collection-card"
+              v-if="collection._id === 'Titre'"
+              flat
+              bordered
+            >
+              <q-img :src="collection.img" class="collection-image" />
+              <q-card-section>
+                <h3 class="collection-name">{{ collection.nom }}</h3>
+                <p class="collection-date">
+                  {{ utils.formatDate(collection.date) }}
+                </p>
+              </q-card-section>
+              <q-card-actions align="right">
+                <q-btn
+                  outline
+                  label="Voir les photos"
+                  class="view-photos-button"
+                  @click="viewPhotos(collection)"
+                />
+              </q-card-actions>
+            </q-card>
+          </div>
+        </div>
+      </q-scroll-area>
     </div>
   </q-img>
 </template>
@@ -59,10 +68,13 @@ export default {
   methods: {
     async getCollections() {
       try {
-        const response = await fetch(`${process.env.API}/listCollections`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/listCollections`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         if (!response.ok) throw new Error(`Error: ${response.statusText}`);
         const collections = await response.json();
         this.collections = collections.map((collection) => collection.name);
@@ -75,7 +87,7 @@ export default {
     async getPhotos(collectionName) {
       try {
         const response = await fetch(
-          `${process.env.API}/photos/${collectionName}`,
+          `${process.env.VUE_APP_API}/photos/${collectionName}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -83,7 +95,7 @@ export default {
         );
         if (!response.ok) throw new Error(`Error: ${response.statusText}`);
         const photos = await response.json();
-        this.data.push(...photos); // Assuming photos is an array
+        this.data.push(...photos);
       } catch (error) {
         console.error("Error getting photos:", error);
         utils.alert("Erreur lors de la récupération des photos");
@@ -115,10 +127,25 @@ export default {
 <style scoped>
 .collection-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
+  align-items: center;
   justify-content: center;
-  padding: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90vw;
+  height: 70vh;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .collection-card {
@@ -139,12 +166,14 @@ export default {
   font-size: 1.25rem;
   font-weight: bold;
   color: white;
+  font-family: Arupala Grotesk Ultra;
 }
 
 .collection-date {
   font-size: 0.875rem;
   opacity: 0.7;
   color: white;
+  font-family: Aileron Light;
 }
 
 .view-photos-button {

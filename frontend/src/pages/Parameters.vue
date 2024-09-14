@@ -25,6 +25,7 @@
 
       <div v-if="!isConnected" class="col-12 q-pa-md">
         <div class="login-label">Connexion</div>
+        <div class="login-label"></div>
 
         <q-input
           v-model="inputPassword"
@@ -190,6 +191,9 @@ export default {
     togglePasswordVisibility() {
       this.isPwd = !this.isPwd;
     },
+  },
+  mounted() {
+    console.log(process.env);
   },
 };
 </script>

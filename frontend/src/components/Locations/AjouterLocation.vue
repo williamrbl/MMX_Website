@@ -268,7 +268,7 @@ export default {
       };
 
       try {
-        const response = await fetch(`${process.env.API}/addLocation`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/addLocation`, {
           method: "POST",
           body: createFormData(),
         });
@@ -284,10 +284,13 @@ export default {
         }
         if (this.access != "admin") {
           try {
-            const response = await fetch(`${process.env.API}/sendMailDemande`, {
-              method: "POST",
-              body: createFormData(),
-            });
+            const response = await fetch(
+              `${process.env.VUE_APP_API}/sendMailDemande`,
+              {
+                method: "POST",
+                body: createFormData(),
+              }
+            );
 
             if (!response.ok) {
               throw new Error(`Error: ${response.statusText}`);

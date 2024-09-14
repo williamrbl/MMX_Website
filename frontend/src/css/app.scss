@@ -1,21 +1,52 @@
-// app global css in SCSS form
-
 .small-screen-only {
   @media (max-width: $breakpoint-xs-max) {
-    display: block;
+    display: block !important;
   }
   @media (min-width: $breakpoint-sm-min) {
-    display: none;
+    display: none !important;
+  }
+  @media only screen and (orientation: landscape) {
+    body {
+      display: none;
+    }
   }
 }
 
 .large-screen-only {
   @media (max-width: $breakpoint-xs-max) {
-    display: none;
+    display: none !important;
   }
   @media (min-width: $breakpoint-sm-min) {
-    display: block;
+    display: block !important;
   }
+}
+
+@font-face {
+  font-family: "Arupala Grotesk Ultra";
+  src: url("src/assets/fonts/ArupalaGrotesk-Ultra.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aileron Heavy";
+  src: url("src/assets/fonts/aileron/Aileron-Heavy.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aileron Bold";
+  src: url("src/assets/fonts/aileron/Aileron-Bold.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Aileron Light";
+  src: url("src/assets/fonts/aileron/Aileron-Light.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .constrain {

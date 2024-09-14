@@ -1,8 +1,8 @@
 {
-  "name": "mmx",
+  "name": "Musique Mix",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "MMX Website",
+  "description": "Site web de Musique Mix",
+  "productName": "Musique Mix",
   "author": "William RABOLIN",
   "private": true,
   "scripts": {

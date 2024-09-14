@@ -67,10 +67,13 @@ export default {
       formData.append("association", location.association);
 
       try {
-        const response = await fetch(`${process.env.API}/uploadContrat`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/uploadContrat`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -89,10 +92,13 @@ export default {
       formData.append("contract", location.contract);
       formData.append("association", location.association);
       try {
-        const response = await fetch(`${process.env.API}/removeContract`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/removeContract`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

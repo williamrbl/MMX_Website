@@ -221,10 +221,13 @@ export default {
       formData.append("association", this.location.association);
 
       try {
-        const response = await fetch(`${process.env.API}/uploadContrat`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/uploadContrat`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

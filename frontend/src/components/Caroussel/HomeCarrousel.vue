@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 50%">
+  <div style="width: 80vw">
     <q-carousel
       v-model="slide"
       transition-prev="slide-right"
@@ -7,20 +7,22 @@
       animated
       control-color="primary"
       class="rounded-borders"
-      style="background-color: purple"
+      style="background-color: #800b95; height: 50vh"
       @click="handleCarouselClick"
     >
       <q-carousel-slide
         v-for="(slideName, index) in slides"
         :key="index"
         :name="slideName"
-        class="column flex-center"
+        class="column"
+        style="display: flex; flex-direction: column; justify-content: center"
       >
         <q-img
           :src="articles[index].photo"
           class="carousel-img"
           @mouseover="isHovered = true"
           @mouseleave="isHovered = false"
+          style="position: relative; width: 100%; height: auto"
         >
           <div class="description-container">
             <div class="annonce-font">{{ articles[index].description }}</div>
@@ -90,7 +92,7 @@ export default {
 
     async getArticles() {
       try {
-        const response = await fetch(`${process.env.API}/articles`, {
+        const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -167,6 +169,22 @@ export default {
 .annonce-font {
   font-size: large;
   color: white;
-  font-family: "Calibri";
+}
+
+.carousel-img {
+  position: relative; /* Ensure this element is positioned relative */
+}
+
+.description-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 90%;
+  box-sizing: border-box;
+  font-family: Aileron Light;
 }
 </style>

@@ -84,7 +84,7 @@ const currentYear = ref(new Date().getFullYear());
 
 const getLocations = async () => {
   try {
-    const response = await fetch(`${process.env.API}/locations`, {
+    const response = await fetch(`${process.env.VUE_APP_API}/locations`, {
       method: "GET",
     });
 

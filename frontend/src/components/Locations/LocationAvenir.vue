@@ -134,13 +134,16 @@ export default {
         await this.deleteContrat(this.selectedLocation);
       }
       try {
-        const response = await fetch(`${process.env.API}/deleteLocation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(this.selectedLocation),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/deleteLocation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.selectedLocation),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -161,10 +164,13 @@ export default {
       formData.append("association", location.association);
 
       try {
-        const response = await fetch(`${process.env.API}/removeContract`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/removeContract`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

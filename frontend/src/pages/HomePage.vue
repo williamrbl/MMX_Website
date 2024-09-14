@@ -1,41 +1,27 @@
 <template>
-  <q-parallax
-    :src="fond"
-    style="width: 100%; height: 120dvh"
-    class="q-py-xl"
-    :speed="0.8"
-  >
-    <div style="width: 100%; height: 100%">
-      <div
-        style="
-          color: white;
-          font-size: 40px;
-          font-family: 'calibri';
-          margin-left: 10%;
-        "
-      >
-        Bienvenue sur le site de Musique Mix
-      </div>
+  <div class="background-container">
+    <q-parallax :src="fond" height="1100">
+      <div class="centered">
+        <div class="content-container centered">
+          <div class="welcome-message">Bienvenue chez Musique Mix :</div>
 
-      <div class="spacer" />
+          <div class="news-section">
+            <div class="news-title">Actualités</div>
+          </div>
 
-      <div style="width: 100%; margin-left: 10%">
-        <div style="color: white; font-size: 30px; font-family: 'calibri'">
-          Actualités
+          <div class="spacer" />
+
+          <div class="carrousel-container">
+            <HomeCarrousel style="margin-bottom: 20%" />
+          </div>
+
+          <div class="spacer" />
         </div>
       </div>
+    </q-parallax>
 
-      <div class="spacer" />
-
-      <div class="centered">
-        <HomeCarrousel />
-      </div>
-
-      <div class="spacer" />
-    </div>
-  </q-parallax>
-
-  <ContactsDiv />
+    <ContactsDiv />
+  </div>
 </template>
 
 <script>
@@ -55,6 +41,68 @@ export default {
 </script>
 
 <style scoped>
+.background-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.content-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 10%;
+  box-sizing: border-box;
+}
+
+.welcome-message {
+  color: white;
+  font-size: 40px;
+  font-family: Arupala Grotesk Ultra;
+  margin-bottom: 20px;
+}
+
+.news-section {
+  width: 100%;
+  margin-bottom: 20px; /* Space between sections */
+}
+
+.news-title {
+  color: white;
+  font-size: 30px;
+  font-family: Aileron Light;
+}
+
+.carrousel-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.large-screen-only {
+  display: block;
+}
+
+.small-screen-only {
+  display: none;
+}
+
+/* Media queries to handle screen sizes */
+@media (max-width: 767px) {
+  .large-screen-only {
+    display: none;
+  }
+  .small-screen-only {
+    display: block;
+  }
+}
+
 .spacer {
   height: 50px;
 }
