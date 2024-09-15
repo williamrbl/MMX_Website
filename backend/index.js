@@ -1,5 +1,3 @@
-require("dotenv").config({ path: "./.env" });
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -14,18 +12,40 @@ const busboy = require("busboy");
 const os = require("os");
 const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
+require("dotenv").config({ path: "./.env" });
 
-// Express setup
+console.log(process.env);
+
+/*
+config express
+*/
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// MongoDB setup
-const uri = process.env.connectionString;
+//MONGO
 
-const client = new MongoClient(uri, {
+const { ConnectionString } = require("mongodb-connection-string-url");
+
+const connectionString = process.env.MONGO_URI;
+
+if (!connectionString) {
+  console.error("MONGO_URI environment variable is not set");
+  process.exit(1);
+}
+
+let url;
+try {
+  const connectionUrl = new ConnectionString(connectionString);
+  url = connectionUrl.toString();
+} catch (error) {
+  console.error("Error parsing connection string:", error.message);
+  process.exit(1);
+}
+
+const client = new MongoClient(url, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -33,20 +53,28 @@ const client = new MongoClient(uri, {
   },
 });
 
-async function connectToDatabase() {
+async function connectToMongoDB() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
-  } catch (err) {
-    console.error("Error connecting to MongoDB", err);
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error.message);
+    process.exit(1);
   }
 }
 
-connectToDatabase().catch(console.dir);
+connectToMongoDB();
 
 // Firestorage setup
 
-const serviceAccount = JSON.parse(process.env.VUE_APP_serviceAccountKey);
+const serviceAccountKey = process.env.VUE_APP_serviceAccountKey;
+
+if (!serviceAccountKey) {
+  console.error("No serviceAccountKey defined");
+  process.exit(1);
+}
+
+const serviceAccount = JSON.parse(serviceAccountKey);
 const admin = require("firebase-admin");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

@@ -1,13 +1,19 @@
 <template>
   <q-page>
-    <q-img src="src/assets/Fond.jpg" style="height: 80vh">
+    <q-img :src="fond" style="height: 80vh">
       <q-card>STUDIO PAGE</q-card>
     </q-img>
   </q-page>
 </template>
 
-<script setup>
-defineOptions({
+<script>
+import fond from "src/assets/Fond.jpg";
+export default {
   name: "DevisPage",
-});
+  data() {
+    return {
+      fond,
+    };
+  },
+};
 </script>

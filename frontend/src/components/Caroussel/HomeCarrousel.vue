@@ -91,6 +91,8 @@ export default {
     },
 
     async getArticles() {
+      console.log(`${process.env.VUE_APP_API}/articles`);
+
       try {
         const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
           method: "GET",

@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require("quasar/wrappers");
+require("dotenv").config({ path: "./.env" });
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -44,7 +45,10 @@ module.exports = configure(function (/* ctx */) {
         node: "node20",
       },
 
-      env: require("dotenv").config().parsed,
+      env: {
+        VUE_APP_PASSWORD: process.env.VUE_APP_PASSWORD,
+        VUE_APP_API: process.env.VUE_APP_API,
+      },
 
       vueRouterMode: "hash", // available values: 'hash', 'history'
       // vueRouterBase,

@@ -1,6 +1,6 @@
 <template>
   <q-img
-    :src="parallaxSrc"
+    :src="fond"
     style="
       height: 80vh;
       width: 100%;
@@ -44,13 +44,14 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import fond from "src/assets/Fond.jpg";
 
 export default {
   data() {
     return {
       collections: [],
       data: [],
-      parallaxSrc: "src/assets/Fond.jpg",
+      fond,
     };
   },
   computed: {

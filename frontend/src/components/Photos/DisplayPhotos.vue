@@ -1,5 +1,5 @@
 <template>
-  <q-img src="src/assets/Fond.jpg" style="height: 80vh">
+  <q-img :src="fond" style="height: 80vh">
     <div class="page-container" v-if="photos.length > 1" style="height: 80vh">
       <div class="album-text">{{ collectionName }}</div>
       <q-scroll-area class="scroll-area">
@@ -37,6 +37,7 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import fond from "src/assets/Fond.jpg";
 export default {
   name: "DisplayPhotos",
   props: { collectionName: { type: String, required: true } },
@@ -45,6 +46,7 @@ export default {
       photos: [],
       isPhotoViewerOpen: false,
       currentPhoto: "",
+      fond,
     };
   },
   methods: {

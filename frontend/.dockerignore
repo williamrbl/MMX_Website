@@ -31,10 +31,10 @@ src-capacitor\node_modules
 **\*.sln
 
 # local .env files
-**\.env
+**/.env.local*
 fly.toml
 
-.env*
+
 .flaskenv*
 !.env.project
 !.env.vault

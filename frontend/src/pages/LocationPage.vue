@@ -1,5 +1,5 @@
 <template>
-  <q-img src="src/assets/Fond.jpg" style="height: 80vh">
+  <q-img :src="fond" style="height: 80vh">
     <div
       style="
         display: flex;
@@ -17,7 +17,7 @@
           first-day-of-week="1"
           :events="dates"
           :event-color="(date) => getEventColor(date)"
-          style="background-color: white; color: purple"
+          style="background-color: white; color: purple; width: 40vh"
         />
 
         <div>
@@ -39,14 +39,16 @@
         <q-card
           class="q-pa-md"
           style="
-            width: 30%;
+            width: 70vw;
             background-color: white;
             margin-left: 5%;
             border-radius: 20px;
+            height: 30vh;
           "
         >
-          <div class="title">Prix</div>
+          <div class="title">A changer tout avec vraies valeurs</div>
           <div class="item">SoundBoks</div>
+
           <div class="type">1 weekend : 40 euros</div>
           <div class="type">1 journée : 40 euros</div>
           <div class="title">Conditions</div>
@@ -64,6 +66,7 @@
 
 <script>
 import AjouterLocation from "src/components/Locations/AjouterLocation.vue";
+import fond from "src/assets/Fond.jpg";
 
 export default {
   name: "LocationPage",
@@ -74,6 +77,7 @@ export default {
       events: [],
       dates: [],
       selectedDate: "",
+      fond,
     };
   },
   methods: {
@@ -168,24 +172,24 @@ export default {
 <style scoped>
 .title {
   color: purple;
-  font-size: 40px;
+  font-size: 20px;
   font-family: calibri;
 }
 .item {
   color: purple;
-  font-size: 30px;
+  font-size: 15px;
   font-family: calibri;
   margin-left: 5px;
 }
 .type {
   color: purple;
-  font-size: 20px;
+  font-size: 10px;
   font-family: calibri;
   margin-left: 10px;
 }
 .texte {
   color: purple;
-  font-size: 10px;
+  font-size: 5px;
   font-family: calibri;
   margin-left: 10px;
   font-weight: 200;

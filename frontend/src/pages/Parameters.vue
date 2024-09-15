@@ -159,7 +159,7 @@ export default {
     checkConnection() {
       if (this.inputPassword === "") {
         utils.alert("Veuillez saisir un mot de passe");
-      } else if (this.inputPassword !== process.env.PASSWORD) {
+      } else if (this.inputPassword !== process.env.VUE_APP_PASSWORD) {
         utils.alert("Le mot de passe est incorrect");
       } else {
         this.isConnected = true;
@@ -191,9 +191,6 @@ export default {
     togglePasswordVisibility() {
       this.isPwd = !this.isPwd;
     },
-  },
-  mounted() {
-    console.log(process.env);
   },
 };
 </script>
