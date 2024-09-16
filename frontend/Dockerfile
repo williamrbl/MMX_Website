@@ -21,6 +21,7 @@ RUN npx quasar build -m pwa
 RUN npm install -g serve
 
 ENV NODE_ENV=production
+
 # Change the working directory to the build output directory
 WORKDIR /app/dist/pwa
 

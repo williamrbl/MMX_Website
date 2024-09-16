@@ -1,8 +1,8 @@
 <template>
   <q-img
     :src="fond"
+    class="height-image"
     style="
-      height: 80vh;
       width: 100%;
       display: flex;
       align-items: center;
@@ -12,7 +12,7 @@
     <div class="collection-container">
       <q-scroll-area class="scroll-area">
         <div class="card-wrapper">
-          <div v-for="(collection, idx) in data" :key="idx">
+          <div v-for="(collection, idx) in sortedData" :key="idx">
             <q-card
               class="collection-card"
               v-if="collection._id === 'Titre'"
@@ -55,10 +55,18 @@ export default {
     };
   },
   computed: {
-    parallaxSpeed() {
-      const numberOfCards = this.data.length;
+    sortedData() {
+      const filteredData = this.data.filter(
+        (collection) => collection._id === "Titre"
+      );
 
-      return numberOfCards > 10 ? 0.5 : 1.0;
+      const sorted = filteredData.slice().sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        console.log("Comparing dates:", dateA, dateB);
+        return dateB - dateA;
+      });
+      return sorted;
     },
   },
   setup() {
@@ -106,7 +114,7 @@ export default {
     async fetchAllPhotos() {
       await this.getCollections();
       for (const collection of this.collections) {
-        await this.getPhotos(collection); // Fetch photos sequentially
+        await this.getPhotos(collection);
       }
     },
 
@@ -124,6 +132,15 @@ export default {
   },
 };
 </script>
+
+<style>
+.height-image {
+  height: 80vh;
+  @media (max-width: 575px) {
+    height: 82.5vh;
+  }
+}
+</style>
 
 <style scoped>
 .collection-container {

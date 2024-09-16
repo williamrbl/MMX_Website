@@ -281,7 +281,7 @@ export default {
 
 <style scoped>
 .detail-btn {
-  color: purple;
+  color: white;
 }
 
 .detail-card {

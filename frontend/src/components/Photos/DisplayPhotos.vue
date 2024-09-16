@@ -3,8 +3,7 @@
     <div class="page-container" v-if="photos.length > 1" style="height: 80vh">
       <div class="album-text">{{ collectionName }}</div>
       <q-scroll-area class="scroll-area">
-        <div class="parallax-background"></div>
-        <div class="photo-flex">
+        <div class="photo-flex" style="z-index: 1">
           <div v-for="photo in photos" :key="photo._id">
             <div v-if="photo._id !== 'Titre'">
               <q-img
@@ -90,9 +89,10 @@ export default {
 .album-text {
   font-size: 30px;
   color: white;
-  z-index: 1;
+  z-index: 0;
   margin-bottom: 20px;
   font-family: Arupala Grotesk Ultra;
+  position: relative;
 }
 
 .page-container {
@@ -103,12 +103,14 @@ export default {
   min-height: 100%;
   width: 100%;
   text-align: center;
+  position: relative;
 }
 
 .scroll-area {
   width: 100%;
   height: 80vh;
-  overflow: auto;
+  overflow: visible;
+  position: relative;
 }
 
 .photo-flex {
@@ -117,6 +119,7 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  position: relative;
 }
 
 .photo {
@@ -125,12 +128,15 @@ export default {
   object-fit: cover;
   border-radius: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
 .photo:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  z-index: 1;
+  @media (min-width: 575px) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+  }
 }
 
 .dialog-container {

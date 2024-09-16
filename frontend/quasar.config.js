@@ -145,14 +145,10 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: "GenerateSW",
-      GenerateSW: {
-        navigateFallback: "index.html",
-        navigateFallbackDenylist: [
-          // Ensure each entry in the denylist has 'hasIndices' property
-          { urlPattern: /^\/admin/, hasIndices: false },
-          // Add more entries as needed
-        ],
+      workboxPluginMode: "injectManifest",
+      workboxOptions: {
+        swSrc: "src-pwa/custom-service-worker.js",
+        swDest: "sw.js",
       },
     },
 

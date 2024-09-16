@@ -16,8 +16,8 @@ const routes = [
         component: () => import("src/pages/DemandesPage.vue"),
       },
       {
-        path: "/parameters",
-        component: () => import("src/pages/Parameters.vue"),
+        path: "/gestionbureau",
+        component: () => import("src/pages/GestionBureau.vue"),
       },
       {
         path: "/photos/:collectionName",

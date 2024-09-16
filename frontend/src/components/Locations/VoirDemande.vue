@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: purple"
+    style="color: white"
     label="Voir la demande"
     @click="voirDemandeDetails(location)"
   />

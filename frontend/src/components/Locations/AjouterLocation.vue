@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: purple"
+    style="color: white"
     :label="
       access === 'admin' ? 'Ajout d\'une location' : 'Demande de location'
     "
@@ -301,7 +301,24 @@ export default {
             console.error("Error sending mail:", error);
             utils.alert("Erreur lors de l'envoi du mail");
           }
+          try {
+            const response = await fetch(
+              `${process.env.VUE_APP_API}/sendMailNewDemande`,
+              {
+                method: "POST",
+                body: createFormData(),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(`Error: ${response.statusText}`);
+            }
+          } catch (error) {
+            console.error("Error sending mail:", error);
+            utils.alert("Erreur lors de l'envoi du mail");
+          }
         }
+
         this.inputAsso = "";
         this.locationDates = {};
         this.isAjoutLocation = false;

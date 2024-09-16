@@ -14,8 +14,6 @@ const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
 require("dotenv").config({ path: "./.env" });
 
-console.log(process.env);
-
 /*
 config express
 */
@@ -562,6 +560,77 @@ let transporter = nodemailer.createTransport({
     user: process.env.USER,
     pass: process.env.PASSWORD,
   },
+});
+
+app.post("/sendMailNewDemande", upload.none(), async (req, res) => {
+  const data = req.body;
+  const materiel = JSON.parse(data.materiel);
+
+  const generateEmailContent = (data, materiel) => {
+    let materialList = [];
+    if (materiel.nbSB != 0) {
+      materialList.push(`<li>Soundboks : ${materiel.nbSB}</li>`);
+    }
+    if (materiel.nbSatellite != 0) {
+      materialList.push(
+        `<li>FBT X-LITE 115A (Satellites) : ${materiel.nbSatellite}</li>`
+      );
+    }
+    if (materiel.isCaisson) {
+      materialList.push(
+        `<li>FBT X-SUB 118SA (Caisson de basses) : ${utils.boolToNumber(
+          materiel.isCaisson
+        )}</li>`
+      );
+    }
+    if (materiel.isScarlett) {
+      materialList.push(
+        `<li>Focusrite Scarlett 18i20 (Carte Son) : ${utils.boolToNumber(
+          materiel.isScarlett
+        )}</li>`
+      );
+    }
+    if (materiel.nbMicro != 0) {
+      materialList.push(`<li>Micro + Câble XLR : ${materiel.nbMicro}</li>`);
+    }
+
+    const materialListHtml =
+      materialList.length > 0 ? `<ul>${materialList.join("")}</ul>` : "";
+
+    return `
+    <html>
+      <body>
+        <h1>Nouvelle demande de location : ${data.association}</h1>
+        <p>Demande de ${data.association} du ${utils.formatDate(
+      data.start
+    )} jusqu'au ${utils.formatDate(data.end)} pour le matériel suivant :</p>
+        ${materialListHtml}
+        <p>Descrption de l'évenement : ${data.description}</p>
+        <p>Magnez vous pour traiter ça sur le site bande de feignasses ...</p>
+        <p>Bisous<br>Le robot des locations de Musique Mix</p>
+        <img src="${process.env.LOGO_URL}" alt="Logo" />    
+      </body>
+    </html>
+  `;
+  };
+
+  const emailContent = generateEmailContent(data, materiel);
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: process.env.MAIL_ASSO,
+    subject: `Nouvelle demande de location - ${data.association}`,
+    html: emailContent,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error: " + error);
+      return res.status(500).send("Error sending email");
+    }
+    console.log("Email sent: " + info.response);
+    res.status(200).send("Mail envoyé");
+  });
 });
 
 app.post("/sendMailDemande", upload.none(), async (req, res) => {

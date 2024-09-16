@@ -1,35 +1,27 @@
 <template>
-  <div style="width: 80vw">
+  <div class="carousel-container">
     <q-carousel
       v-model="slide"
       transition-prev="slide-right"
       transition-next="slide-left"
       animated
       control-color="primary"
-      class="rounded-borders"
-      style="background-color: #800b95; height: 50vh"
+      class="rounded-borders caroussel"
       @click="handleCarouselClick"
     >
       <q-carousel-slide
         v-for="(slideName, index) in slides"
         :key="index"
         :name="slideName"
-        class="column"
-        style="display: flex; flex-direction: column; justify-content: center"
       >
-        <q-img
-          :src="articles[index].photo"
-          class="carousel-img"
-          @mouseover="isHovered = true"
-          @mouseleave="isHovered = false"
-          style="position: relative; width: 100%; height: auto"
-        >
+        <q-img :src="articles[index].photo" class="carousel-img" lazy-src>
           <div class="description-container">
             <div class="annonce-font">{{ articles[index].description }}</div>
           </div>
         </q-img>
       </q-carousel-slide>
     </q-carousel>
+
     <div class="row justify-center q-mt-md">
       <q-btn-toggle
         v-model="slide"
@@ -58,6 +50,7 @@ export default {
       slides: [],
       articles: [],
       options: [],
+      observers: [],
     };
   },
   methods: {
@@ -91,8 +84,6 @@ export default {
     },
 
     async getArticles() {
-      console.log(`${process.env.VUE_APP_API}/articles`);
-
       try {
         const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
           method: "GET",
@@ -113,8 +104,9 @@ export default {
           value: this.slides[index],
         }));
 
-        // Start from the first slide
         this.slide = this.slides[0];
+
+        this.preloadImages();
       } catch (error) {
         console.error("Error getting articles:", error);
         this.$q.notify({
@@ -123,21 +115,80 @@ export default {
         });
       }
     },
+
+    preloadImages() {
+      this.articles.forEach((article) => {
+        const img = new Image();
+        img.src = article.photo;
+        img.onload = () => console.log(`${article.photo} preloaded`);
+      });
+    },
+
+    observeImages() {
+      const options = {
+        root: null,
+        threshold: 0.1,
+      };
+
+      this.observers = this.articles.map((article, index) => {
+        console.log("Observing : ", article);
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = new Image();
+              img.src = article.photo;
+              observer.unobserve(entry.target);
+            }
+          });
+        }, options);
+
+        const imgElement = document.querySelector(
+          `.carousel-img[data-index="${index}"]`
+        );
+        if (imgElement) observer.observe(imgElement);
+
+        return observer;
+      });
+    },
   },
 
   mounted() {
     this.startInterval();
     this.getArticles();
+
+    this.$nextTick(() => {
+      this.observeImages();
+    });
   },
 
   beforeUnmount() {
     this.stopInterval();
     if (this.restartTimeout) clearTimeout(this.restartTimeout);
+    // Disconnect all observers on unmount
+    this.observers.forEach((observer) => observer.disconnect());
   },
 };
 </script>
 
 <style scoped>
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.caroussel {
+  background-color: #800b95;
+  height: 50vh;
+  width: 50vw;
+
+  @media (max-width: 575px) {
+    height: 30vh;
+    width: 90vw;
+  }
+}
+
 .carousel-img {
   width: 100%;
   height: 100%;
@@ -148,19 +199,6 @@ export default {
   display: flex;
   align-items: end;
   justify-content: center;
-}
-
-.hover-overlay {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  border: 1px solid white;
-  opacity: 0.7;
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 5px 10px;
-  cursor: pointer;
-  color: white;
 }
 
 .toggle-btn {
@@ -174,7 +212,7 @@ export default {
 }
 
 .carousel-img {
-  position: relative; /* Ensure this element is positioned relative */
+  position: relative;
 }
 
 .description-container {

@@ -33,10 +33,9 @@
           no-caps
           class="q-mr-md"
           inline-label
-          align="right"
           style="min-width: 200px"
         >
-          <q-btn flat icon="eva-home-outline" to="/" />
+          <q-route-tab name="home" icon="eva-home-outline" to="/" />
           <q-route-tab
             name="photos"
             label="Photos"
@@ -61,13 +60,19 @@
             to="/studio"
             style="font-family: Aileron Bold"
           />
+          <q-route-tab
+            name="bureau"
+            label="Espace Bureau"
+            to="/gestionbureau"
+            style="font-family: Aileron Bold"
+          />
         </q-tabs>
       </q-toolbar>
     </q-header>
 
     <q-header class="centered small-screen-only">
       <div
-        @click="$router.push('/')"
+        class="row"
         style="
           display: flex;
           flex-direction: column;
@@ -76,11 +81,36 @@
           text-align: center;
         "
       >
-        <q-avatar>
-          <q-img :src="logo" fit="cover" />
-        </q-avatar>
-        <div style="font-family: Arupala Grotesk Ultra">Musique Mix</div>
+        <div
+          @click="$router.push('/')"
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          "
+        >
+          <q-avatar>
+            <q-img :src="logo" fit="cover" />
+          </q-avatar>
+          <div style="font-family: Arupala Grotesk Ultra">Musique Mix</div>
+        </div>
       </div>
+      <q-btn
+        v-if="$route.path !== '/gestionbureau'"
+        flat
+        dense
+        icon="eva-log-in-outline"
+        to="/gestionbureau"
+        style="
+          font-size: 20px;
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+        "
+      />
     </q-header>
 
     <q-page-container style="background-color: #800b95">
@@ -181,7 +211,7 @@ export default {
   data() {
     return {
       logo,
-      tab: ref("mails"),
+      tab: "home",
     };
   },
 };

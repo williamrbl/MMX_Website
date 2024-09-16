@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: purple"
+    style="color: white"
     label="Demandes de location"
     @click="isDemandes = true"
   >
@@ -63,7 +63,7 @@ export default {
   },
   props: {
     locations: {
-      type: Array,
+      type: Object,
       required: true,
     },
   },

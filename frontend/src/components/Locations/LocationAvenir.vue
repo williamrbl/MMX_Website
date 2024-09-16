@@ -1,6 +1,6 @@
 <template>
   <div class="texte">Locations à venir</div>
-  <q-separator style="margin-bottom: 20px" />
+  <q-separator style="margin-bottom: 20px" color="white" />
   <q-scroll-area style="height: 29vh">
     <div
       v-for="location in filteredLocations"
@@ -96,7 +96,7 @@ export default {
   emits: ["update-location"],
   props: {
     locations: {
-      type: Array,
+      type: Object,
       required: true,
     },
     getLocations: {

@@ -1,5 +1,5 @@
 <template>
-  <q-img :src="fond" style="height: 80vh">
+  <q-img :src="fond" class="height-image">
     <div
       style="
         display: flex;
@@ -97,7 +97,9 @@ export default {
         this.locations = data;
         this.calculateEvents();
       } catch (error) {
-        alert(`Erreur lors de la récupération des locations: ${error.message}`);
+        console.log(
+          `Erreur lors de la récupération des locations: ${error.message}`
+        );
       }
     },
 

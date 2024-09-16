@@ -2,18 +2,30 @@
   <div class="q-px-lg">
     <div class="row items-center">
       <div class="section-title q-mr-md">Locations</div>
-      <AjouterLocation :access="'admin'" @get-locations="getLocations()" />
-      <DemandesLocations
-        :locations="locations"
-        @get-locations="getLocations()"
-      />
+      <div class="row">
+        <AjouterLocation
+          :access="'admin'"
+          @get-locations="getLocations()"
+          class="col-2"
+        />
+        <DemandesLocations
+          :locations="locations"
+          @get-locations="getLocations()"
+        />
+      </div>
     </div>
 
     <q-tabs
       v-model="tab"
       no-caps
-      class="bg-purple text-white shadow-2 custom-tabs"
-      style="margin-top: 3%"
+      class="bg-primary text-white shadow-2 custom-tabs"
+      style="
+        margin-top: 3%;
+        border-top: 1px solid white;
+        border-left: 1px solid white;
+        border-right: 1px solid white;
+        border-radius: 5px;
+      "
     >
       <div class="tab-container">
         <q-tab name="avenir" label="A venir" />
@@ -208,7 +220,7 @@ export default {
 </style>
 <style scoped>
 .locations {
-  border: 1px solid purple;
+  border: 1px solid white;
   border-radius: 5px;
 }
 
