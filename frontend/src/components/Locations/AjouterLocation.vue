@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: white"
+    :style="{ color: getColor() }"
     :label="
       access === 'admin' ? 'Ajout d\'une location' : 'Demande de location'
     "
@@ -201,6 +201,14 @@ export default {
   },
 
   methods: {
+    getColor() {
+      let color = "purple";
+      if (this.access === "admin") {
+        color = "white";
+      }
+      return color;
+    },
+
     getLabel() {
       switch (this.typeLocataire) {
         case "Association du pôle":

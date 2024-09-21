@@ -24,16 +24,17 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 cleanupOutdatedCaches();
 
-// Cache strategy for images
+// Cache strategy for images only in the root directory "/"
 registerRoute(
-  // Match image requests
-  ({ request }) => request.destination === "image",
+  // Match image requests at the base "/" path
+  ({ request }) =>
+    request.destination === "image" && new URL(request.url).pathname === "/",
   new CacheFirst({
     cacheName: "image-cache",
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 50, // Max number of images to cache
-        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 Days
+        maxEntries: 50,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 days
       }),
     ],
   })
