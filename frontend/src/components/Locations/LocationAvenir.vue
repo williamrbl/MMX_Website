@@ -12,12 +12,14 @@
       <div class="col locations-text">
         {{ utils.formatDate(location.start) }}
       </div>
-      <div class="col locations-text">
-        {{
-          utils.formatDate(location.start) == utils.formatDate(location.end)
-            ? "-"
-            : utils.formatDate(location.end)
-        }}
+      <div class="large-screen-only">
+        <div class="col locations-text">
+          {{
+            utils.formatDate(location.start) == utils.formatDate(location.end)
+              ? "-"
+              : utils.formatDate(location.end)
+          }}
+        </div>
       </div>
 
       <div class="col">

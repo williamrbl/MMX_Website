@@ -1,5 +1,5 @@
 <template>
-  <div class="q-px-lg">
+  <div>
     <div class="row items-center">
       <div class="section-title q-mr-md">Locations</div>
       <div class="row">

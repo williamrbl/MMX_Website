@@ -5,7 +5,7 @@
     <q-btn
       outline
       label="Ajouter une collection"
-      style="color: purple"
+      style="color: white"
       @click="addingCollection = true"
     />
   </div>
@@ -20,11 +20,13 @@
       class="col"
       style="width: 30%"
       @update:modelValue="getCollection()"
+      dark
+      color="white"
     />
     <q-btn
       outline
       label="Ajouter des photos à la collection"
-      style="color: purple"
+      style="color: white"
       class="col"
       @click="
         if (selectedCollection) {
@@ -37,7 +39,7 @@
     <q-btn
       outline
       label="Delete collection"
-      style="color: purple"
+      style="color: white"
       class="col"
       @click="
         if (selectedCollection) {

@@ -139,9 +139,9 @@ app.post("/createCollection", (req, res) => {
 
     fileData = { filepath, mimeType, filename: `${collectionName}.png` }; // Use the collection name
 
-    writeStream.on("close", () => {
-      console.log(`File [${collectionName}.png] written to ${filepath}`);
-    });
+    // writeStream.on("close", () => {
+    //   console.log(`File [${collectionName}.png] written to ${filepath}`);
+    // });
   });
 
   bb.on("field", (fieldname, val) => {
@@ -345,9 +345,9 @@ app.post("/addCaroussel", async (req, res) => {
 
     fileData = { tempFilePath, mimeType };
 
-    writeStream.on("close", () => {
-      console.log(`File [${name}] written to ${tempFilePath}`);
-    });
+    // writeStream.on("close", () => {
+    //   console.log(`File [${name}] written to ${tempFilePath}`);
+    // });
   });
 
   // Handle form fields
@@ -396,6 +396,77 @@ app.post("/addCaroussel", async (req, res) => {
     } catch (err) {
       console.error("Error adding caroussel item:", err);
       res.status(500).send("Error adding caroussel item");
+    } finally {
+      // Clean up the temporary file
+      if (fileData.tempFilePath && fs.existsSync(fileData.tempFilePath)) {
+        fs.unlinkSync(fileData.tempFilePath);
+      }
+    }
+  });
+
+  req.pipe(bb);
+});
+
+app.post("/updateArticlePhoto", async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+
+  const bb = busboy({ headers: req.headers });
+  const fields = {};
+  let fileData = {};
+  const uuid = UUID();
+
+  // Handle file upload
+  bb.on("file", (name, file, info) => {
+    const { mimeType } = info;
+    const tempFilePath = path.join(os.tmpdir(), name);
+    const writeStream = fs.createWriteStream(tempFilePath);
+
+    file.pipe(writeStream);
+
+    fileData = { tempFilePath, mimeType };
+
+    // writeStream.on("close", () => {
+    //   console.log(`File [${name}] written to ${tempFilePath}`);
+    // });
+  });
+
+  bb.on("field", (fieldname, val) => {
+    fields[fieldname] = val;
+  });
+
+  bb.on("finish", async () => {
+    try {
+      const { _id } = fields;
+      let photoURL = "";
+
+      if (fileData.tempFilePath) {
+        const destinationFileName = `${_id}.png`;
+
+        await bucket.upload(fileData.tempFilePath, {
+          destination: `caroussel/${destinationFileName}`,
+          uploadType: "media",
+          metadata: {
+            contentType: fileData.mimeType,
+            metadata: {
+              firebaseStorageDownloadTokens: uuid,
+            },
+          },
+        });
+
+        photoURL = `https://firebasestorage.googleapis.com/v0/b/${
+          bucket.name
+        }/o/${encodeURIComponent(
+          `caroussel/${destinationFileName}`
+        )}?alt=media&token=${uuid}`;
+      }
+
+      const collection = client.db("Caroussel").collection("articles");
+      await collection.updateOne({ _id }, { $set: { photo: photoURL } });
+
+      res.status(200).json({ message: "Article photo updated successfully" });
+    } catch (err) {
+      console.error("Error updating article photo:", err);
+      res.status(500).send("Error updating article photo");
     } finally {
       // Clean up the temporary file
       if (fileData.tempFilePath && fs.existsSync(fileData.tempFilePath)) {

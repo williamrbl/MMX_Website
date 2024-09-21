@@ -114,31 +114,59 @@
     </div>
 
     <div class="small-screen-only" style="width: 100%; height: 100%">
-      <q-date
-        v-model="selectedDate"
-        minimal
-        flat
-        first-day-of-week="1"
-        :events="dates"
-        :event-color="(date) => getEventColor(date)"
-        style="background-color: white; color: purple; width: 80vw"
-      />
+      <!-- <div class="title-dark">Location de matériel</div> -->
+      <div class="centered" style="height: 100%; flex-direction: column">
+        <q-date
+          v-model="selectedDate"
+          minimal
+          flat
+          first-day-of-week="1"
+          :events="dates"
+          :event-color="(date) => getEventColor(date)"
+          style="background-color: white; color: purple; width: 80vw"
+        />
 
-      <q-scroll-area style="height: 50vh">
+        <q-card
+          style="width: 80vw; border-radius: 25px; margin-top: 3vh"
+          class="q-pa-md"
+        >
+          <div class="calendar-footer">
+            <div class="day-text-format">Disponibilités :</div>
+            <div class="legend-item">
+              <div class="color-box orange"></div>
+              <div class="legend">Une seule SoundBoks disponible</div>
+            </div>
+            <div class="legend-item">
+              <div class="color-box red"></div>
+              <div class="legend">Pas de SoundBoks disponibles</div>
+            </div>
+          </div>
+          <div class="centered">
+            <q-btn
+              outline
+              label="Faire une demande"
+              style="color: purple"
+              @click="isDemanding = true"
+            />
+          </div>
+        </q-card>
+      </div>
+
+      <q-dialog v-model="isDemanding">
         <q-card
           class="q-pa-md"
           style="
-            width: 80vw;
+            width: 85vw;
             background-color: white;
-            margin-left: 5%;
+
             border-radius: 20px;
           "
         >
           <div class="title" style="margin-bottom: 2vh">
             Conditions de location
           </div>
-          <div class="row">
-            <div class="col-6">
+          <div>
+            <div>
               <div class="section">Prix (asso)</div>
               <div class="content">Petit Déjeuner / Soirée : 20 euros</div>
               <div class="content">Week-end :</div>
@@ -153,9 +181,11 @@
               </div>
             </div>
 
-            <q-separator vertical />
+            <div class="q-py-md">
+              <q-separator />
+            </div>
 
-            <div class="col-5">
+            <div>
               <div class="section">Règlement</div>
               <div class="reglement">
                 La location de matériel implique un chèque de caution
@@ -176,28 +206,7 @@
             <AjouterLocation @get-locations="getLocations" />
           </div>
         </q-card>
-
-        <q-card
-          style="
-            margin-left: 5%;
-            width: 80vw;
-            border-radius: 25px;
-            margin-top: 3vh;
-          "
-        >
-          <div class="calendar-footer">
-            <div class="day-text-format">Disponibilités :</div>
-            <div class="legend-item">
-              <div class="color-box orange"></div>
-              <div class="legend">Une seule SB disponible</div>
-            </div>
-            <div class="legend-item">
-              <div class="color-box red"></div>
-              <div class="legend">Pas de SB disponible</div>
-            </div>
-          </div>
-        </q-card>
-      </q-scroll-area>
+      </q-dialog>
     </div>
   </q-img>
 </template>
@@ -216,6 +225,7 @@ export default {
       dates: [],
       selectedDate: "",
       fond,
+      isDemanding: false,
     };
   },
   methods: {
@@ -315,6 +325,13 @@ export default {
   font-size: 25px;
   font-family: Arupala Grotesk Ultra;
 }
+
+.title-dark {
+  color: white;
+  font-size: 25px;
+  font-family: Arupala Grotesk Ultra;
+}
+
 .section {
   color: purple;
   font-size: 25px;

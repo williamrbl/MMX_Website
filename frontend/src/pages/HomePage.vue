@@ -1,6 +1,6 @@
 <template>
   <div class="background-container">
-    <q-parallax :src="fond" :height="1100" speed="1">
+    <q-parallax :src="fond" :height="1100" :speed="1">
       <div class="centered">
         <div class="content-container centered">
           <div class="welcome-message">Bienvenue chez Musique Mix !</div>

@@ -3,7 +3,7 @@
     <div class="section-title col-4">Caroussel</div>
     <q-btn
       outline
-      color="primary"
+      color="white"
       label="Ajouter un article"
       @click="addingArticle = true"
     />
@@ -12,7 +12,7 @@
     class="col"
     style="
       color: white;
-      border: 1px solid purple;
+      border: 1px solid white;
       border-radius: 10px;
       width: 100%;
       display: flex;
@@ -43,7 +43,7 @@
         <div class="col" style="margin-bottom: 5px">
           <q-btn
             outline
-            color="purple"
+            color="white"
             label="Photo"
             @click="editPhotos(article)"
           />
@@ -89,10 +89,23 @@
     </q-card>
   </q-dialog>
 
-  <!-- Modify Photo Dialog -->
   <q-dialog v-model="isPhotoModif">
-    <q-card style="width: 60%; height: 50%">
-      <div style="display: flex; justify-content: end">
+    <q-card
+      class="size-modif-photo"
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 16px;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
         <q-btn
           flat
           dense
@@ -103,20 +116,37 @@
               modifPhoto = '';
             }
           "
+          class="large-screen-only"
         />
       </div>
-      <div class="centered">
+
+      <div
+        class="centered"
+        style="
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
         <q-img
           :src="modifPhoto"
-          style="width: 60%; height: 60%"
+          style="max-width: 100%; max-height: 100%"
           v-if="modifPhoto"
         />
-        <q-file outlined ref="photoInput" v-else @input="handleFileSelection">
+        <q-file
+          outlined
+          ref="photoInput"
+          v-else
+          @input="handleFileSelection"
+          style="width: 100%"
+        >
           <template v-slot:prepend>
             <q-icon name="attach_file" />
           </template>
         </q-file>
       </div>
+
       <div class="centered">
         <q-btn
           flat
@@ -124,13 +154,6 @@
           icon="eva-trash-outline"
           @click="deletePhotoCaroussel"
           v-if="modifPhoto"
-        />
-        <q-btn
-          outline
-          color="purple"
-          label="Add Photo"
-          @click="addPhotoCarrousel"
-          v-if="file"
         />
       </div>
     </q-card>
@@ -156,10 +179,6 @@ export default {
     };
   },
   methods: {
-    handleRefresh() {
-      this.getArticles();
-    },
-
     async getArticles() {
       try {
         const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
@@ -225,27 +244,61 @@ export default {
       }
     },
 
-    async updateArticle() {
-      try {
-        const response = await fetch(
-          `${process.env.VUE_APP_API}/updateCaroussel`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.articles),
-          }
-        );
+    async updateArticlePhoto() {
+      console.log(this.currentArticle);
+      if (this.currentArticle && this.currentArticle.photo instanceof File) {
+        const formData = new FormData();
+        formData.append("photo", this.currentArticle.photo);
+        formData.append("_id", this.currentArticle._id);
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
+        try {
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/updateArticlePhoto`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+
+          const updatedArticle = await response.json();
+          const index = this.articles.findIndex(
+            (article) => article._id === updatedArticle._id
+          );
+          if (index !== -1) {
+            this.articles.splice(index, 1, updatedArticle);
+            utils.validate("Photo mise à jour avec succès !");
+          }
+          this.getArticles();
+        } catch (error) {
+          console.error("Error updating photo:", error);
+          utils.alert("Erreur lors de la mise à jour de la photo");
         }
-        await this.getArticles();
-        utils.validate("L'article a été mis à jour !");
-      } catch (error) {
-        console.error("Error updating article:", error);
-        utils.alert("Erreur lors de la MAJ de l'article");
+      }
+    },
+
+    editPhotos(article) {
+      this.isPhotoModif = true;
+      this.modifPhoto = article.photo;
+      this.currentArticle = article;
+    },
+
+    handleFileSelection(event) {
+      const fileInput = event.target.files[0];
+      if (fileInput && this.currentArticle) {
+        this.currentArticle.photo = fileInput;
+        this.modifPhoto = URL.createObjectURL(fileInput);
+        this.updateArticlePhoto();
+      }
+    },
+
+    handleFileUpload(event) {
+      const fileInput = event.target.files[0];
+      if (fileInput) {
+        this.file = fileInput;
       }
     },
 
@@ -271,12 +324,6 @@ export default {
         console.error("Error deleting article:", error);
         utils.alert("Erreur lors de la suppression de l'article");
       }
-    },
-
-    editPhotos(article) {
-      this.isPhotoModif = true;
-      this.modifPhoto = article.photo;
-      this.currentArticle = article;
     },
 
     async deletePhotoCaroussel() {
@@ -306,28 +353,6 @@ export default {
         utils.alert("Erreur lors de la suppression de la photo");
       }
     },
-
-    async addPhotoCarrousel() {},
-
-    handleFileSelection(event) {
-      const fileInput = event.target.files[0];
-      if (fileInput) {
-        this.file = fileInput;
-      }
-    },
-
-    handleFileUpload(event) {
-      const fileInput = event.target.files[0];
-      if (fileInput) {
-        this.file = fileInput;
-      }
-    },
-
-    async handleEnter(scope) {
-      scope.set();
-      await nextTick();
-      this.updateArticle();
-    },
   },
   mounted() {
     this.getArticles();
@@ -343,8 +368,12 @@ export default {
   color: white;
 }
 
-.titre-popup {
-  font-size: 20px;
-  color: black;
+.size-modif-photo {
+  height: 70vh;
+  width: 80vw;
+
+  @media (max-width: 575px) {
+    height: 30vh;
+  }
 }
 </style>

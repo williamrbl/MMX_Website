@@ -418,5 +418,6 @@ export default {
 
 .card {
   border-radius: 15px;
+  width: 100vw !important;
 }
 </style>

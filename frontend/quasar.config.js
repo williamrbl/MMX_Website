@@ -44,13 +44,13 @@ module.exports = configure(function (/* ctx */) {
         browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
         node: "node20",
       },
-      vueRouterMode: "history",
 
       env: {
         VUE_APP_PASSWORD: process.env.VUE_APP_PASSWORD,
         VUE_APP_API: process.env.VUE_APP_API,
       },
 
+      vueRouterMode: "history", // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -145,10 +145,10 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: "injectManifest",
-      workboxOptions: {
+      workboxPluginMode: "InjectManifest",
+      injectManifest: {
         swSrc: "src-pwa/custom-service-worker.js",
-        swDest: "sw.js",
+        swDest: "service-worker.js",
       },
     },
 

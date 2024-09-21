@@ -1,8 +1,8 @@
 <template>
   <q-img :src="fond" style="height: 80vh">
-    <div class="q-col-gutter-md" style="width: 100%; height: 100%">
+    <div style="width: 100%; height: 100%">
       <div
-        class="col-12 col-md-12 row align-items-center justify-content-between"
+        class="col-12 row align-items-center"
         style="
           display: flex;
           align-items: center;
@@ -37,6 +37,7 @@
             aria-label="Password"
             color="white"
             label-color="white"
+            content-class="text-white"
           >
             <template v-slot:append>
               <q-icon
@@ -60,7 +61,7 @@
         </q-form>
       </div>
 
-      <div v-else class="col-12 row">
+      <div v-else class="col-12 row" style="height: 100%">
         <div class="sidebar col-md-3" v-show="isLargeScreen">
           <q-list padding class="q-pa-md side-bar">
             <q-item
@@ -145,7 +146,7 @@
           </q-list>
         </div>
 
-        <div class="col-12 q-pa-md q-mb-md" v-show="!isLargeScreen">
+        <div class="col-12 q-pa-md" v-show="!isLargeScreen" style="height: 5vw">
           <q-select
             v-model="selectedPage"
             :options="pages"
@@ -162,7 +163,7 @@
           />
         </div>
 
-        <div class="col-md-9 q-pa-md">
+        <div class="col-md-9">
           <EditLocations
             ref="locationsComponent"
             v-if="selectedPage === 'locations'"
@@ -319,23 +320,7 @@ export default {
   opacity: 0.7;
 }
 
-.custom-text-color .q-field__native {
-  color: white;
-}
-
-.custom-text-color .q-field__control {
-  border-color: #ff5722;
-}
-
-.custom-text-color .q-field__control:hover {
-  border-color: #ff5722;
-}
-
-.custom-text-color .q-field__control:focus {
-  border-color: #4caf50;
-}
-
-.my-custom-select .q-select__control {
-  color: red; /* Change this to your desired color */
+::v-deep .text-white .q-field__native {
+  color: white !important;
 }
 </style>
