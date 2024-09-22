@@ -1,7 +1,7 @@
 <template>
   <q-btn
     outline
-    style="color: white"
+    style="color: purple"
     label="Voir la demande"
     @click="voirDemandeDetails(location)"
   />
@@ -193,6 +193,7 @@ export default {
 .header {
   background-color: purple;
   color: white;
+  font-family: Aileron Bold;
 }
 
 .refus-card {

@@ -37,6 +37,9 @@ export default {
       fond,
     };
   },
+  mounted() {
+    console.log(`${process.env.VUE_APP_API}/articles`);
+  },
 };
 </script>
 

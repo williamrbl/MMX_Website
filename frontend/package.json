@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
+    "dotenv-vault": "^1.26.2",
     "quasar": "^2.16.6",
     "vue": "^3.4.18",
     "vue-router": "^4.0.12"

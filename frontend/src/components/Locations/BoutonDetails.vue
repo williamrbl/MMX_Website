@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="display: flex; justify-content: center">
     <q-btn
       outline
       label="État de la location"
@@ -99,7 +99,7 @@
           </div>
         </div>
         <div class="row" style="display: flex; align-items: center">
-          <div class="price col-4">
+          <div class="price col">
             Prix de la location : {{ locationTemp.prix }} euros
           </div>
           <div
@@ -285,9 +285,14 @@ export default {
 }
 
 .detail-card {
-  width: 50%;
+  width: 100vw;
   border-radius: 10px;
+  height: 45vh;
   overflow: hidden;
+  @media (min-width: 767px) {
+    width: 50vw;
+    height: 55vh;
+  }
 }
 
 .card-header {

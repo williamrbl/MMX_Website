@@ -1,16 +1,18 @@
 <template>
   <div>
-    <q-file
-      v-if="!location.contrat"
-      outlined
-      v-model="file"
-      label="Contrat"
-      @input="handleFileInput"
-    >
-      <template v-slot:prepend>
-        <q-icon name="attach_file" />
-      </template>
-    </q-file>
+    <div v-if="!location.contrat" class="centered">
+      <q-file
+        outlined
+        v-model="file"
+        label="Contrat"
+        @input="handleFileInput"
+        style="width: 80%"
+      >
+        <template v-slot:prepend>
+          <q-icon name="attach_file" />
+        </template>
+      </q-file>
+    </div>
     <q-btn
       v-else
       outline

@@ -20,7 +20,10 @@ RUN npx quasar build -m pwa
 # Install serve globally
 RUN npm install -g serve
 
-ENV NODE_ENV=production
+
+ENV VUE_APP_API=${VUE_APP_API}
+ENV VUE_APP_PASSWORD=${VUE_APP_PASSWORD}
+
 
 # Change the working directory to the build output directory
 WORKDIR /app/dist/pwa

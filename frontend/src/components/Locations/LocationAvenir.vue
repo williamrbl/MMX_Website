@@ -10,16 +10,12 @@
       <div class="col locations-text">{{ location.association }}</div>
 
       <div class="col locations-text">
-        {{ utils.formatDate(location.start) }}
-      </div>
-      <div class="large-screen-only">
-        <div class="col locations-text">
-          {{
-            utils.formatDate(location.start) == utils.formatDate(location.end)
-              ? "-"
-              : utils.formatDate(location.end)
-          }}
-        </div>
+        {{ utils.formatDate(location.start) }} →
+        {{
+          utils.formatDate(location.start) == utils.formatDate(location.end)
+            ? "-"
+            : utils.formatDate(location.end)
+        }}
       </div>
 
       <div class="col">

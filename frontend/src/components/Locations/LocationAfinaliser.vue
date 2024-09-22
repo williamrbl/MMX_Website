@@ -11,23 +11,27 @@
         {{ location.association }}
       </div>
       <div class="col locations-text">
-        {{ utils.formatDate(location.start) }}
+        {{ utils.formatDate(location.start) }} →
+        {{
+          utils.formatDate(location.start) == utils.formatDate(location.end)
+            ? "-"
+            : utils.formatDate(location.end)
+        }}
       </div>
-      <div class="col locations-text">
-        {{ utils.formatDate(location.end) }}
-      </div>
-      <!-- <div class="col locations-text">{{ utils.formatDate(location.end) }}</div> -->
 
-      <BoutonDetails
-        :location="location"
-        :getLocations="getLocations"
-        @update-location="
-          (location) => {
-            console.log('Updating : ', location);
-            this.$emit('update-location', location);
-          }
-        "
-      />
+      <!-- <div class="col locations-text">{{ utils.formatDate(location.end) }}</div> -->
+      <div class="col">
+        <BoutonDetails
+          :location="location"
+          :getLocations="getLocations"
+          @update-location="
+            (location) => {
+              console.log('Updating : ', location);
+              this.$emit('update-location', location);
+            }
+          "
+        />
+      </div>
     </div>
   </q-scroll-area>
 </template>

@@ -77,7 +77,7 @@
                     fin de la location. Chaque jour de retard entrainera une
                     pénalité financière à hauteur de 10 euros par jour de retard
                     et de 40 euros par weekend de retard (ces conditions sont
-                    stuipulées dans le contrat à signer)
+                    stipulées dans le contrat à signer)
                   </div>
                 </div>
               </div>
@@ -197,13 +197,19 @@
                 Le matériel devra être rendu au plus tard le lendemain de la fin
                 de la location. Chaque jour de retard entrainera une pénalité
                 financière à hauteur de 10 euros par jour de retard et de 40
-                euros par weekend de retard (ces conditions sont stuipulées dans
+                euros par weekend de retard (ces conditions sont stipulées dans
                 le contrat à signer)
               </div>
             </div>
           </div>
           <div style="display: flex; justify-content: center; margin-top: 2vh">
-            <AjouterLocation @get-locations="getLocations" />
+            <AjouterLocation
+              @get-locations="
+                {
+                  getLocations, (this.isDemanding = false);
+                }
+              "
+            />
           </div>
         </q-card>
       </q-dialog>

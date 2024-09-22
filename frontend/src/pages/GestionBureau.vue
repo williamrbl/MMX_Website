@@ -61,123 +61,159 @@
         </q-form>
       </div>
 
-      <div v-else class="col-12 row" style="height: 100%">
-        <div class="sidebar col-md-3" v-show="isLargeScreen">
-          <q-list padding class="q-pa-md side-bar">
-            <q-item
-              class="item"
-              clickable
-              v-ripple
-              :class="{ 'selected-item': selectedPage === 'locations' }"
-              @click="selectedPage = 'locations'"
-              aria-label="Locations"
-            >
-              <q-item-section>
-                <q-item-label>Locations</q-item-label>
-                <q-item-label caption class="caption">
-                  Gérez les locations de SoundBoks
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+      <div v-else>
+        <div class="row" v-show="isLargeScreen">
+          <div class="sidebar col-3">
+            <q-list padding class="q-pa-md side-bar">
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'locations' }"
+                @click="selectedPage = 'locations'"
+                aria-label="Locations"
+              >
+                <q-item-section>
+                  <q-item-label>Locations</q-item-label>
+                  <q-item-label caption class="caption">
+                    Gérez les locations de SoundBoks
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item
-              class="item"
-              clickable
-              v-ripple
-              :class="{ 'selected-item': selectedPage === 'photos' }"
-              @click="selectedPage = 'photos'"
-              aria-label="Photos"
-            >
-              <q-item-section>
-                <q-item-label>Photos</q-item-label>
-                <q-item-label caption class="caption">
-                  Mettez à jour l'album photo
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'photos' }"
+                @click="selectedPage = 'photos'"
+                aria-label="Photos"
+              >
+                <q-item-section>
+                  <q-item-label>Photos</q-item-label>
+                  <q-item-label caption class="caption">
+                    Mettez à jour l'album photo
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item
-              class="item"
-              clickable
-              v-ripple
-              :class="{ 'selected-item': selectedPage === 'caroussel' }"
-              @click="selectedPage = 'caroussel'"
-              aria-label="Caroussel"
-            >
-              <q-item-section>
-                <q-item-label>Caroussel</q-item-label>
-                <q-item-label caption class="caption">
-                  Mettez à jour le caroussel de la page d'accueil
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'caroussel' }"
+                @click="selectedPage = 'caroussel'"
+                aria-label="Caroussel"
+              >
+                <q-item-section>
+                  <q-item-label>Caroussel</q-item-label>
+                  <q-item-label caption class="caption">
+                    Mettez à jour le caroussel de la page d'accueil
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item
-              class="item"
-              clickable
-              v-ripple
-              :class="{ 'selected-item': selectedPage === 'studio' }"
-              @click="selectedPage = 'studio'"
-              aria-label="Studio"
-            >
-              <q-item-section>
-                <q-item-label>Studio</q-item-label>
-                <q-item-label caption class="caption">
-                  Gérez les réservations du studio
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'studio' }"
+                @click="selectedPage = 'studio'"
+                aria-label="Studio"
+              >
+                <q-item-section>
+                  <q-item-label>Studio</q-item-label>
+                  <q-item-label caption class="caption">
+                    Gérez les réservations du studio
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-            <q-item
-              class="item"
-              clickable
-              v-ripple
-              :class="{ 'selected-item': selectedPage === 'taches' }"
-              @click="selectedPage = 'taches'"
-              aria-label="TachesComponent"
-            >
-              <q-item-section>
-                <q-item-label>Tâches</q-item-label>
-                <q-item-label caption class="caption">
-                  Gérez les tâches à faire
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'taches' }"
+                @click="selectedPage = 'taches'"
+                aria-label="TachesComponent"
+              >
+                <q-item-section>
+                  <q-item-label>Tâches</q-item-label>
+                  <q-item-label caption class="caption">
+                    Gérez les tâches à faire
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+          <div class="col-9">
+            <EditLocations
+              ref="locationsComponent"
+              v-if="selectedPage === 'locations'"
+            />
+            <EditPhotos
+              ref="photosComponent"
+              v-if="selectedPage === 'photos'"
+            />
+            <EditCaroussel
+              ref="carousselComponent"
+              v-if="selectedPage === 'caroussel'"
+            />
+            <EditStudio
+              ref="studioComponent"
+              v-if="selectedPage === 'studio'"
+            />
+            <TachesComponent
+              ref="tachesComponent"
+              v-if="selectedPage === 'taches'"
+            />
+          </div>
         </div>
 
-        <div class="col-12 q-pa-md" v-show="!isLargeScreen" style="height: 5vw">
-          <q-select
-            v-model="selectedPage"
-            :options="pages"
-            class="my-custom-select"
-            emit-value
-            outlined
-            color="white"
-            label="Tab"
-            label-color="white"
-            map-options
-            dark
-            style="max-width: 300px"
-            behavior="menu"
-          />
-        </div>
-
-        <div class="col-md-9">
-          <EditLocations
-            ref="locationsComponent"
-            v-if="selectedPage === 'locations'"
-          />
-          <EditPhotos ref="photosComponent" v-if="selectedPage === 'photos'" />
-          <EditCaroussel
-            ref="carousselComponent"
-            v-if="selectedPage === 'caroussel'"
-          />
-          <EditStudio ref="studioComponent" v-if="selectedPage === 'studio'" />
-          <TachesComponent
-            ref="tachesComponent"
-            v-if="selectedPage === 'taches'"
-          />
+        <div v-show="!isLargeScreen">
+          <div style="display: flex; justify-content: center">
+            <q-select
+              v-model="selectedPage"
+              :options="pages"
+              emit-value
+              outlined
+              color="white"
+              label="Tab"
+              label-color="white"
+              map-options
+              dark
+              style="
+                max-width: 300px;
+                margin-bottom: 4vh;
+                margin-top: 3vh;
+                width: 50vw;
+              "
+              behavior="menu"
+            />
+          </div>
+          <q-separator color="white" style="margin-bottom: 4vh" />
+          <div>
+            <EditLocations
+              ref="locationsComponent"
+              v-if="selectedPage === 'locations'"
+            />
+            <EditPhotos
+              ref="photosComponent"
+              v-if="selectedPage === 'photos'"
+            />
+            <EditCaroussel
+              ref="carousselComponent"
+              v-if="selectedPage === 'caroussel'"
+            />
+            <EditStudio
+              ref="studioComponent"
+              v-if="selectedPage === 'studio'"
+            />
+            <TachesComponent
+              ref="tachesComponent"
+              v-if="selectedPage === 'taches'"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -320,7 +356,7 @@ export default {
   opacity: 0.7;
 }
 
-::v-deep .text-white .q-field__native {
+:deep(.text-white) .q-field__native {
   color: white !important;
 }
 </style>

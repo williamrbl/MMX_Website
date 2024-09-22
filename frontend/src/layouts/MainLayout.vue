@@ -28,14 +28,8 @@
           </q-toolbar-title>
         </div>
 
-        <q-tabs
-          v-model="tab"
-          no-caps
-          class="q-mr-md"
-          inline-label
-          style="min-width: 200px"
-        >
-          <q-route-tab name="home" icon="eva-home-outline" to="/" />
+        <q-tabs v-model="tab" no-caps class="q-mr-md" style="min-width: 200px">
+          <q-route-tab name="home" icon="eva-home-outline" to="/" exact />
           <q-route-tab
             name="photos"
             label="Photos"
@@ -63,7 +57,8 @@
           <q-route-tab
             name="bureau"
             label="Espace Bureau"
-            to="/gestionbureau"
+            to="/bureau"
+            exact
             style="font-family: Aileron Bold"
           />
         </q-tabs>
@@ -102,7 +97,7 @@
         flat
         dense
         icon="eva-log-in-outline"
-        to="/gestionbureau"
+        to="/bureau"
         style="
           font-size: 20px;
           position: absolute;
@@ -204,14 +199,13 @@
 
 <script>
 import logo from "src/assets/Logo.jpg";
-import { ref } from "vue";
 
 export default {
   name: "MainLayout",
   data() {
     return {
       logo,
-      tab: "home",
+      tab: this.$route.name,
     };
   },
 };

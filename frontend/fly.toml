@@ -6,6 +6,9 @@
 app = 'frontend-mmx'
 primary_region = 'cdg'
 
+[build]
+  dockerfile = "Dockerfile"
+
 [http_service]
   internal_port = 9000
   force_https = true

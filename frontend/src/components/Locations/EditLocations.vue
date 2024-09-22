@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row items-center">
-      <div class="section-title q-mr-md">Locations</div>
+      <div class="section-title">Locations</div>
       <div class="row">
         <AjouterLocation
           :access="'admin'"
@@ -212,7 +212,7 @@ export default {
   color: white;
 }
 .section-title {
-  font-family: "calibri";
+  font-family: Aileron Light;
   font-size: 30px;
   font-weight: 200;
   color: white;
@@ -222,6 +222,10 @@ export default {
 .locations {
   border: 1px solid white;
   border-radius: 5px;
+  height: 38vh;
+  @media (min-width: 767px) {
+    height: 50vh;
+  }
 }
 
 .texte {

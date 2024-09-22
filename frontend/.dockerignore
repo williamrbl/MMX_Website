@@ -37,6 +37,10 @@ fly.toml
 
 .flaskenv*
 !.env.project
+
+.env.production
+.env.development
+
 !.env.vault
 
 .env*

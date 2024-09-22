@@ -3,30 +3,28 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("src/pages/HomePage.vue") },
-      { path: "/photos", component: () => import("src/pages/PhotoPage.vue") },
+      { path: "", component: () => import("src/pages/HomePage.vue") }, // Route Home
+      { path: "photos", component: () => import("src/pages/PhotoPage.vue") }, // Pas de "/" devant le chemin
       {
-        path: "/locations",
+        path: "locations",
         component: () => import("src/pages/LocationPage.vue"),
       },
-      { path: "/studio", component: () => import("src/pages/StudioPage.vue") },
-
+      { path: "studio", component: () => import("src/pages/StudioPage.vue") },
       {
-        path: "/demandes",
+        path: "demandes",
         component: () => import("src/pages/DemandesPage.vue"),
       },
       {
-        path: "/gestionbureau",
+        path: "bureau",
         component: () => import("src/pages/GestionBureau.vue"),
       },
       {
-        path: "/photos/:collectionName",
+        path: "photos/:collectionName",
         component: () => import("src/components/Photos/DisplayPhotos.vue"),
         props: true,
       },
     ],
   },
-
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),

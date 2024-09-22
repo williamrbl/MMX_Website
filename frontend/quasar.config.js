@@ -9,7 +9,19 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require("quasar/wrappers");
-require("dotenv").config({ path: "./.env" });
+
+const dotenv = require("dotenv");
+const dotenvVault = require("dotenv-vault");
+
+if (process.env.NODE_ENV != "production") {
+  dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
+} else {
+  const result = dotenvVault.config({ path: "./.env.vault", vault: true });
+
+  if (result.error) {
+    console.error("Error loading .env.vault:", result.error);
+  }
+}
 
 module.exports = configure(function (/* ctx */) {
   return {

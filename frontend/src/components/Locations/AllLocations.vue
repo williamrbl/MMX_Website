@@ -9,9 +9,13 @@
     >
       <div class="col locations-text">{{ location.association }}</div>
       <div class="col locations-text">
-        {{ utils.formatDate(location.start) }}
+        {{ utils.formatDate(location.start) }} →
+        {{
+          utils.formatDate(location.start) == utils.formatDate(location.end)
+            ? "-"
+            : utils.formatDate(location.end)
+        }}
       </div>
-      <div class="col locations-text">{{ utils.formatDate(location.end) }}</div>
       <div class="col">
         <BoutonDetails
           :location="location"

@@ -10,7 +10,7 @@
     />
   </div>
 
-  <div class="row q-px-lg" style="display: flex; align-items: center">
+  <div style="display: flex; align-items: center">
     <q-select
       rounded
       outlined
@@ -22,6 +22,7 @@
       @update:modelValue="getCollection()"
       dark
       color="white"
+      behavior="menu"
     />
     <q-btn
       outline
