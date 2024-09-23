@@ -51,7 +51,7 @@
       "
     />
   </div>
-  <q-scroll-area style="height: 350px">
+  <q-scroll-area class="scroll-area-edit-photo">
     <div v-for="photo in photos" :key="photo._id" class="photo-container">
       <div v-if="photo._id != 'Titre'">
         <q-img :src="photo.photo" class="photo">
@@ -68,8 +68,19 @@
   </q-scroll-area>
 
   <q-dialog v-model="addingCollection">
-    <q-card class="q-pa-md" style="width: 40%">
-      <div class="titre-popup q-pb-md">Ajout d'une collection</div>
+    <q-card class="col-dialog">
+      <div
+        class="centered titre-popup"
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+        "
+      >
+        <div>Ajout d'une collection</div>
+      </div>
+
       <q-separator />
       <div class="q-pa-md">
         <q-input
@@ -120,7 +131,7 @@
             </template>
           </q-file>
 
-          <div v-else class="row" style="width: 60%">
+          <div v-else class="row q-pa-md" style="width: 60%">
             <div
               class="q-pa-md"
               style="border: solid black 1px; border-radius: 5px"
@@ -142,7 +153,7 @@
 
       <q-separator />
 
-      <div class="q-pt-md" style="display: flex; justify-content: end">
+      <div class="q-pa-md" style="display: flex; justify-content: end">
         <q-btn
           outline
           label="Cancel"
@@ -165,21 +176,27 @@
     v-model="deletingCollection"
     @keyup.enter="deleteCollection(selectedCollection)"
   >
-    <q-card class="q-pa-md" style="width: 30%">
+    <q-card class="q-pa-md col-dialog">
       <div>Collection being deleted : {{ selectedCollection }}</div>
       <div class="q-pt-md" style="display: flex; justify-content: end">
-        <q-btn outline label="Cancel" @click="deletingCollection = false" />
+        <q-btn
+          outline
+          label="Cancel"
+          @click="deletingCollection = false"
+          style="color: purple"
+        />
         <q-btn
           outline
           label="Ok"
           @click="deleteCollection(selectedCollection)"
+          style="color: purple"
         />
       </div>
     </q-card>
   </q-dialog>
 
   <q-dialog v-model="addingPhotos">
-    <q-card class="q-pa-md" style="width: 30%">
+    <q-card class="q-pa-md col-dialog">
       <div style="margin-bottom: 15px; font-weight: 400">
         Adding pictures to : {{ selectedCollection }}
       </div>
@@ -362,6 +379,7 @@ export default {
         this.date = new Date();
         this.proxyDate = new Date();
         this.getCollections();
+        this.selectedCollection = name;
         utils.validate("La collection a bien été créée");
       } catch (error) {
         console.error("Error adding collection:", error);
@@ -470,7 +488,9 @@ export default {
 
 .titre-popup {
   font-size: 20px;
-  color: black;
+  color: white;
+  background-color: purple;
+  font-family: Aileron Bold;
 }
 
 .photo-container {
@@ -496,5 +516,25 @@ export default {
 
 .photo-container:hover .btn-hovered {
   display: block;
+}
+
+.scroll-area-edit-photo {
+  height: 50vh;
+
+  @media (max-width: 767px) {
+    display: flex;
+    align-items: center;
+    height: 45vh;
+  }
+}
+
+.col-dialog {
+  width: 40vw;
+
+  @media (max-width: 767px) {
+    width: 80vw;
+  }
+
+  border-radius: 10px;
 }
 </style>

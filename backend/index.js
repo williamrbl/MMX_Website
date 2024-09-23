@@ -12,7 +12,23 @@ const busboy = require("busboy");
 const os = require("os");
 const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
-require("dotenv").config({ path: "./.env" });
+
+// index.js
+const environment = process.env.NODE_ENV || "development";
+
+console.log(`Running in ${environment} mode`);
+
+if (environment === "production") {
+  console.log("Production environment settings.");
+} else if (environment === "development") {
+  console.log("Development environment settings.");
+} else if (environment === "test") {
+  console.log("Test environment settings.");
+}
+
+require("dotenv").config({ path: `./.env.${environment}` });
+
+console.log(environment);
 
 /*
 config express
@@ -132,12 +148,19 @@ app.post("/createCollection", (req, res) => {
       return res.status(400).send("Collection name is required");
     }
 
-    const filepath = path.join(os.tmpdir(), `${collectionName}.png`); // Use collection name
+    const filepath = path.join(
+      os.tmpdir(),
+      `${collectionName.toLowerCase()}.png`
+    ); // Use collection name
     const writeStream = fs.createWriteStream(filepath);
 
     file.pipe(writeStream);
 
-    fileData = { filepath, mimeType, filename: `${collectionName}.png` }; // Use the collection name
+    fileData = {
+      filepath,
+      mimeType,
+      filename: `${collectionName.toLowerCase()}.png`,
+    }; // Use the collection name
 
     // writeStream.on("close", () => {
     //   console.log(`File [${collectionName}.png] written to ${filepath}`);
@@ -159,7 +182,7 @@ app.post("/createCollection", (req, res) => {
       }
 
       await bucket.upload(fileData.filepath, {
-        destination: `collections/${collectionName}.png`, // Use collection name
+        destination: `collections/${collectionName.toLowerCase()}.png`, // Use collection name
         uploadType: "media",
         metadata: {
           contentType: fileData.mimeType,
@@ -192,7 +215,7 @@ app.post("/createCollection", (req, res) => {
       const imgURL = `https://firebasestorage.googleapis.com/v0/b/${
         bucket.name
       }/o/${encodeURIComponent(
-        `collections/${collectionName}.png`
+        `collections/${collectionName.toLowerCase()}.png`
       )}?alt=media&token=${uuid}`;
 
       const newCollection = {
@@ -214,6 +237,7 @@ app.post("/createCollection", (req, res) => {
 app.post("/deleteCollection", async (req, res) => {
   try {
     const collectionName = req.body.name;
+    console.log("Deleting ", collectionName);
 
     if (!collectionName) {
       return res.status(400).send("Collection name is required");
@@ -248,7 +272,10 @@ app.post("/deleteCollection", async (req, res) => {
 
 app.post("/uploadPhotos", upload.any(), async (req, res) => {
   try {
-    const { collection } = req.body;
+    let { collection } = req.body;
+
+    collection = collection.toLowerCase();
+
     const files = req.files;
 
     if (!collection || !files || files.length === 0) {

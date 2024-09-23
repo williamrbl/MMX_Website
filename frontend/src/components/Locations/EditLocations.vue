@@ -2,15 +2,13 @@
   <div>
     <div class="row items-center">
       <div class="section-title">Locations</div>
-      <div class="row">
-        <AjouterLocation
-          :access="'admin'"
-          @get-locations="getLocations()"
-          class="col-2"
-        />
+      <div class="row" style="display: flex; flex-direction: row; width: 100%">
+        <AjouterLocation :access="'admin'" @get-locations="getLocations()" />
+
         <DemandesLocations
           :locations="locations"
           @get-locations="getLocations()"
+          style="width: 5vw"
         />
       </div>
     </div>
@@ -32,7 +30,12 @@
         <q-tab name="afinaliser" label="A finaliser" />
         <q-tab name="alllocations" label="Toutes les locations" />
       </div>
-      <q-btn flat dense class="far-right-btn" @click="exportExcel()">
+      <q-btn
+        flat
+        dense
+        class="far-right-btn large-screen-only"
+        @click="exportExcel()"
+      >
         <i class="las la-file-excel" style="font-size: 30px" />
       </q-btn>
     </q-tabs>
@@ -217,14 +220,26 @@ export default {
   font-weight: 200;
   color: white;
 }
+
+.edit-location-btn {
+  height: 5vh;
+}
+
+.q-scroll-locations {
+  height: 29vh;
+  @media (max-width: 767px) {
+    height: 24vh;
+  }
+}
 </style>
+
 <style scoped>
 .locations {
   border: 1px solid white;
   border-radius: 5px;
   height: 38vh;
   @media (min-width: 767px) {
-    height: 50vh;
+    height: 45vh;
   }
 }
 

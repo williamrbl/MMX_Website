@@ -3,10 +3,9 @@
     <q-btn
       outline
       :style="{ color: getColor() }"
-      :label="
-        access === 'admin' ? 'Ajout d\'une location' : 'Demande de location'
-      "
+      :label="access === 'admin' ? 'Nouvelle location' : 'Demande de location'"
       @click="isAjoutLocation = true"
+      class="edit-location-btn"
     />
     <q-dialog v-model="isAjoutLocation">
       <q-card class="card">

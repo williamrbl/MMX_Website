@@ -1,5 +1,5 @@
 <template>
-  <q-img :src="fond" class="height-image">
+  <q-img :src="fond" style="height: 80vh">
     <div class="large-screen-only">
       <div
         style="
@@ -7,7 +7,7 @@
           justify-content: center;
           flex-direction: column;
           width: 100%;
-          height: 100%;
+          height: 80vh;
         "
       >
         <div class="row" style="display: flex; align-items: center">

@@ -65,7 +65,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-header class="centered small-screen-only">
+    <q-header class="centered small-screen-only" style="height: 10vh">
       <div
         class="row"
         style="
@@ -198,7 +198,7 @@
 </template>
 
 <script>
-import logo from "src/assets/Logo.jpg";
+import logo from "src/assets/Logo.png";
 
 export default {
   name: "MainLayout",

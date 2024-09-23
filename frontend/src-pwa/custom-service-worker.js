@@ -24,11 +24,17 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 cleanupOutdatedCaches();
 
-// Cache strategy for images only in the root directory "/"
+// Cache strategy for images only when the route is "/"
 registerRoute(
   // Match image requests at the base "/" path
-  ({ request }) =>
-    request.destination === "image" && new URL(request.url).pathname === "/",
+  ({ request }) => {
+    const url = new URL(request.url);
+    return (
+      request.destination === "image" &&
+      url.pathname === "/" &&
+      url.search === ""
+    );
+  },
   new CacheFirst({
     cacheName: "image-cache",
     plugins: [

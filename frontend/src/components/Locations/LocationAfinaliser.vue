@@ -1,7 +1,7 @@
 <template>
   <div class="texte">Locations à finaliser</div>
   <q-separator style="margin-bottom: 20px" color="white" />
-  <q-scroll-area style="height: 29vh">
+  <q-scroll-area class="q-scroll-locations">
     <div
       v-for="location in filteredLocationsARegler"
       :key="location._id"

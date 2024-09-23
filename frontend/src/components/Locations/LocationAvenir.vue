@@ -1,7 +1,7 @@
 <template>
   <div class="texte">Locations à venir</div>
   <q-separator style="margin-bottom: 20px" color="white" />
-  <q-scroll-area style="height: 29vh">
+  <q-scroll-area class="q-scroll-locations">
     <div
       v-for="location in filteredLocations"
       :key="location._id"
@@ -148,7 +148,7 @@ export default {
         }
         await this.getLocations();
         this.isDeleting = false;
-        utils.validate("La location a été supprimée !");
+        // utils.validate("La location a été supprimée !");
       } catch (error) {
         console.error("Error deleting location:", error);
         utils.alert("Erreur lors de la suppression de la location");

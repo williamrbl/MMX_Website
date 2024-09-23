@@ -184,14 +184,14 @@
               dark
               style="
                 max-width: 300px;
-                margin-bottom: 4vh;
+                margin-bottom: 2vh;
                 margin-top: 3vh;
                 width: 50vw;
               "
               behavior="menu"
             />
           </div>
-          <q-separator color="white" style="margin-bottom: 4vh" />
+          <q-separator color="white" style="margin-bottom: 2vh" />
           <div>
             <EditLocations
               ref="locationsComponent"

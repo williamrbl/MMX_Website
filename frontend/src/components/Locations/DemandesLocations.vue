@@ -2,8 +2,9 @@
   <q-btn
     outline
     style="color: white"
-    label="Demandes de location"
+    label="Demandes"
     @click="isDemandes = true"
+    class="edit-location-btn"
   >
     <q-badge
       v-if="filteredLocations.length"

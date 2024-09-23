@@ -38,7 +38,7 @@ export default {
     };
   },
   mounted() {
-    console.log(`${process.env.VUE_APP_API}/articles`);
+    console.log(`${process.env.NODE_ENV}`);
   },
 };
 </script>

@@ -17,7 +17,10 @@
       </q-scroll-area>
     </div>
 
-    <q-dialog v-model="isPhotoViewerOpen" class="dialog-container">
+    <q-dialog
+      v-model="isPhotoViewerOpen"
+      class="dialog-container large-screen-only"
+    >
       <q-card class="dialog-card">
         <div class="header">
           <q-btn
