@@ -1,8 +1,7 @@
 # flyctl launch added from .gitignore
 fly.toml
-.env
-.env.json
 .env*
+.env.json
 .flaskenv*
 !.env.project
 !.env.vault
