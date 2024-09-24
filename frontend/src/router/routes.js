@@ -11,7 +11,7 @@ const routes = [
       },
       { path: "studio", component: () => import("src/pages/StudioPage.vue") },
       {
-        path: "demandes",
+        path: "prestations",
         component: () => import("src/pages/DemandesPage.vue"),
       },
       {

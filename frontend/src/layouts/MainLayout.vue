@@ -43,9 +43,9 @@
             style="font-family: Aileron Bold"
           />
           <q-route-tab
-            name="demandes"
-            label="Demandes"
-            to="/demandes"
+            name="prestations"
+            label="Prestations"
+            to="/prestations"
             style="font-family: Aileron Bold"
           />
           <q-route-tab
@@ -181,9 +181,9 @@
           style="font-family: Aileron Bold"
         />
         <q-route-tab
-          name="demandes"
-          label="Demandes"
-          to="/demandes"
+          name="prestations"
+          label="Prestations"
+          to="/prestations"
           style="font-family: Aileron Bold"
         />
         <q-route-tab

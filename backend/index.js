@@ -13,7 +13,6 @@ const os = require("os");
 const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
 
-// index.js
 const environment = process.env.NODE_ENV || "development";
 
 console.log(`Running in ${environment} mode`);
@@ -26,9 +25,16 @@ if (environment === "production") {
   console.log("Test environment settings.");
 }
 
-require("dotenv").config({ path: `./.env.${environment}` });
-
-console.log(environment);
+const dotenv = require("dotenv");
+console.log(process.env.MONGO_URI); //already defined here.. WHYYYY ???
+if (environment != "production") {
+  console.log("Loading environment variables from:", `./.env.${environment}`);
+  dotenv.config({ path: `./.env.development` });
+  console.log(process.env.MONGO_URI);
+} else {
+  console.log("Loading environment variables from: .env.vault");
+  dotenv.config({ path: `./.env.vault` });
+}
 
 /*
 config express
@@ -1138,6 +1144,50 @@ app.post("/accepterDemande", async (req, res) => {
     console.error("Erreur lors de la validation de la demande", err);
     res.status(500).send("Error processing request");
   }
+});
+
+// Demandes -----------------------------------------------------------------------------------------------
+
+app.post("/createDemande", upload.none(), (req, res) => {
+  const infos = req.body;
+
+  const generateEmailContent = () => {
+    return `
+    <html>
+      <body>
+        <h1>Hello l'équipe !</h1>
+        <p>Y'a eu une demande d'évènement pour le ${utils.formatDate(
+          infos.date
+        )} de la part de ${infos.organisateur}.
+        <p>Description de l'évènement : </p>
+        <p>${infos.description}</p>
+        <p>Mail de l'organisateur de l'évènement : ${infos.mail}</p>
+        <p>Bougez vous pour traiter la demande !<br>Le robot du site MMX</p>
+        <img src="${process.env.LOGO_URL}" alt="Logo" />    
+      </body>
+    </html>
+  `;
+  };
+
+  const emailContent = generateEmailContent();
+
+  let mailOptions = {
+    from: process.env.USER,
+    to: process.env.MAIL_ASSO,
+    subject: `Demande de prestation - ${
+      infos.organisateur
+    } - ${utils.formatDate(infos.date)}`,
+    html: emailContent,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error: " + error);
+      return res.status(500).send("Error sending email");
+    }
+    console.log("Email sent: " + info.response);
+    res.status(200).send("Mail envoyé");
+  });
 });
 
 // Listen-----------------------------------------------------------------------------------------------------
