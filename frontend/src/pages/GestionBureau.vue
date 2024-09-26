@@ -117,6 +117,22 @@
                 class="item"
                 clickable
                 v-ripple
+                :class="{ 'selected-item': selectedPage === 'prestations' }"
+                @click="selectedPage = 'prestations'"
+                aria-label="Caroussel"
+              >
+                <q-item-section>
+                  <q-item-label>Prestations</q-item-label>
+                  <q-item-label caption class="caption">
+                    Personnalisez la page de prestations
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item
+                class="item"
+                clickable
+                v-ripple
                 :class="{ 'selected-item': selectedPage === 'studio' }"
                 @click="selectedPage = 'studio'"
                 aria-label="Studio"
@@ -159,6 +175,11 @@
               ref="carousselComponent"
               v-if="selectedPage === 'caroussel'"
             />
+            <EditPrestations
+              ref="prestationsComponent"
+              v-if="selectedPage === 'prestations'"
+            />
+
             <EditStudio
               ref="studioComponent"
               v-if="selectedPage === 'studio'"
@@ -205,9 +226,9 @@
               ref="carousselComponent"
               v-if="selectedPage === 'caroussel'"
             />
-            <EditStudio
-              ref="studioComponent"
-              v-if="selectedPage === 'studio'"
+            <EditPrestations
+              ref="prestationsComponent"
+              v-if="selectedPage === 'prestations'"
             />
             <TachesComponent
               ref="tachesComponent"
@@ -225,6 +246,7 @@ import EditPhotos from "src/components/Photos/EditPhotos.vue";
 import EditCaroussel from "src/components/Caroussel/EditCaroussel.vue";
 import EditLocations from "src/components/Locations/EditLocations.vue";
 import EditStudio from "src/components/Studio/EditStudio.vue";
+import EditPrestations from "src/components/Prestations/EditPrestations.vue";
 import TachesComponent from "src/components/Taches/TachesComponent.vue";
 import utils from "src/helpers/utils.ts";
 import fond from "src/assets/Fond.jpg";
@@ -235,6 +257,7 @@ export default {
     EditPhotos,
     EditCaroussel,
     EditLocations,
+    EditPrestations,
     EditStudio,
     TachesComponent,
   },
@@ -251,6 +274,7 @@ export default {
         { label: "Locations", value: "locations" },
         { label: "Photos", value: "photos" },
         { label: "Caroussel", value: "caroussel" },
+        { label: "Prestations", value: "prestations" },
         { label: "Studio", value: "studio" },
         { label: "Tâches", value: "taches" },
       ],

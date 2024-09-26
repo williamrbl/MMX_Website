@@ -1190,6 +1190,80 @@ app.post("/createDemande", upload.none(), (req, res) => {
   });
 });
 
+app.post(
+  "/uploadImagePrestations",
+  upload.single("image"),
+  async (req, res) => {
+    const data = req.body;
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    try {
+      const db = client.db("Prestations");
+      const collectionName = `Photos`;
+      const mongoCollection = db.collection(collectionName);
+
+      const uuid = UUID();
+      const fileName = `prestations/${data.position}-${uuid}.jpg`;
+      const fileUpload = bucket.file(fileName);
+
+      await new Promise((resolve, reject) => {
+        const stream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+
+        stream.on("error", (err) => {
+          console.error("Error uploading file to Firebase Storage:", err);
+          reject(err);
+        });
+
+        stream.on("finish", async () => {
+          try {
+            await fileUpload.makePublic();
+            const fileUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+            const photo = {
+              _id: uuid,
+              photo: fileUrl,
+            };
+            const result = await mongoCollection.insertOne(photo);
+
+            if (!result.acknowledged) {
+              reject(new Error("Failed to insert document into MongoDB"));
+            } else {
+              resolve();
+            }
+          } catch (err) {
+            reject(err);
+          }
+        });
+
+        stream.end(file.buffer);
+      });
+
+      res.status(200).send("Photo uploaded successfully");
+    } catch (error) {
+      console.error(`Error: ${error.message}`);
+      res.status(500).send(`Server error: ${error.message}`);
+    }
+  }
+);
+
+app.get("/getImagesPrestations", async (req, res) => {
+  try {
+    const collection = client.db("Prestations").collection("Photos");
+    const objects = await collection.find({}).toArray();
+    res.json(objects);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching objects");
+  }
+});
+
 // Listen-----------------------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

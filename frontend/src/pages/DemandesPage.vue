@@ -36,9 +36,17 @@
               class="centered row q-gutter-md"
               style="height: 100%; width: 100%"
             >
-              <div class="col image">IMAGE</div>
-              <div class="col image">IMAGE</div>
-              <div class="col image">IMAGE</div>
+              <div
+                v-for="image in imagesHaut"
+                :key="image._id"
+                class="image-container col"
+              >
+                <q-img
+                  :src="image.photo"
+                  alt="Image"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
             </div>
           </div>
 
@@ -106,6 +114,34 @@
               @click="createDemande()"
             />
           </div>
+
+          <div
+            class="q-pa-md"
+            style="
+              width: 90vw;
+              height: 30vh;
+              display: flex;
+              align-items: stretch;
+              justify-content: center;
+            "
+          >
+            <div
+              class="centered row q-gutter-md"
+              style="height: 100%; width: 100%"
+            >
+              <div
+                v-for="image in imagesBas"
+                :key="image._id"
+                class="image-container col"
+              >
+                <q-img
+                  :src="image.photo"
+                  alt="Image"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
+            </div>
+          </div>
         </q-scroll-area>
       </div>
     </div>
@@ -129,6 +165,7 @@ export default {
       description: "",
       selectedDate: new Date(),
       mail: "",
+      images: [],
     };
   },
   methods: {
@@ -171,6 +208,41 @@ export default {
           console.log("Impossible de créer la demande : ", error);
         }
       }
+    },
+    async getImages() {
+      try {
+        const response = await fetch(
+          process.env.VUE_APP_API + "/getImagesPrestations",
+          {
+            method: "GET",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        this.images = data;
+        this.isAddImage = false;
+        this.uploadImage = {};
+      } catch (error) {
+        console.log(`Erreur lors de l'ajout de l'image': ${error.message}`);
+      }
+    },
+  },
+
+  async mounted() {
+    await this.getImages();
+  },
+
+  computed: {
+    imagesHaut() {
+      return this.images.filter((image) => image.photo.includes("haut"));
+    },
+    imagesBas() {
+      return this.images.filter((image) => image.photo.includes("bas"));
     },
   },
 };

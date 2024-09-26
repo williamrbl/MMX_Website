@@ -31,13 +31,32 @@
         <div class="col" style="margin-bottom: 5px">
           {{ article.description }}
           <q-popup-edit v-model="article.description" auto-save v-slot="scope">
-            <q-input
-              v-model="scope.value"
-              dense
-              autofocus
-              counter
-              @keyup.enter="handleEnter(scope)"
-            />
+            <div class="row">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                class="col-10"
+                @keydown.enter="
+                  () => {
+                    handleEnter({ article, value: scope.value });
+                    scope.cancel();
+                  }
+                "
+              />
+              <q-btn
+                flat
+                dense
+                icon="eva-checkmark-outline"
+                @click="
+                  () => {
+                    handleEnter({ article, value: scope.value });
+                    scope.cancel();
+                  }
+                "
+              />
+            </div>
           </q-popup-edit>
         </div>
         <div class="col" style="margin-bottom: 5px">
@@ -284,6 +303,41 @@ export default {
       this.isPhotoModif = true;
       this.modifPhoto = article.photo;
       this.currentArticle = article;
+    },
+
+    async handleEnter(scope) {
+      const updatedArticles = this.articles.map((article) => {
+        if (article._id === scope.article._id) {
+          return {
+            ...article,
+            description: scope.value,
+          };
+        }
+        return article;
+      });
+
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/updateCaroussel`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedArticles),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        await this.getArticles();
+        utils.validate("Articles mise à jour avec succès !");
+      } catch (error) {
+        console.error("Error updating articles:", error);
+        utils.alert("Erreur lors de la mise à jour des articles");
+      }
     },
 
     handleFileSelection(event) {
