@@ -31,6 +31,13 @@
               this.$emit('update-location', location);
             }
           "
+          @delete-location="
+            (location) => {
+              console.log('deleting : ', location);
+              this.$emit('delete-location', location);
+            }
+          "
+          :deleteContrat="deleteContrat"
         />
       </div>
     </div>
@@ -63,7 +70,9 @@ export default {
   },
   computed: {
     filteredLocations() {
-      return this.locations.filter((location) => !location.demande);
+      return this.locations
+        .filter((location) => !location.demande)
+        .sort((a, b) => new Date(b.start) - new Date(a.start));
     },
   },
   methods: {
@@ -113,7 +122,7 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
-        utils.validate("Le contrat a bien été supprimé");
+        // utils.validate("Le contrat a bien été supprimé");
         this.isVisuContrat = false;
         this.locationVisu = {};
         this.contratVisu = {};

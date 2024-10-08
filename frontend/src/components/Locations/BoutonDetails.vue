@@ -98,16 +98,27 @@
             </div>
           </div>
         </div>
-        <div class="row" style="display: flex; align-items: center">
-          <div class="price col">
-            Prix de la location : {{ locationTemp.prix }} euros
+        <div class="row" style="display: flex; justify-content: space-between">
+          <div class="row" style="display: flex; align-items: center">
+            <div class="price col">
+              Prix de la location : {{ locationTemp.prix }} euros
+            </div>
+            <div
+              class="col"
+              style="color: red; font-weight: 700"
+              v-if="locationTemp.suppRetard"
+            >
+              + {{ locationTemp.suppRetard }} euros de retard
+            </div>
           </div>
-          <div
-            class="col"
-            style="color: red; font-weight: 700"
-            v-if="locationTemp.suppRetard"
-          >
-            + {{ locationTemp.suppRetard }} euros de retard
+          <div class="q-pa-md">
+            <q-btn
+              dense
+              label="Supprimer la location"
+              outline
+              color="red"
+              @click="this.$emit('delete-location', this.locationTemp)"
+            />
           </div>
         </div>
       </q-card>

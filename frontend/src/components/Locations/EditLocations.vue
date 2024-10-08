@@ -26,8 +26,8 @@
       "
     >
       <div class="tab-container">
+        <q-tab name="afinaliser" label="En cours" />
         <q-tab name="avenir" label="A venir" />
-        <q-tab name="afinaliser" label="A finaliser" />
         <q-tab name="alllocations" label="Toutes les locations" />
       </div>
       <q-btn
@@ -50,6 +50,11 @@
               handleUpdateLocation(location);
             }
           "
+          @delete-location="
+            (location) => {
+              confirmDelete(location);
+            }
+          "
         />
       </div>
 
@@ -61,6 +66,11 @@
           @update-location="
             (location) => {
               handleUpdateLocation(location);
+            }
+          "
+          @delete-location="
+            (location) => {
+              confirmDelete(location);
             }
           "
         />
@@ -76,9 +86,49 @@
               handleUpdateLocation(location);
             }
           "
+          @delete-location="
+            (location) => {
+              confirmDelete(location);
+            }
+          "
         />
       </div>
     </div>
+
+    <q-dialog v-model="isDeleting">
+      <q-card class="q-pa-md" style="width: 40%; height: 20%">
+        <q-card-section>
+          <div style="font-size: 15px; font-weight: 400">
+            Voulez-vous supprimer la location de
+            {{ selectedLocation?.association }} ?
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pa-none">
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              margin-top: auto;
+            "
+          >
+            <q-btn
+              outline
+              label="Non"
+              @click="isDeleting = false"
+              style="color: purple; margin-right: 8px"
+            />
+            <q-btn
+              outline
+              label="Oui"
+              @click="deleteLocation"
+              style="color: purple"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -86,7 +136,7 @@
 import utils from "src/helpers/utils.ts";
 
 import ComponentAvenir from "./LocationAvenir.vue";
-import ComponentAfinaliser from "./LocationAfinaliser.vue";
+import ComponentAfinaliser from "./LocationEnCours.vue";
 import ComponentLocations from "./AllLocations.vue";
 import DemandesLocations from "./DemandesLocations.vue";
 import AjouterLocation from "./AjouterLocation.vue";
@@ -106,7 +156,7 @@ export default {
   data() {
     return {
       locations: {},
-      tab: "avenir",
+      tab: "afinaliser",
       isDeleting: false,
       selectedLocation: null,
     };
@@ -181,6 +231,73 @@ export default {
       } catch (error) {
         console.error("Error updating renting:", error);
         utils.alert("Erreur lors de la MAJ de la location");
+      }
+    },
+
+    confirmDelete(location) {
+      this.selectedLocation = location;
+      this.isDeleting = true;
+    },
+
+    async deleteLocation() {
+      if (this.selectedLocation && this.selectedLocation.contrat) {
+        await this.deleteContrat(this.selectedLocation);
+      }
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/deleteLocation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.selectedLocation),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getLocations();
+        this.isDeleting = false;
+        // utils.validate("La location a été supprimée !");
+      } catch (error) {
+        console.error("Error deleting location:", error);
+        utils.alert("Erreur lors de la suppression de la location");
+      }
+    },
+
+    async deleteContrat(location) {
+      const formData = new FormData();
+      formData.append("_id", location._id);
+      formData.append("contract", location.contrat); // Ensure contract field exists
+      formData.append("association", location.association);
+
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/removeContract`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        await this.getLocations();
+        utils.validate("Le contrat a bien été supprimé");
+
+        if (this.timelineItems) {
+          this.timelineItems[0].value = false;
+          this.timelineItems[0].isUploaded = false;
+          this.handleUpdate();
+        }
+      } catch (error) {
+        console.error("Error deleting contract:", error);
+        utils.alert(
+          `Erreur lors de la suppression du contrat: ${error.message}`
+        );
       }
     },
 

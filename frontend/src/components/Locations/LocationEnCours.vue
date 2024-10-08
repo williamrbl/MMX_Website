@@ -1,5 +1,5 @@
 <template>
-  <div class="texte">Locations à finaliser</div>
+  <div class="texte">Locations en cours</div>
   <q-separator style="margin-bottom: 20px" color="white" />
   <q-scroll-area class="q-scroll-locations">
     <div
@@ -35,6 +35,13 @@
               this.$emit('update-location', location);
             }
           "
+          @delete-location="
+            (location) => {
+              console.log('deleting : ', location);
+              this.$emit('delete-location', location);
+            }
+          "
+          :deleteContrat="deleteContrat"
         />
       </div>
     </div>
@@ -70,18 +77,33 @@ export default {
   computed: {
     filteredLocationsARegler() {
       const today = new Date().setHours(0, 0, 0, 0);
+      const fourDaysFromNow = new Date().setDate(new Date().getDate() + 2);
+
       return Object.entries(this.locations)
-        .filter(
-          ([key, location]) =>
-            (location.paye === false ||
-              location.caution === false ||
+        .filter(([key, location]) => {
+          const startDate = new Date(location.start).setHours(0, 0, 0, 0);
+          const endDate = new Date(location.end).setHours(0, 0, 0, 0);
+
+          const isMissing =
+            (!location.paye ||
+              !location.caution ||
               location.contrat == null ||
-              location.pret === false ||
-              location.rendu === false) &&
-            new Date(location.end) >= today &&
+              !location.pret ||
+              !location.rendu) &&
+            startDate <= today;
+
+          const isStartInLessThanFourDays =
+            startDate <= fourDaysFromNow && startDate >= today;
+
+          const isBetweenStartAndEnd = startDate <= today && endDate >= today;
+
+          return (
+            (isStartInLessThanFourDays || isBetweenStartAndEnd || isMissing) &&
             !location.demande
-        )
-        .map(([key, location]) => location);
+          );
+        })
+        .map(([key, location]) => location)
+        .sort((a, b) => new Date(a.start) - new Date(b.start));
     },
   },
   methods: {
@@ -106,35 +128,43 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
-        utils.validate("Le contrat a bien été importé");
+        // utils.validate("Le contrat a bien été importé");
       } catch (error) {
         console.error("Error importing contract:", error);
         utils.alert("Erreur lors de l'import du contrat");
       }
     },
-
     async deleteContrat(location) {
       const formData = new FormData();
       formData.append("_id", location._id);
-      formData.append("contract", location.contract);
+      formData.append("contract", location.contrat);
       formData.append("association", location.association);
+
       try {
-        const response = await fetch(`${process.env.API}/removeContract`, {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/removeContract`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
         utils.validate("Le contrat a bien été supprimé");
-        this.isVisuContrat = false;
-        this.locationVisu = {};
-        this.contratVisu = {};
+
+        if (this.timelineItems) {
+          this.timelineItems[0].value = false;
+          this.timelineItems[0].isUploaded = false;
+          this.handleUpdate();
+        }
       } catch (error) {
         console.error("Error deleting contract:", error);
-        utils.alert("Erreur lors de la suppression du contrat");
+        utils.alert(
+          `Erreur lors de la suppression du contrat: ${error.message}`
+        );
       }
     },
   },

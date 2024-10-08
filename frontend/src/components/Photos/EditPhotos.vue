@@ -54,15 +54,14 @@
   <q-scroll-area class="scroll-area-edit-photo">
     <div v-for="photo in photos" :key="photo._id" class="photo-container">
       <div v-if="photo._id != 'Titre'">
-        <q-img :src="photo.photo" class="photo">
-          <q-btn
-            icon="eva-trash-outline"
-            class="btn-hovered"
-            flat
-            @click="deletePhoto(photo)"
-            style="z-index: 1"
-          />
-        </q-img>
+        <q-img :src="photo.photo" class="photo"> </q-img
+        ><q-btn
+          icon="eva-trash-outline"
+          class="btn-hovered"
+          flat
+          @click="deletePhoto(photo, selectedCollection)"
+          style="z-index: 1"
+        />
       </div>
     </div>
   </q-scroll-area>
@@ -455,8 +454,31 @@ export default {
       this.addCollection(this.nameCollection, this.date, this.cover);
     },
 
-    deletePhoto(photo) {
+    async deletePhoto(photo, collection) {
       console.log("Deleting photo : ", photo);
+      try {
+        Loading.show({ spinner: SpinnerComponent });
+        const response = await fetch(`${process.env.VUE_APP_API}/deletePhoto`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: photo._id, collection: collection }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        this.photos = this.photos.filter((p) => p._id !== photo._id);
+        await this.getCollections();
+        this.selectedCollection = collection;
+
+        Loading.hide();
+        utils.validate("La photo a bien été supprimée");
+      } catch (error) {
+        console.error("Error deleting photo:", error);
+        utils.alert("Erreur lors de la suppression de la photo");
+      }
     },
   },
 

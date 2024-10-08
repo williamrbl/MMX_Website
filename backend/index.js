@@ -26,7 +26,7 @@ if (environment === "production") {
 }
 
 const dotenv = require("dotenv");
-console.log(process.env.MONGO_URI); //already defined here.. WHYYYY ???
+
 if (environment != "production") {
   console.log("Loading environment variables from:", `./.env.${environment}`);
   dotenv.config({ path: `./.env.development` });
@@ -337,6 +337,18 @@ app.post("/uploadPhotos", upload.any(), async (req, res) => {
     res.status(200).send("Photos uploaded successfully");
   } catch (err) {
     console.error("Error in /uploadPhotos route:", err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.delete("/deletePhoto", async (req, res) => {
+  const { id, collection } = req.body;
+  try {
+    const database = client.db("Photos");
+    const photoCollection = database.collection(collection);
+    await photoCollection.deleteOne({ _id: id });
+    res.status(200).send("Photo supprimée");
+  } catch (err) {
     res.status(500).send(err.message);
   }
 });
@@ -709,7 +721,7 @@ app.post("/sendMailNewDemande", upload.none(), async (req, res) => {
       data.start
     )} jusqu'au ${utils.formatDate(data.end)} pour le matériel suivant :</p>
         ${materialListHtml}
-        <p>Descrption de l'évenement : ${data.description}</p>
+        <p>Description de l'évènement : ${data.description}</p>
         <p>Magnez vous pour traiter ça sur le site bande de feignasses ...</p>
         <p>Bisous<br>Le robot des locations de Musique Mix</p>
         <img src="${process.env.LOGO_URL}" alt="Logo" />    

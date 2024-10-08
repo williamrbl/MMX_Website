@@ -33,55 +33,17 @@
               this.$emit('update-location', updatedLocation);
             }
           "
+          @delete-location="
+            (deletedLocation) => {
+              console.log('Deleting : ', deletedLocation);
+              this.$emit('delete-location', deletedLocation);
+            }
+          "
           :deleteContrat="deleteContrat"
         />
       </div>
-
-      <q-btn
-        flat
-        dense
-        icon="eva-trash-outline"
-        class="col-1"
-        style="color: white"
-        @click="confirmDelete(location)"
-      />
     </div>
   </q-scroll-area>
-
-  <q-dialog v-model="isDeleting">
-    <q-card class="q-pa-md" style="width: 40%; height: 20%">
-      <q-card-section>
-        <div style="font-size: 15px; font-weight: 400">
-          Voulez-vous supprimer la location de
-          {{ selectedLocation?.association }} ?
-        </div>
-      </q-card-section>
-
-      <q-card-section class="q-pa-none">
-        <div
-          style="
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-top: auto;
-          "
-        >
-          <q-btn
-            outline
-            label="Non"
-            @click="isDeleting = false"
-            style="color: purple; margin-right: 8px"
-          />
-          <q-btn
-            outline
-            label="Oui"
-            @click="deleteLocation"
-            style="color: purple"
-          />
-        </div>
-      </q-card-section>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script>
@@ -96,7 +58,7 @@ export default {
     };
   },
   components: { BoutonDetails },
-  emits: ["update-location"],
+  emits: ["update-location", "delete-location"],
   props: {
     locations: {
       type: Object,
@@ -118,52 +80,30 @@ export default {
   computed: {
     filteredLocations() {
       const today = new Date().setHours(0, 0, 0, 0);
-      return Array.isArray(this.locations)
-        ? this.locations.filter(
-            (location) => !location.demande && new Date(location.end) >= today
-          )
-        : [];
+      const twoDaysFromNow = new Date().setDate(new Date().getDate() + 2);
+
+      return Object.entries(this.locations)
+        .filter(([key, location]) => {
+          const startDate = new Date(location.start).setHours(0, 0, 0, 0);
+          const endDate = new Date(location.end).setHours(0, 0, 0, 0);
+
+          const isStartInLessThanTwoDays =
+            startDate <= twoDaysFromNow && startDate >= today;
+
+          return (
+            !isStartInLessThanTwoDays && !location.demande && endDate >= today
+          );
+        })
+        .map(([key, location]) => location)
+        .sort((a, b) => new Date(a.start) - new Date(b.start));
     },
   },
 
   methods: {
-    confirmDelete(location) {
-      this.selectedLocation = location;
-      this.isDeleting = true;
-    },
-
-    async deleteLocation() {
-      if (this.selectedLocation && this.selectedLocation.contrat) {
-        await this.deleteContrat(this.selectedLocation);
-      }
-      try {
-        const response = await fetch(
-          `${process.env.VUE_APP_API}/deleteLocation`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.selectedLocation),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        await this.getLocations();
-        this.isDeleting = false;
-        // utils.validate("La location a été supprimée !");
-      } catch (error) {
-        console.error("Error deleting location:", error);
-        utils.alert("Erreur lors de la suppression de la location");
-      }
-    },
-
     async deleteContrat(location) {
       const formData = new FormData();
       formData.append("_id", location._id);
-      formData.append("contract", location.contrat); // Ensure contract field exists
+      formData.append("contract", location.contrat);
       formData.append("association", location.association);
 
       try {
@@ -179,7 +119,7 @@ export default {
           throw new Error(`Error: ${response.statusText}`);
         }
         await this.getLocations();
-        utils.validate("Le contrat a bien été supprimé");
+        // utils.validate("Le contrat a bien été supprimé");
 
         if (this.timelineItems) {
           this.timelineItems[0].value = false;

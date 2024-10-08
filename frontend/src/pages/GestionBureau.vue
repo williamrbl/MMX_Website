@@ -76,7 +76,7 @@
                 <q-item-section>
                   <q-item-label>Locations</q-item-label>
                   <q-item-label caption class="caption">
-                    Gérez les locations de SoundBoks
+                    Gérez les locations de matériel
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -124,7 +124,7 @@
                 <q-item-section>
                   <q-item-label>Prestations</q-item-label>
                   <q-item-label caption class="caption">
-                    Personnalisez la page de prestations
+                    Gérez les prestations et personnalisez la page
                   </q-item-label>
                 </q-item-section>
               </q-item>

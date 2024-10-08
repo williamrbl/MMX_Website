@@ -200,15 +200,12 @@ export default {
   methods: {
     async getArticles() {
       try {
-        const response = await fetch(
-          `${process.env.VUE_APP_API}/caroussel/articles`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);

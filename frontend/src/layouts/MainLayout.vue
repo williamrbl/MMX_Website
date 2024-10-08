@@ -48,12 +48,12 @@
             to="/prestations"
             style="font-family: Aileron Bold"
           />
-          <q-route-tab
+          <!-- <q-route-tab
             name="studio"
             label="Studio"
             to="/studio"
             style="font-family: Aileron Bold"
-          />
+          /> -->
           <q-route-tab
             name="bureau"
             label="Espace Bureau"
@@ -108,7 +108,7 @@
       />
     </q-header>
 
-    <q-page-container style="background-color: #800b95">
+    <q-page-container style="background-color: #800b95; height: 85vh">
       <router-view />
     </q-page-container>
 
@@ -186,12 +186,12 @@
           to="/prestations"
           style="font-family: Aileron Bold"
         />
-        <q-route-tab
+        <!-- <q-route-tab
           name="studio"
           label="Studio"
           to="/studio"
           style="font-family: Aileron Bold"
-        />
+        /> -->
       </q-tabs>
     </q-footer>
   </q-layout>
