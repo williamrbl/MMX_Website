@@ -18,17 +18,18 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      justify-content: center;
     "
   >
     <div
       v-for="article in articles"
       class="row"
       :key="article._id"
-      style="display: flex; flex-direction: column; margin-bottom: 10px"
+      style="display: flex; flex-direction: column"
     >
-      <div class="row q-px-md" style="display: flex; align-items: center">
-        <div class="col" style="margin-bottom: 5px">{{ article._id }}</div>
-        <div class="col" style="margin-bottom: 5px">
+      <div class="row q-pa-md" style="display: flex; align-items: center">
+        <div class="col">{{ article._id }}</div>
+        <div class="col">
           {{ article.description }}
           <q-popup-edit v-model="article.description" auto-save v-slot="scope">
             <div class="row">
@@ -59,7 +60,7 @@
             </div>
           </q-popup-edit>
         </div>
-        <div class="col" style="margin-bottom: 5px">
+        <div class="col">
           <q-btn
             outline
             color="white"
@@ -181,7 +182,6 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
-import { nextTick } from "vue";
 
 export default {
   name: "EditCarroussel",
@@ -200,12 +200,15 @@ export default {
   methods: {
     async getArticles() {
       try {
-        const response = await fetch(`${process.env.VUE_APP_API}/articles`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/caroussel/articles`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
@@ -361,7 +364,7 @@ export default {
         const response = await fetch(
           `${process.env.VUE_APP_API}/deleteCaroussel`,
           {
-            method: "POST",
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
@@ -387,7 +390,7 @@ export default {
         const response = await fetch(
           `${process.env.VUE_APP_API}/deletePhotoCaroussel`,
           {
-            method: "POST",
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
@@ -415,13 +418,6 @@ export default {
 </script>
 
 <style scoped>
-.section-title {
-  font-family: "calibri";
-  font-size: 30px;
-  font-weight: 200;
-  color: white;
-}
-
 .size-modif-photo {
   height: 70vh;
   width: 80vw;

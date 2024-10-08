@@ -75,7 +75,7 @@
           display: flex;
           justify-content: center;
           align-items: center;
-          height: 100%;
+          height: 7vh;
         "
       >
         <div>Ajout d'une collection</div>
@@ -84,11 +84,11 @@
       <q-separator />
       <div class="q-pa-md">
         <q-input
-          label="Veuillez entrer le nom de la nouvelle collection"
+          label="Nom de la nouvelle collection"
           v-model="nameCollection"
         />
         <div class="row" style="display: flex; align-items: center">
-          <div class="q-pa-md col-4">
+          <div class="q-pa-md col-6">
             <q-btn icon="event" round color="primary">
               <q-popup-proxy
                 @before-show="updateProxy"
@@ -112,18 +112,17 @@
             </q-btn>
             <div class="q-mb-sm">
               <q-badge color="purple">
-                Date: {{ utils.formatDate(date) }}
+                {{ utils.formatDate(date) }}
               </q-badge>
             </div>
           </div>
-
           <q-file
             outlined
             v-model="cover"
-            label="Couverture de collection"
+            label="Couverture "
             accept="image/png, image/jpeg"
-            class="col"
-            @change="onCoverChange"
+            class="col-6"
+            @update:model-value="onCoverChange"
             v-if="!cover"
           >
             <template v-slot:prepend>
@@ -136,7 +135,7 @@
               class="q-pa-md"
               style="border: solid black 1px; border-radius: 5px"
             >
-              <q-img src="coverUrl()" class="col-9" />
+              <q-img :src="coverUrl" class="col-9" />
             </div>
             <q-btn
               flat
@@ -227,6 +226,8 @@
 <script>
 import utils from "src/helpers/utils.ts";
 import { ref } from "vue";
+import SpinnerComponent from "../Other/SpinnerComponent.vue";
+import { Loading } from "quasar";
 
 export default {
   name: "EditPhotos",
@@ -267,6 +268,7 @@ export default {
     },
 
     async handleFileUpload(collection) {
+      Loading.show({ spinner: SpinnerComponent });
       try {
         const formData = new FormData();
         formData.append("collection", collection);
@@ -289,8 +291,9 @@ export default {
 
         this.addingPhotos = false;
         this.selectedFiles = [];
-        utils.validate("Photos ajoutées avec succès");
         this.getCollection();
+        Loading.hide();
+        utils.validate("Photos ajoutées avec succès");
       } catch (error) {
         console.error("Error uploading photos:", error);
         utils.alert("Erreur lors du téléchargement des photos");
@@ -348,6 +351,7 @@ export default {
     },
 
     async addCollection(name, date, cover) {
+      Loading.show({ spinner: SpinnerComponent });
       const allowedTypes = ["image/png", "image/jpeg"];
       if (cover && !allowedTypes.includes(cover.type)) {
         utils.alert("Mauvais type de fichier pour la couverture");
@@ -379,7 +383,8 @@ export default {
         this.date = new Date();
         this.proxyDate = new Date();
         this.getCollections();
-        this.selectedCollection = name;
+        this.selectedCollection = name.toLowerCase();
+        Loading.hide();
         utils.validate("La collection a bien été créée");
       } catch (error) {
         console.error("Error adding collection:", error);
@@ -388,6 +393,7 @@ export default {
     },
 
     async deleteCollection(name) {
+      Loading.show({ spinner: SpinnerComponent });
       name = name.toLowerCase();
       try {
         const response = await fetch(
@@ -408,9 +414,11 @@ export default {
         this.nameCollection = "";
         this.deletingCollection = false;
         this.selectedCollection = "";
-        utils.validate("La collection a bien été supprimée");
-        this.getCollections();
         this.photos = [];
+
+        this.getCollections();
+        Loading.hide();
+        utils.validate("La collection a bien été supprimée");
       } catch (error) {
         console.error("Error deleting collection:", error);
         utils.alert("Erreur lors de la suppression de la collection");
@@ -424,13 +432,12 @@ export default {
       }
     },
 
-    onCoverChange(event) {
-      const file = event.target.files[0];
-      const allowedTypes = ["image/png", "image/jpeg"];
-      if (file && allowedTypes.includes(file.type)) {
+    onCoverChange(newFile) {
+      const file = newFile[0];
+      if (file) {
         this.cover = file;
       } else {
-        utils.alert("Mauvais type de fichier pour la couverture");
+        this.cover = null;
       }
     },
 

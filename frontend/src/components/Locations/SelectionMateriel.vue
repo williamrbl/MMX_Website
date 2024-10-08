@@ -38,7 +38,12 @@
 
         <div class="row" style="display: flex; align-items: center">
           <div class="col">Nombre de SoundBoks :</div>
-          <q-select class="col" v-model="nbSB" :options="[0, 1, 2]" />
+          <q-select
+            behavior="menu"
+            class="col"
+            v-model="nbSB"
+            :options="[0, 1, 2]"
+          />
         </div>
 
         <div class="col texte-section">Matériel Annexe :</div>
@@ -46,7 +51,12 @@
         <div class="col">
           <div class="row" style="display: flex; align-items: center">
             <div class="col">Nombre de FBT X-LITE 115A (Satellite Sono) :</div>
-            <q-select class="col" v-model="nbSatellite" :options="[0, 1, 2]" />
+            <q-select
+              behavior="menu"
+              class="col"
+              v-model="nbSatellite"
+              :options="[0, 1, 2]"
+            />
           </div>
 
           <div class="row">
@@ -67,24 +77,28 @@
 
           <div class="row" style="display: flex; align-items: center">
             <div class="col">Nombre de micros/câbles :</div>
-            <q-select class="col" v-model="nbMicro" :options="[0, 1, 2]" />
+            <q-select
+              behavior="menu"
+              class="col"
+              v-model="nbMicro"
+              :options="[0, 1, 2]"
+            />
           </div>
         </div>
-      </div>
-
-      <div style="display: flex; justify-content: end">
-        <q-btn
-          outline
-          style="color: purple"
-          label="Cancel"
-          @click="isSelectionMateriel = false"
-        />
-        <q-btn
-          outline
-          style="color: purple"
-          label="OK"
-          @click="this.addMateriel()"
-        />
+        <div style="display: flex; justify-content: end; margin-top: 10px">
+          <q-btn
+            outline
+            style="color: purple"
+            label="Cancel"
+            @click="isSelectionMateriel = false"
+          />
+          <q-btn
+            outline
+            style="color: purple"
+            label="OK"
+            @click="this.addMateriel()"
+          />
+        </div>
       </div>
     </q-card>
   </q-dialog>
@@ -161,8 +175,11 @@ export default {
 }
 
 .selection-card {
-  width: 80%;
-  height: 70%;
+  width: 40vw;
+
+  @media (max-width: 767px) {
+    width: 90vw;
+  }
 }
 
 .texte-section {

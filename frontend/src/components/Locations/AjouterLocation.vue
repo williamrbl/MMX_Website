@@ -54,6 +54,7 @@
                     'Particulier',
                     'Membre de MMX',
                   ]"
+                  behavior="menu"
                   style="width: 80%"
                   outlined
                 />
@@ -80,7 +81,7 @@
                 <q-toggle
                   v-model="isDay"
                   label="Location sur une journée"
-                  @click="locationDates = {}"
+                  @click="onToggleDaySelection"
                   style="margin-top: 5%"
                 />
 
@@ -124,6 +125,7 @@
                 :range="!isDay"
                 first-day-of-week="1"
                 style="color: purple"
+                @update:model-value="handleDateChange(locationDates)"
               />
             </div>
 
@@ -140,14 +142,14 @@
                   Prix : {{ calculatePrice() }} euros
                 </div>
               </div>
-              <div v-else>
+              <!-- <div v-else>
                 <div class="row">
                   <div>Date sélectionnée :&nbsp;</div>
                   <div v-if="Object.keys(locationDates).length > 0">
                     {{ locationDates }}
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
 
             <div
@@ -263,15 +265,16 @@
             </div>
             <div class="centered" style="display: flex; flex-direction: column">
               <q-date
-                v-model="locationDates"
+                :v-model="locationDates"
                 :range="!isDay"
                 first-day-of-week="1"
                 style="color: purple; margin-top: 3vh"
+                @update:model-value="handleDateChange(locationDates)"
               />
               <q-toggle
                 v-model="isDay"
                 label="Location sur une journée"
-                @click="locationDates = {}"
+                @click="onToggleDaySelection"
               />
             </div>
 
@@ -315,6 +318,8 @@
 import SelectionMateriel from "./SelectionMateriel.vue";
 import { v4 as uuidv4 } from "uuid";
 import utils from "src/helpers/utils.ts";
+import { Loading } from "quasar";
+import SpinnerComponent from "src/components/Other/SpinnerComponent.vue";
 
 export default {
   name: "AjouterLocation",
@@ -328,6 +333,7 @@ export default {
       isAjoutLocation: false,
       inputAsso: "",
       locationDates: {},
+      dates: {},
       isDay: false,
       materiel: {},
       prix: 0,
@@ -363,9 +369,30 @@ export default {
       }
     },
 
+    onToggleDaySelection() {
+      if (this.isDay) {
+        this.locationDates = {};
+        this.dates = {};
+      }
+    },
+
+    handleDateChange(dates) {
+      console.log("before:", this.locationDates);
+      if (this.isDay) {
+        this.dates = {
+          from: dates,
+          to: dates,
+        };
+      } else {
+        this.dates = dates;
+      }
+      console.log("after:", this.dates);
+    },
+
     async addLocation() {
-      if (typeof this.locationDates === "string") {
-        this.locationDates = utils.transformDate(this.locationDates);
+      console.log(this.dates);
+      if (typeof this.dates === "string") {
+        this.dates = utils.formatDate(this.dates);
       }
       if (this.access != "admin") {
         this.isDemande = true;
@@ -376,109 +403,120 @@ export default {
         if (!(this.email.includes("@") && this.email.includes("."))) {
           utils.alert("Veuillez entrer un email valide");
         }
-      } else if (
-        !this.locationDates.from ||
-        !this.locationDates.to ||
-        this.inputAsso === "" ||
+      }
+      if (
+        !this.dates ||
+        !this.inputAsso ||
         Object.keys(this.materiel).length === 0 ||
         !this.typeLocataire
       ) {
+        console.log("=======>");
         utils.alert("Veuillez entrer toutes les informations");
         return;
       } else if (this.access != "admin" && this.description == "") {
         utils.alert("Veuillez entrer toutes les informations");
         return;
       } else if (
-        new Date(this.locationDates.from) < new Date().setHours(0, 0, 0, 0) ||
-        new Date(this.locationDates.to) < new Date().setHours(0, 0, 0, 0)
+        new Date(this.dates.from) < new Date().setHours(0, 0, 0, 0) ||
+        new Date(this.dates.to) < new Date().setHours(0, 0, 0, 0)
       ) {
         utils.alert("Veuillez entrer des dates correctes");
         return;
-      }
-
-      this.calculatePrice();
-      const uuid = uuidv4();
-
-      const createFormData = () => {
-        const formData = new FormData();
-        formData.append("_id", uuid);
-        formData.append("typeLocataire", this.typeLocataire);
-        formData.append("association", this.inputAsso);
-        formData.append("start", this.locationDates.from);
-        formData.append("end", this.locationDates.to);
-        formData.append("prix", this.prix);
-        formData.append("materiel", JSON.stringify(this.materiel));
-        if (this.isDemande) {
-          formData.append("email", this.email);
-          formData.append("demande", true);
-        }
-        formData.append("description", this.description);
-        return formData;
-      };
-
-      try {
-        const response = await fetch(`${process.env.VUE_APP_API}/addLocation`, {
-          method: "POST",
-          body: createFormData(),
+      } else {
+        Loading.show({
+          spinner: SpinnerComponent,
         });
+        this.calculatePrice();
+        const uuid = uuidv4();
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        this.$emit("get-locations");
-        if (this.access) {
-          utils.validate("La location a bien été ajoutée");
-        } else {
-          utils.validate("La demande a bien été prise en compte");
-        }
-        if (this.access != "admin") {
-          try {
-            const response = await fetch(
-              `${process.env.VUE_APP_API}/sendMailDemande`,
-              {
-                method: "POST",
-                body: createFormData(),
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error(`Error: ${response.statusText}`);
-            }
-            this.$emit("get-locations");
-            //utils.validate("Le mail a bien été envoyé");
-          } catch (error) {
-            console.error("Error sending mail:", error);
-            utils.alert("Erreur lors de l'envoi du mail");
+        const createFormData = () => {
+          const formData = new FormData();
+          formData.append("_id", uuid);
+          formData.append("typeLocataire", this.typeLocataire);
+          formData.append("association", this.inputAsso);
+          formData.append("start", this.dates.from);
+          formData.append("end", this.dates.to);
+          formData.append("prix", this.prix);
+          formData.append("materiel", JSON.stringify(this.materiel));
+          if (this.isDemande) {
+            formData.append("email", this.email);
+            formData.append("demande", true);
           }
-          try {
-            const response = await fetch(
-              `${process.env.VUE_APP_API}/sendMailNewDemande`,
-              {
-                method: "POST",
-                body: createFormData(),
-              }
-            );
+          formData.append("description", this.description);
+          return formData;
+        };
 
-            if (!response.ok) {
-              throw new Error(`Error: ${response.statusText}`);
+        try {
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/addLocation`,
+            {
+              method: "POST",
+              body: createFormData(),
             }
-          } catch (error) {
-            console.error("Error sending mail:", error);
-            utils.alert("Erreur lors de l'envoi du mail");
-          }
-        }
+          );
 
-        this.inputAsso = "";
-        this.locationDates = {};
-        this.isAjoutLocation = false;
-        this.description = "";
-        this.materiel = {};
-        this.isDemande = false;
-        this.typeLocataire = null;
-      } catch (error) {
-        console.error("Error adding renting:", error);
-        utils.alert("Erreur lors de l'ajout de la location");
-        return;
+          if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+          this.$emit("get-locations");
+
+          if (this.access != "admin") {
+            try {
+              const response = await fetch(
+                `${process.env.VUE_APP_API}/sendMailDemande`,
+                {
+                  method: "POST",
+                  body: createFormData(),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+              }
+              this.$emit("get-locations");
+              if (this.access) {
+                utils.validate("La location a bien été ajoutée");
+              } else {
+                utils.validate("La demande a bien été prise en compte");
+              }
+              Loading.hide();
+            } catch (error) {
+              console.error("Error sending mail:", error);
+              utils.alert("Erreur lors de l'envoi du mail");
+            }
+            try {
+              const response = await fetch(
+                `${process.env.VUE_APP_API}/sendMailNewDemande`,
+                {
+                  method: "POST",
+                  body: createFormData(),
+                }
+              );
+
+              if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+              }
+            } catch (error) {
+              console.error("Error sending mail:", error);
+              utils.alert("Erreur lors de l'envoi du mail");
+            }
+          }
+
+          this.inputAsso = "";
+          this.dates = {};
+          this.locationDates = {};
+          this.isAjoutLocation = false;
+          this.description = "";
+          this.materiel = {};
+          this.isDemande = false;
+          this.typeLocataire = null;
+          this.email = "";
+          Loading.hide();
+        } catch (error) {
+          console.error("Error adding renting:", error);
+          utils.alert("Erreur lors de l'ajout de la location");
+          return;
+        }
       }
     },
 

@@ -3,8 +3,8 @@ const routes = [
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("src/pages/HomePage.vue") }, // Route Home
-      { path: "photos", component: () => import("src/pages/PhotoPage.vue") }, // Pas de "/" devant le chemin
+      { path: "", component: () => import("src/pages/HomePage.vue") },
+      { path: "photos", component: () => import("src/pages/PhotoPage.vue") },
       {
         path: "locations",
         component: () => import("src/pages/LocationPage.vue"),
@@ -12,7 +12,7 @@ const routes = [
       { path: "studio", component: () => import("src/pages/StudioPage.vue") },
       {
         path: "prestations",
-        component: () => import("src/pages/DemandesPage.vue"),
+        component: () => import("src/pages/PrestationsPage.vue"),
       },
       {
         path: "bureau",

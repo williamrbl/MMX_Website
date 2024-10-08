@@ -6,6 +6,7 @@
     style="border: 1px solid white"
     @click="handleAdd(position)"
   />
+
   <q-dialog v-model="isAddImage">
     <q-card class="add-img-card">
       <div class="header">
@@ -24,7 +25,14 @@
         <div v-show="uploadImage.length > 0">{{ uploadImage }}</div>
         <q-img v-show="uploadImage.length > 0" :src="uploadImage" />
 
-        <div style="display: flex; align-items: end; margin-top: 10px">
+        <div
+          style="
+            display: flex;
+            align-items: end;
+            justify-content: end;
+            margin-top: 10px;
+          "
+        >
           <q-btn
             outline
             color="purple"
@@ -50,6 +58,8 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import { Loading } from "quasar";
+import SpinnerComponent from "../Other/SpinnerComponent.vue";
 export default {
   name: "AddImageDialog",
   emits: ["get-images"],
@@ -77,10 +87,10 @@ export default {
       console.log(this.images);
       console.log(position);
       if (position == "haut") {
-        if (this.imagesHaut.length >= 5) {
+        if (this.imagesHaut.length >= 4) {
           utils.alert("Impossible d'ajouter plus de photos en tête de page");
         } else {
-          this.addImage(position);
+          this.isAddImage = true;
         }
       } else {
         if (this.imagesBas.length >= 5) {
@@ -95,6 +105,9 @@ export default {
       if (!this.uploadImage) {
         utils.alert("Veuillez sélectionner une image à ajouter");
       } else {
+        Loading.show({
+          spinner: SpinnerComponent,
+        });
         console.log("Adding image to : ", position);
 
         const formData = new FormData();
@@ -117,6 +130,7 @@ export default {
           this.isAddImage = false;
           this.uploadImage = {};
           this.$emit("get-images");
+          Loading.hide();
         } catch (error) {
           console.log(`Erreur lors de l'ajout de l'image': ${error.message}`);
         }
@@ -138,5 +152,8 @@ export default {
 <style scoped>
 .add-img-card {
   width: 50vw;
+  @media (max-width: 767px) {
+    width: 80vw;
+  }
 }
 </style>
