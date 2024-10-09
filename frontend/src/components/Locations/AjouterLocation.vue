@@ -265,7 +265,7 @@
             </div>
             <div class="centered" style="display: flex; flex-direction: column">
               <q-date
-                :v-model="locationDates"
+                v-model="locationDates"
                 :range="!isDay"
                 first-day-of-week="1"
                 style="color: purple; margin-top: 3vh"

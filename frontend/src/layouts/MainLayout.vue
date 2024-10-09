@@ -108,7 +108,7 @@
       />
     </q-header>
 
-    <q-page-container style="background-color: #800b95; height: 85vh">
+    <q-page-container style="background-color: #800b95">
       <router-view />
     </q-page-container>
 

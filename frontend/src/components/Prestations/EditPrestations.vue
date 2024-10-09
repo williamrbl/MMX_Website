@@ -48,8 +48,6 @@
             color="white"
             type="textarea"
             class="input-desc col-9"
-            @blur="updateDescriptionText()"
-            @keypup.enter="updateDescriptionText()"
           />
           <q-btn
             label="Valider"

@@ -1276,6 +1276,39 @@ app.get("/getImagesPrestations", async (req, res) => {
   }
 });
 
+app.get("/getDescription", async (req, res) => {
+  try {
+    const collection = client.db("Prestations").collection("Description");
+    const objects = await collection.find({}).toArray();
+    res.json(objects);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching objects");
+  }
+});
+
+app.post("/updateDescription", upload.single(), async (req, res) => {
+  const description = req.body.description;
+  console.log(description);
+  try {
+    const collection = client.db("Prestations").collection("Description");
+    const updateResult = await collection.updateOne(
+      { _id: "Description" },
+      { $set: { texte: description } }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      res.status(404).send("No objects found to update");
+      return;
+    }
+
+    res.send("Description updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching objects");
+  }
+});
+
 // Listen-----------------------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
