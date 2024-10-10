@@ -77,7 +77,8 @@ export default {
   computed: {
     filteredLocationsARegler() {
       const today = new Date().setHours(0, 0, 0, 0);
-      const fourDaysFromNow = new Date().setDate(new Date().getDate() + 2);
+      const fourDaysFromNow = new Date();
+      fourDaysFromNow.setDate(fourDaysFromNow.getDate() + 2);
 
       return Object.entries(this.locations)
         .filter(([key, location]) => {
@@ -85,17 +86,33 @@ export default {
           const endDate = new Date(location.end).setHours(0, 0, 0, 0);
 
           const isMissing =
-            !location.paye ||
-            !location.caution ||
-            location.contrat == null ||
-            !location.prete ||
-            !location.rendu;
+            (!location.paye ||
+              !location.caution ||
+              location.contrat == null ||
+              !location.prete ||
+              !location.rendu) &&
+            startDate <= today;
+
+          console.log(startDate);
+          console.log(today);
 
           const isStartInLessThanFourDays =
-            startDate <= fourDaysFromNow && startDate >= today && isMissing;
+            startDate <= fourDaysFromNow &&
+            startDate >= today &&
+            (!location.paye ||
+              !location.caution ||
+              location.contrat == null ||
+              !location.prete ||
+              !location.rendu);
 
           const isBetweenStartAndEnd =
-            startDate <= today && endDate >= today && isMissing;
+            startDate <= today &&
+            endDate >= today &&
+            (!location.paye ||
+              !location.caution ||
+              location.contrat == null ||
+              !location.prete ||
+              !location.rendu);
 
           return (
             (isMissing || isStartInLessThanFourDays || isBetweenStartAndEnd) &&
@@ -103,7 +120,7 @@ export default {
           );
         })
         .map(([key, location]) => location)
-        .sort((a, b) => new Date(a.start) - new Date(b.start));
+        .sort((a, b) => new Date(a.start) - new Date(b.start)); // Sort by start date
     },
   },
   methods: {
