@@ -93,9 +93,6 @@ export default {
               !location.rendu) &&
             startDate <= today;
 
-          console.log(startDate);
-          console.log(today);
-
           const isStartInLessThanFourDays =
             startDate <= fourDaysFromNow &&
             startDate >= today &&
