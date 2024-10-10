@@ -28,6 +28,17 @@
         <div class="login-label">Connexion</div>
         <q-form @submit.prevent="checkConnection">
           <q-input
+            v-model="inputUsername"
+            class="inputPassword q-py-md custom-text-color"
+            outlined
+            :type="text"
+            label="Username"
+            aria-label="Username"
+            color="white"
+            label-color="white"
+            content-class="text-white"
+          />
+          <q-input
             v-model="inputPassword"
             class="inputPassword q-py-md custom-text-color"
             outlined
@@ -287,6 +298,9 @@ export default {
   },
   methods: {
     checkConnection() {
+      if (this.inputUsername === "") {
+        utils.alert("Veuillez saisir un nom d'utilisateur");
+      }
       if (this.inputPassword === "") {
         utils.alert("Veuillez saisir un mot de passe");
       } else if (this.inputPassword !== process.env.VUE_APP_PASSWORD) {
