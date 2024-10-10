@@ -12,6 +12,7 @@ const busboy = require("busboy");
 const os = require("os");
 const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
+const bcrypt = require("bcrypt");
 
 const environment = process.env.NODE_ENV || "development";
 
@@ -118,6 +119,44 @@ app.post("/connexion", upload.single(), (req, res) => {
     res.status(200).send("Connexion réussie");
   } catch {
     res.status(500).send("Erreur lors de la connexion");
+  }
+});
+
+app.get("/getAccounts", async (req, res) => {
+  const database = client.db("Comptes");
+  const collection = database.collection("Administrateurs");
+  const documents = await collection.find({}).toArray();
+  res.json(documents);
+});
+
+app.post("/addAdmin", upload.single(), async (req, res) => {
+  try {
+    const { prenom, nom, role, username, password } = req.body;
+
+    if (!prenom || !nom || !role || !username || !password) {
+      return res.status(400).send("All fields are required");
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const database = client.db("Comptes");
+    const collection = database.collection("Administrateurs");
+
+    const adminData = {
+      prenom,
+      nom,
+      role,
+      username,
+      password: hashedPassword,
+      createdAt: new Date(),
+    };
+
+    const result = await collection.insertOne(adminData);
+    res.status(201).send("Administrateur ajouté avec succès");
+  } catch (error) {
+    console.error("Error while adding admin:", error);
+    res.status(500).send("Erreur lors de l'ajout administrateur");
   }
 });
 
