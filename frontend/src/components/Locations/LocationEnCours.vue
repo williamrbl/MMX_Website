@@ -77,7 +77,8 @@ export default {
   computed: {
     filteredLocationsARegler() {
       const today = new Date().setHours(0, 0, 0, 0);
-      const fourDaysFromNow = new Date().setDate(new Date().getDate() + 2);
+      const fourDaysFromNow = new Date();
+      fourDaysFromNow.setDate(fourDaysFromNow.getDate() + 2);
 
       return Object.entries(this.locations)
         .filter(([key, location]) => {
@@ -88,22 +89,35 @@ export default {
             (!location.paye ||
               !location.caution ||
               location.contrat == null ||
-              !location.pret ||
+              !location.prete ||
               !location.rendu) &&
             startDate <= today;
 
           const isStartInLessThanFourDays =
-            startDate <= fourDaysFromNow && startDate >= today;
+            startDate <= fourDaysFromNow &&
+            startDate >= today &&
+            (!location.paye ||
+              !location.caution ||
+              location.contrat == null ||
+              !location.prete ||
+              !location.rendu);
 
-          const isBetweenStartAndEnd = startDate <= today && endDate >= today;
+          const isBetweenStartAndEnd =
+            startDate <= today &&
+            endDate >= today &&
+            (!location.paye ||
+              !location.caution ||
+              location.contrat == null ||
+              !location.prete ||
+              !location.rendu);
 
           return (
-            (isStartInLessThanFourDays || isBetweenStartAndEnd || isMissing) &&
+            (isMissing || isStartInLessThanFourDays || isBetweenStartAndEnd) &&
             !location.demande
           );
         })
         .map(([key, location]) => location)
-        .sort((a, b) => new Date(a.start) - new Date(b.start));
+        .sort((a, b) => new Date(a.start) - new Date(b.start)); // Sort by start date
     },
   },
   methods: {
