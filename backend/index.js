@@ -108,6 +108,19 @@ let bucket = admin.storage().bucket();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+//CONNEXION SETUP-------------------------------------------------------------------------------------------------------
+
+app.post("/connexion", upload.single(), (req, res) => {
+  try {
+    const { username, password } = req.body;
+    console.log(username, password);
+
+    res.status(200).send("Connexion réussie");
+  } catch {
+    res.status(500).send("Erreur lors de la connexion");
+  }
+});
+
 //COLLECTION SETUP-------------------------------------------------------------------------------------------------------
 
 // Get list of collections

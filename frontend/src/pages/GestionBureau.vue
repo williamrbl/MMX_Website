@@ -171,6 +171,22 @@
                   </q-item-label>
                 </q-item-section>
               </q-item>
+
+              <q-item
+                class="item"
+                clickable
+                v-ripple
+                :class="{ 'selected-item': selectedPage === 'connexions' }"
+                @click="selectedPage = 'connexions'"
+                aria-label="Connexions"
+              >
+                <q-item-section>
+                  <q-item-label>Comptes</q-item-label>
+                  <q-item-label caption class="caption">
+                    Gérez les comptes
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
             </q-list>
           </div>
           <div class="col-9">
@@ -198,6 +214,10 @@
             <TachesComponent
               ref="tachesComponent"
               v-if="selectedPage === 'taches'"
+            />
+            <EditConnexions
+              ref="connexionComponent"
+              v-if="selectedPage === 'connexions'"
             />
           </div>
         </div>
@@ -245,6 +265,10 @@
               ref="tachesComponent"
               v-if="selectedPage === 'taches'"
             />
+            <EditConnexions
+              ref="connexionComponent"
+              v-if="selectedPage === 'connexions'"
+            />
           </div>
         </div>
       </div>
@@ -259,6 +283,7 @@ import EditLocations from "src/components/Locations/EditLocations.vue";
 import EditStudio from "src/components/Studio/EditStudio.vue";
 import EditPrestations from "src/components/Prestations/EditPrestations.vue";
 import TachesComponent from "src/components/Taches/TachesComponent.vue";
+import EditConnexions from "src/components/Connexions/EditConnexions.vue";
 import utils from "src/helpers/utils.ts";
 import fond from "src/assets/Fond.jpg";
 
@@ -271,6 +296,7 @@ export default {
     EditPrestations,
     EditStudio,
     TachesComponent,
+    EditConnexions,
   },
   data() {
     return {
@@ -297,17 +323,35 @@ export default {
     },
   },
   methods: {
-    checkConnection() {
+    async checkConnection() {
       if (this.inputUsername === "") {
         utils.alert("Veuillez saisir un nom d'utilisateur");
+        return;
       }
+
       if (this.inputPassword === "") {
         utils.alert("Veuillez saisir un mot de passe");
-      } else if (this.inputPassword !== process.env.VUE_APP_PASSWORD) {
-        utils.alert("Le mot de passe est incorrect");
-      } else {
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append("username", this.inputUsername);
+        formData.append("password", this.inputPassword);
+
+        const response = await fetch(`${process.env.VUE_APP_API}/connexion`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
         this.isConnected = true;
+        this.inputUsername = "";
         this.inputPassword = "";
+      } catch (error) {
+        console.log(`Erreur lors de la connexion: ${error.message}`);
       }
     },
 
