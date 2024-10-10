@@ -85,20 +85,20 @@ export default {
           const endDate = new Date(location.end).setHours(0, 0, 0, 0);
 
           const isMissing =
-            (!location.paye ||
-              !location.caution ||
-              location.contrat == null ||
-              !location.pret ||
-              !location.rendu) &&
-            startDate <= today;
+            !location.paye ||
+            !location.caution ||
+            location.contrat == null ||
+            !location.prete ||
+            !location.rendu;
 
           const isStartInLessThanFourDays =
-            startDate <= fourDaysFromNow && startDate >= today;
+            startDate <= fourDaysFromNow && startDate >= today && isMissing;
 
-          const isBetweenStartAndEnd = startDate <= today && endDate >= today;
+          const isBetweenStartAndEnd =
+            startDate <= today && endDate >= today && isMissing;
 
           return (
-            (isStartInLessThanFourDays || isBetweenStartAndEnd || isMissing) &&
+            (isMissing || isStartInLessThanFourDays || isBetweenStartAndEnd) &&
             !location.demande
           );
         })
