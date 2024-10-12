@@ -203,8 +203,8 @@ export default {
   width: 100%;
   height: 54vh;
   @media (max-width: 767px) {
-    height: 20vh;
-    max-height: 41vh;
+    height: 43vh;
   }
+  border-radius: 10px;
 }
 </style>
