@@ -111,10 +111,24 @@ const upload = multer({ storage: storage });
 
 //CONNEXION SETUP-------------------------------------------------------------------------------------------------------
 
-app.post("/connexion", upload.single(), (req, res) => {
+app.post("/connexion", upload.single(), async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(username, password);
+
+    const database = client.db("Comptes");
+    const collection = database.collection("Administrateurs");
+
+    const user = await collection.findOne({ username });
+
+    if (!user) {
+      return res.status(404).send("Utilisateur non trouvé");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send("Mot de passe incorrect");
+    }
 
     res.status(200).send("Connexion réussie");
   } catch {
@@ -157,6 +171,73 @@ app.post("/addAdmin", upload.single(), async (req, res) => {
   } catch (error) {
     console.error("Error while adding admin:", error);
     res.status(500).send("Erreur lors de l'ajout administrateur");
+  }
+});
+
+app.post("/removeAdmin", upload.single(), async (req, res) => {
+  const { username } = req.body;
+
+  const database = client.db("Comptes");
+  const collection = database.collection("Administrateurs");
+
+  const result = await collection.deleteOne({ username });
+
+  if (result.deletedCount === 1) {
+    res.json({ message: "Admin removed successfully." });
+  } else {
+    res.status(404).json({ message: "Admin not found." });
+  }
+});
+
+app.post("/checkOldPassword", upload.single(), async (req, res) => {
+  const { username, password } = req.body;
+
+  const database = client.db("Comptes");
+  const collection = database.collection("Administrateurs");
+
+  const user = await collection.findOne({ username });
+
+  if (!user) {
+    return res.status(404).send("Utilisateur non trouvé");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    return res.status(401).send("Mot de passe incorrect");
+  }
+  return res.status(200).send("Mot de passe validé");
+});
+
+app.post("/setNewPassword", upload.single(), async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).send("Username and password are required");
+  }
+
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const database = client.db("Comptes");
+    const collection = database.collection("Administrateurs");
+
+    const result = await collection.updateOne(
+      { username },
+      { $set: { password: hashedPassword } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).send("Utilisateur non trouvé");
+    }
+
+    return res.status(200).send("Mot de passe changé");
+  } catch (error) {
+    console.error("Error updating password:", error);
+    return res
+      .status(500)
+      .send("Erreur lors de la mise à jour du mot de passe");
   }
 });
 

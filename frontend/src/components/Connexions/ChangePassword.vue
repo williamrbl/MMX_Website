@@ -7,13 +7,23 @@
 
   <q-dialog v-model="isChangePassword">
     <q-card class="card">
-      <div class="header">Changement du mot de passe</div>
+      <div class="header">Changement du mot de passe de {{ username }}</div>
       <div class="q-pa-md" v-if="!isUser">
         <q-input
-          label="Ancien mot de passe"
           v-model="inputCurrentPassword"
-          @keydown.enter="checkCurrentPassword"
-        />
+          filled
+          :type="isPwd ? 'password' : 'text'"
+          label="Ancien mot de passe"
+          @keyup.enter="handleEnter"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+        </q-input>
 
         <div class="q-pa-sm" style="display: flex; justify-content: end">
           <q-btn
@@ -24,6 +34,7 @@
               {
                 inputCurrentPassword = '';
                 isChangePassword = false;
+                isPwd = true;
               }
             "
           />
@@ -37,17 +48,42 @@
       </div>
       <div class="q-pa-md" v-if="isUser">
         <q-input
-          label="Nouveau mot de passe"
           v-model="newPassword"
+          filled
+          :type="isPwd ? 'password' : 'text'"
+          label="Nouveau mot de passe"
           @keydown.enter="checkNewPassword"
-        />
-        <q-input
-          label="Valider le nouveau mot de passe"
-          v-model="newPasswordValidate"
-          @keydown.enter="checkNewPassword"
-        />
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+        </q-input>
 
-        <div class="q-pa-sm" style="display: flex; justify-content: end">
+        <q-input
+          v-model="newPasswordValidate"
+          filled
+          :type="isPwd ? 'password' : 'text'"
+          label="Valider le nouveau mot de passe"
+          @keydown.enter="checkNewPassword"
+          style="margin-top: 20px"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+        </q-input>
+
+        <div
+          class="q-pa-sm"
+          style="display: flex; justify-content: end; margin-top: 10px"
+        >
           <q-btn
             outline
             color="purple"
@@ -76,10 +112,19 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import SpinnerComponent from "../Other/SpinnerComponent.vue";
+import { Loading } from "quasar";
 export default {
   name: "ChangePassword",
+  emits: ["update-accounts"],
   setup() {
     return { utils };
+  },
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -88,17 +133,43 @@ export default {
       isUser: false,
       newPassword: "",
       newPasswordValidate: "",
+      isPwd: true,
     };
   },
   methods: {
-    checkCurrentPassword() {
+    handleEnter() {
+      this.checkCurrentPassword();
+      this.isPwd = true;
+    },
+    async checkCurrentPassword() {
       if (!this.inputCurrentPassword) {
         utils.alert("Veuillez entrer votre mot de passe actuel");
         return;
       }
 
-      console.log("Checking");
-      this.isUser = true;
+      try {
+        const formData = new FormData();
+        formData.append("username", this.username);
+        formData.append("password", this.inputCurrentPassword);
+
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/checkOldPassword`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        } else {
+          this.isUser = true;
+        }
+      } catch (error) {
+        utils.alert("Authentification incorrecte");
+        console.log(`Erreur lors de la connexion: ${error.message}`);
+        this.isUser = false;
+      }
     },
 
     checkNewPassword() {
@@ -120,8 +191,35 @@ export default {
       this.setNewPassword();
     },
 
-    setNewPassword() {
-      console.log("setNewPassword");
+    async setNewPassword() {
+      this.isPwd = true;
+      try {
+        const formData = new FormData();
+        formData.append("username", this.username);
+        formData.append("password", this.newPassword);
+        Loading.show({ spinner: SpinnerComponent });
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/setNewPassword`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        this.$emit("update-accounts");
+        this.newPassword = "";
+        this.newPasswordValidate = "";
+        this.isChangePassword = false;
+        this.inputCurrentPassword = "";
+        this.isUser = false;
+        Loading.hide();
+      } catch (error) {
+        console.log("Error fetching accounts:", error);
+      }
     },
   },
 };

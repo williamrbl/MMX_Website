@@ -474,7 +474,7 @@ export default {
         this.selectedCollection = collection;
 
         Loading.hide();
-        utils.validate("La photo a bien été supprimée");
+        //utils.validate("La photo a bien été supprimée");
       } catch (error) {
         console.error("Error deleting photo:", error);
         utils.alert("Erreur lors de la suppression de la photo");

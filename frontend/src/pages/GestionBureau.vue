@@ -130,7 +130,7 @@
                 v-ripple
                 :class="{ 'selected-item': selectedPage === 'prestations' }"
                 @click="selectedPage = 'prestations'"
-                aria-label="Caroussel"
+                aria-label="Prestations"
               >
                 <q-item-section>
                   <q-item-label>Prestations</q-item-label>
@@ -140,7 +140,7 @@
                 </q-item-section>
               </q-item>
 
-              <q-item
+              <!-- <q-item
                 class="item"
                 clickable
                 v-ripple
@@ -170,7 +170,7 @@
                     Gérez les tâches à faire
                   </q-item-label>
                 </q-item-section>
-              </q-item>
+              </q-item> -->
 
               <q-item
                 class="item"
@@ -207,14 +207,14 @@
               v-if="selectedPage === 'prestations'"
             />
 
-            <EditStudio
+            <!-- <EditStudio
               ref="studioComponent"
               v-if="selectedPage === 'studio'"
             />
             <TachesComponent
               ref="tachesComponent"
               v-if="selectedPage === 'taches'"
-            />
+            /> -->
             <EditConnexions
               ref="connexionComponent"
               v-if="selectedPage === 'connexions'"
@@ -261,10 +261,14 @@
               ref="prestationsComponent"
               v-if="selectedPage === 'prestations'"
             />
-            <TachesComponent
+            <!-- <TachesComponent
               ref="tachesComponent"
               v-if="selectedPage === 'taches'"
             />
+            <EditConnexions
+              ref="connexionComponent"
+              v-if="selectedPage === 'connexions'"
+            /> -->
             <EditConnexions
               ref="connexionComponent"
               v-if="selectedPage === 'connexions'"
@@ -294,8 +298,8 @@ export default {
     EditCaroussel,
     EditLocations,
     EditPrestations,
-    EditStudio,
-    TachesComponent,
+    // EditStudio,
+    // TachesComponent,
     EditConnexions,
   },
   data() {
@@ -312,8 +316,9 @@ export default {
         { label: "Photos", value: "photos" },
         { label: "Caroussel", value: "caroussel" },
         { label: "Prestations", value: "prestations" },
-        { label: "Studio", value: "studio" },
-        { label: "Tâches", value: "taches" },
+        // { label: "Studio", value: "studio" },
+        // { label: "Tâches", value: "taches" },
+        { label: "Comptes", value: "connexions" },
       ],
     };
   },
@@ -346,12 +351,15 @@ export default {
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
+        } else {
+          this.isConnected = true;
+          this.inputUsername = "";
+          this.inputPassword = "";
         }
-        this.isConnected = true;
-        this.inputUsername = "";
-        this.inputPassword = "";
       } catch (error) {
+        utils.alert("Authentification incorrecte");
         console.log(`Erreur lors de la connexion: ${error.message}`);
+        this.isConnected = false;
       }
     },
 
