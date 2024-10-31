@@ -13,6 +13,8 @@ const os = require("os");
 const nodemailer = require("nodemailer");
 const utils = require("./utils.ts");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const environment = process.env.NODE_ENV || "development";
 
@@ -118,7 +120,9 @@ app.post("/connexion", upload.single(), async (req, res) => {
     const database = client.db("Comptes");
     const collection = database.collection("Administrateurs");
 
-    const user = await collection.findOne({ username });
+    const lowerUsername = username.toLowerCase();
+
+    const user = await collection.findOne({ username: lowerUsername });
 
     if (!user) {
       return res.status(404).send("Utilisateur non trouvé");
@@ -130,8 +134,13 @@ app.post("/connexion", upload.single(), async (req, res) => {
       return res.status(401).send("Mot de passe incorrect");
     }
 
-    res.status(200).send("Connexion réussie");
-  } catch {
+    const JWT_SECRET = crypto.randomBytes(64).toString("hex");
+    const token = jwt.sign({ username: user.username }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ token });
+  } catch (error) {
     res.status(500).send("Erreur lors de la connexion");
   }
 });

@@ -329,13 +329,8 @@ export default {
   },
   methods: {
     async checkConnection() {
-      if (this.inputUsername === "") {
-        utils.alert("Veuillez saisir un nom d'utilisateur");
-        return;
-      }
-
-      if (this.inputPassword === "") {
-        utils.alert("Veuillez saisir un mot de passe");
+      if (this.inputUsername === "" || this.inputPassword === "") {
+        utils.alert("Veuillez saisir un nom d'utilisateur et un mot de passe");
         return;
       }
 
@@ -349,28 +344,54 @@ export default {
           body: formData,
         });
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        } else {
+        if (response.ok) {
+          const token = await response.json();
+          const expirationTime = new Date().getTime() + 3600 * 1000;
+          localStorage.setItem(
+            "authToken",
+            JSON.stringify({ token, expirationTime })
+          );
           this.isConnected = true;
           this.inputUsername = "";
           this.inputPassword = "";
+          this.startTokenCheck();
+        } else {
+          utils.alert("Authentification incorrecte");
         }
       } catch (error) {
-        utils.alert("Authentification incorrecte");
-        console.log(`Erreur lors de la connexion: ${error.message}`);
+        utils.alert("Erreur lors de la connexion");
         this.isConnected = false;
       }
     },
 
+    startTokenCheck() {
+      this.tokenCheckInterval = setInterval(() => {
+        const storedToken = JSON.parse(localStorage.getItem("authToken"));
+        if (storedToken && new Date().getTime() > storedToken.expirationTime) {
+          this.logOut();
+          utils.alert("Votre session a expiré. Veuillez vous reconnecter.");
+        }
+      }, 1000 * 5 * 60);
+    },
+
     logOut() {
       this.isConnected = false;
-      this.isPwd = true;
+      localStorage.removeItem("authToken");
+      clearInterval(this.tokenCheckInterval);
+      //utils.alert("Vous avez été déconnecté.");
     },
 
     togglePasswordVisibility() {
       this.isPwd = !this.isPwd;
     },
+  },
+
+  mounted() {
+    const storedToken = JSON.parse(localStorage.getItem("authToken"));
+    if (storedToken && new Date().getTime() < storedToken.expirationTime) {
+      this.isConnected = true;
+      this.startTokenCheck();
+    }
   },
 };
 </script>
