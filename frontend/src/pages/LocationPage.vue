@@ -1,6 +1,6 @@
 <template>
-  <q-img :src="fond" style="height: 80vh">
-    <div class="large-screen-only">
+  <q-img :src="fond" style="height: 86.95vh">
+    <div class="large-screen-only" style="height: 100%">
       <div
         style="
           display: flex;
@@ -52,7 +52,7 @@
                   <div class="content">Petit Déjeuner / Soirée : 20 euros</div>
                   <div class="content">Week-end :</div>
                   <div class="content-tab">1 SoundBoks : 50 euros</div>
-                  <div class="content-tab">2 SoundBoks : 90 euros</div>
+                  <!-- <div class="content-tab">2 SoundBoks : 90 euros</div> -->
                   <div class="content">
                     Autre (micro, carte son, sono) : voir en DM Instagram !
                   </div>
@@ -98,10 +98,10 @@
             >
               <div class="calendar-footer">
                 <div class="day-text-format">Disponibilités :</div>
-                <div class="legend-item">
+                <!-- <div class="legend-item">
                   <div class="color-box orange"></div>
                   <div class="legend">Une seule SB disponible</div>
-                </div>
+                </div> -->
                 <div class="legend-item">
                   <div class="color-box red"></div>
                   <div class="legend">Pas de SB disponible</div>
@@ -132,13 +132,13 @@
         >
           <div class="calendar-footer">
             <div class="day-text-format">Disponibilités :</div>
-            <div class="legend-item">
+            <!-- <div class="legend-item">
               <div class="color-box orange"></div>
               <div class="legend">Une seule SoundBoks disponible</div>
-            </div>
+            </div> -->
             <div class="legend-item">
               <div class="color-box red"></div>
-              <div class="legend">Pas de SoundBoks disponibles</div>
+              <div class="legend">Pas de SoundBoks disponible</div>
             </div>
           </div>
           <div class="centered">
@@ -171,7 +171,7 @@
               <div class="content">Petit Déjeuner / Soirée : 20 euros</div>
               <div class="content">Week-end :</div>
               <div class="content-tab">1 SoundBoks : 50 euros</div>
-              <div class="content-tab">2 SoundBoks : 90 euros</div>
+              <!-- <div class="content-tab">2 SoundBoks : 90 euros</div> -->
               <div class="content">
                 Autre (micro, carte son, sono) : voir en DM Instagram !
               </div>
@@ -313,7 +313,7 @@ export default {
       if (event.availableSB === 2) {
         return "green";
       } else if (event.availableSB === 1) {
-        return "yellow";
+        return "red"; //CHANGER ICI SI REPARE
       } else {
         return "red";
       }

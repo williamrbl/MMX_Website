@@ -97,9 +97,11 @@ export default {
         }
 
         const data = await response.json();
-        this.articles = data;
-        this.slides = data.map((_, index) => `slide-${index}`);
-        this.options = data.map((_, index) => ({
+
+        // Reverse the data so that the slides appear in reverse order
+        this.articles = data.reverse();
+        this.slides = this.articles.map((_, index) => `slide-${index}`);
+        this.options = this.articles.map((_, index) => ({
           label: index + 1,
           value: this.slides[index],
         }));

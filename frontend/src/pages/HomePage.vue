@@ -70,7 +70,7 @@ export default {
 
 .news-section {
   width: 100%;
-  margin-bottom: 20px; /* Space between sections */
+  margin-bottom: 20px;
 }
 
 .news-title {

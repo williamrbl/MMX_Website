@@ -121,31 +121,11 @@
             label="Couverture "
             accept="image/png, image/jpeg"
             class="col-6"
-            @update:model-value="onCoverChange"
-            v-if="!cover"
           >
             <template v-slot:prepend>
               <q-icon name="attach_file" />
             </template>
           </q-file>
-
-          <div v-else class="row q-pa-md" style="width: 60%">
-            <div
-              class="q-pa-md"
-              style="border: solid black 1px; border-radius: 5px"
-            >
-              <q-img :src="coverUrl" class="col-9" />
-            </div>
-            <q-btn
-              flat
-              dense
-              round
-              icon="eva-close-outline"
-              style="color: black"
-              class="col-3"
-              @click="deselectCover()"
-            />
-          </div>
         </div>
       </div>
 
@@ -431,15 +411,6 @@ export default {
       }
     },
 
-    onCoverChange(newFile) {
-      const file = newFile[0];
-      if (file) {
-        this.cover = file;
-      } else {
-        this.cover = null;
-      }
-    },
-
     submitCollection() {
       if (!this.nameCollection.trim()) {
         utils.alert("Veuillez entrer un nom pour la collection");
@@ -508,13 +479,6 @@ export default {
 </script>
 
 <style scoped>
-.section-title {
-  font-family: "calibri";
-  font-size: 30px;
-  font-weight: 200;
-  color: white;
-}
-
 .titre-popup {
   font-size: 20px;
   color: white;

@@ -90,10 +90,10 @@
             <q-file
               outlined
               ref="fileInput"
+              v-model="file"
               label="Photo"
               accept="image/png, image/jpeg"
               style="width: 50%"
-              @input="handleFileUpload"
             >
               <template v-slot:prepend>
                 <q-icon name="attach_file" />
@@ -349,13 +349,6 @@ export default {
       }
     },
 
-    handleFileUpload(event) {
-      const fileInput = event.target.files[0];
-      if (fileInput) {
-        this.file = fileInput;
-      }
-    },
-
     async deleteArticle(article) {
       try {
         const response = await fetch(
@@ -382,7 +375,6 @@ export default {
 
     async deletePhotoCaroussel() {
       if (!this.currentArticle) return;
-
       try {
         const response = await fetch(
           `${process.env.VUE_APP_API}/deletePhotoCaroussel`,

@@ -3,7 +3,7 @@
     <q-header
       elevated
       class="text-white large-screen-only"
-      style="background-color: primary; height: 10vh"
+      style="background-color: primary; height: 8vh"
     >
       <q-toolbar
         class="constrain"
@@ -116,7 +116,7 @@
       elevated
       bordered
       class="q-px-lg large-screen-only"
-      style="background-color: primary; height: 10vh"
+      style="background-color: primary; height: 5vh"
     >
       <div
         style="

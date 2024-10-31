@@ -138,9 +138,9 @@
                 <!-- <div class="col">Date de début : {{ locationDates.from }}</div>
             <div class="col">Date de fin : {{ locationDates.to }}</div> -->
 
-                <div v-if="materiel && locationDates.from && locationDates.to">
+                <!-- <div v-if="materiel && locationDates.from && locationDates.to">
                   Prix : {{ calculatePrice() }} euros
-                </div>
+                </div> -->
               </div>
               <!-- <div v-else>
                 <div class="row">
@@ -278,9 +278,9 @@
               />
             </div>
 
-            <div v-if="materiel && locationDates.from && locationDates.to">
+            <!-- <div v-if="materiel && locationDates.from && locationDates.to">
               Prix : {{ calculatePrice() }} euros
-            </div>
+            </div> -->
           </q-scroll-area>
           <q-separator />
           <div style="display: flex; justify-content: end" class="q-pa-md">

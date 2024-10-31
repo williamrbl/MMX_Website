@@ -7,6 +7,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      height: 86.95vh;
     "
   >
     <div class="collection-container">

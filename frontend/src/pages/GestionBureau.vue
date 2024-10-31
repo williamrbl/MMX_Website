@@ -1,5 +1,5 @@
 <template>
-  <q-img :src="fond" style="height: 80vh">
+  <q-img :src="fond" style="height: 86.95vh">
     <div style="width: 100%; height: 100%">
       <div
         class="col-12 row align-items-center"

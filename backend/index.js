@@ -274,54 +274,66 @@ app.post("/createCollection", (req, res) => {
   const bb = busboy({ headers: req.headers });
 
   const fields = {};
-  let fileData = {};
   let collectionName = "";
+  let fileBuffer = []; // Buffer to store file chunks
+  let fileData = {
+    filename: "",
+    mimeType: "",
+  };
 
-  // Handle file upload
   bb.on("file", (name, file, info) => {
-    const { mimeType } = info;
-    console.log(`File [${name}]: mimeType: %j`, mimeType);
+    const { mimeType, filename } = info;
+    console.log(
+      `File [${name}]: filename: %j, mimeType: %j`,
+      filename,
+      mimeType
+    );
 
-    if (!collectionName) {
-      console.error("Collection name not provided");
-      return res.status(400).send("Collection name is required");
-    }
+    fileData.mimeType = mimeType;
+    fileData.filename = filename;
 
-    const filepath = path.join(
-      os.tmpdir(),
-      `${collectionName.toLowerCase()}.png`
-    ); // Use collection name
-    const writeStream = fs.createWriteStream(filepath);
+    file.on("data", (data) => {
+      fileBuffer.push(data);
+    });
 
-    file.pipe(writeStream);
-
-    fileData = {
-      filepath,
-      mimeType,
-      filename: `${collectionName.toLowerCase()}.png`,
-    }; // Use the collection name
-
-    // writeStream.on("close", () => {
-    //   console.log(`File [${collectionName}.png] written to ${filepath}`);
-    // });
+    file.on("end", () => {
+      console.log(`Finished receiving file [${filename}]`);
+    });
   });
 
   bb.on("field", (fieldname, val) => {
     fields[fieldname] = val;
     if (fieldname === "name") {
-      collectionName = val; // Capture the collection name from the form field
+      collectionName = val;
+      console.log(`Received collection name: ${collectionName}`);
     }
   });
 
   bb.on("close", async () => {
     try {
       if (!collectionName) {
-        console.error("Collection name is not provided");
+        console.error("Collection name not provided");
         return res.status(400).send("Collection name is required");
       }
 
+      if (fileBuffer.length === 0) {
+        console.error("No file uploaded");
+        return res.status(400).send("File upload was not successful");
+      }
+
+      const filepath = path.join(
+        os.tmpdir(),
+        `${collectionName.toLowerCase()}.png`
+      );
+      fileData.filepath = filepath;
+
+      // Save file data to disk
+      fs.writeFileSync(filepath, Buffer.concat(fileBuffer));
+      console.log(`File [${fileData.filename}] written to ${filepath}`);
+
+      // Upload the file to Google Cloud Storage
       await bucket.upload(fileData.filepath, {
-        destination: `collections/${collectionName.toLowerCase()}.png`, // Use collection name
+        destination: `collections/${collectionName.toLowerCase()}.png`,
         uploadType: "media",
         metadata: {
           contentType: fileData.mimeType,
@@ -330,6 +342,8 @@ app.post("/createCollection", (req, res) => {
           },
         },
       });
+
+      // Create collection in database
       await createCollection();
 
       res
@@ -340,7 +354,7 @@ app.post("/createCollection", (req, res) => {
       res.status(500).send(err.message);
     } finally {
       if (fs.existsSync(fileData.filepath)) {
-        fs.unlinkSync(fileData.filepath);
+        fs.unlinkSync(fileData.filepath); // Remove temp file
       }
     }
   });
@@ -351,6 +365,7 @@ app.post("/createCollection", (req, res) => {
     try {
       const database = client.db(process.env.DATABASE);
       const { name, date } = fields;
+
       const imgURL = `https://firebasestorage.googleapis.com/v0/b/${
         bucket.name
       }/o/${encodeURIComponent(
@@ -461,7 +476,6 @@ app.post("/uploadPhotos", upload.any(), async (req, res) => {
             reject(err);
           }
         });
-
         stream.end(file.buffer);
       });
     });
@@ -675,9 +689,10 @@ app.post("/updateCaroussel", async (req, res) => {
 });
 
 // Delete article
-app.post("/deleteCaroussel", async (req, res) => {
+app.delete("/deleteCaroussel", async (req, res) => {
   try {
     const articleId = req.body._id;
+    console.log(articleId);
     if (!articleId) {
       return res.status(400).send("Article name is required");
     }
@@ -695,7 +710,7 @@ app.post("/deleteCaroussel", async (req, res) => {
 });
 
 // Delete photo caroussel
-app.post("/deletePhotoCaroussel", async (req, res) => {
+app.delete("/deletePhotoCaroussel", async (req, res) => {
   try {
     const photoID = req.body._id;
     const collection = client.db("Caroussel").collection("articles");

@@ -1,6 +1,10 @@
 <template>
-  <q-img :src="fond" class="height-image" style="object-fit: cover">
-    <div style="width: 100%; height: 100%">
+  <q-img
+    :src="fond"
+    class="height-image"
+    style="object-fit: cover; height: 86.95vh"
+  >
+    <div style="width: 100%">
       <div
         style="
           display: flex;
@@ -155,7 +159,7 @@
               </div>
             </div>
           </div>
-          <q-card class="top-img-container centered">
+          <q-card class="centered">
             <div
               class="q-pa-md"
               style="
@@ -179,7 +183,7 @@
                   <q-img
                     :src="image.photo"
                     alt="Image"
-                    style="width: 100%; height: 100%"
+                    style="width: 100%; height: 100%; max-height: 25vh"
                   />
                 </div>
               </div>
@@ -352,7 +356,7 @@ export default {
 }
 
 .scroll-area {
-  height: 75vh;
+  height: 85vh;
   width: 100%;
   max-width: 90vw;
 
@@ -418,9 +422,5 @@ export default {
   max-height: 100%;
   width: auto;
   height: auto;
-}
-
-.top-img-container {
-  background-color: white;
 }
 </style>

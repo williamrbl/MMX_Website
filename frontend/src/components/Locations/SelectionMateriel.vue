@@ -42,7 +42,7 @@
             behavior="menu"
             class="col"
             v-model="nbSB"
-            :options="[0, 1, 2]"
+            :options="[0, 1]"
           />
         </div>
 
