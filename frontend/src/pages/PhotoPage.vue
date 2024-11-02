@@ -153,18 +153,21 @@ export default {
 }
 
 .scroll-area {
+  width: 95%;
+  height: 86.9vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  width: 90vw;
-  height: 70vh;
+  align-items: center;
 }
 
 .card-wrapper {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 86.5vh;
+  width: 100%;
 }
 
 .collection-card {
