@@ -15,6 +15,8 @@ RUN npm install exceljs --force
 RUN npm install nodemailer --force
 RUN npm install firebase-admin --force
 RUN npm install bcrypt --force
+RUN npm install crypto --force
+RUN npm install jsonwebtoken --force
 
 # Copy the rest of the application code to the working directory
 COPY . .

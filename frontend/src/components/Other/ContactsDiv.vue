@@ -31,6 +31,9 @@
       </div>
     </div>
     <div class="contact-logo col-6">
+      <div class="large-screen-only" style="margin-right: 6%">
+        <q-img class="logo-img" :src="logo" />
+      </div>
       <q-img class="logo-img" :src="pole" />
     </div>
   </div>
@@ -38,12 +41,14 @@
 
 <script>
 import pole from "src/assets/Pole.png";
+import logo from "src/assets/Logo.png";
 
 export default {
   name: "ContactsDiv",
   data() {
     return {
       pole,
+      logo,
     };
   },
 };

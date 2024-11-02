@@ -1,5 +1,5 @@
 <template>
-  <q-img :src="fond" style="height: 86.95vh">
+  <q-img :src="fond" class="taille-page">
     <div class="page-container" v-if="photos.length > 1" style="height: 80vh">
       <div class="album-text">{{ collectionName }}</div>
       <q-scroll-area class="scroll-area">

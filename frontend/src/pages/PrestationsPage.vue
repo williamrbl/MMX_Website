@@ -1,9 +1,5 @@
 <template>
-  <q-img
-    :src="fond"
-    class="height-image"
-    style="object-fit: cover; height: 86.95vh"
-  >
+  <q-img :src="fond" class="taille-page">
     <div style="width: 100%">
       <div
         style="
@@ -341,11 +337,6 @@ export default {
 </script>
 
 <style scoped>
-.height-image {
-  width: 100%;
-  height: 100vh;
-}
-
 .titre-demandes {
   font-family: Arupala Grotesk Ultra;
   color: white;

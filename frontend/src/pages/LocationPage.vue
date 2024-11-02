@@ -1,5 +1,5 @@
 <template>
-  <q-img :src="fond" style="height: 86.95vh">
+  <q-img :src="fond" class="taille-page">
     <div class="large-screen-only" style="height: 100%">
       <div
         style="
@@ -324,6 +324,15 @@ export default {
   },
 };
 </script>
+
+<style>
+.taille-page {
+  height: 86.95vh;
+  @media (max-width: 767px) {
+    height: 79.8vh;
+  }
+}
+</style>
 
 <style scoped>
 .title {

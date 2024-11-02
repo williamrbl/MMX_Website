@@ -1,44 +1,48 @@
 <template>
   <q-img
     :src="fond"
-    class="height-image"
+    class="taille-page"
     style="
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 86.95vh;
     "
   >
-    <div class="collection-container">
-      <q-scroll-area class="scroll-area">
-        <div class="card-wrapper">
-          <div v-for="(collection, idx) in sortedData" :key="idx">
-            <q-card
-              class="collection-card"
-              v-if="collection._id === 'Titre'"
-              flat
-              bordered
-            >
-              <q-img :src="collection.img" class="collection-image" />
-              <q-card-section>
-                <h3 class="collection-name">{{ collection.nom }}</h3>
-                <p class="collection-date">
-                  {{ utils.formatDate(collection.date) }}
-                </p>
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn
-                  outline
-                  label="Voir les photos"
-                  class="view-photos-button"
-                  @click="viewPhotos(collection)"
-                />
-              </q-card-actions>
-            </q-card>
+    <div style="width: 100%">
+      <div class="position-album">
+        <div class="album-text">Album photos</div>
+      </div>
+      <div class="collection-container">
+        <q-scroll-area class="scroll-area">
+          <div class="card-wrapper">
+            <div v-for="(collection, idx) in sortedData" :key="idx">
+              <q-card
+                class="collection-card"
+                v-if="collection._id === 'Titre'"
+                flat
+                bordered
+              >
+                <q-img :src="collection.img" class="collection-image" />
+                <q-card-section>
+                  <h3 class="collection-name">{{ collection.nom }}</h3>
+                  <p class="collection-date">
+                    {{ utils.formatDate(collection.date) }}
+                  </p>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn
+                    outline
+                    label="Voir les photos"
+                    class="view-photos-button"
+                    @click="viewPhotos(collection)"
+                  />
+                </q-card-actions>
+              </q-card>
+            </div>
           </div>
-        </div>
-      </q-scroll-area>
+        </q-scroll-area>
+      </div>
     </div>
   </q-img>
 </template>
@@ -137,7 +141,7 @@ export default {
 <style>
 .height-image {
   height: 80vh;
-  @media (max-width: 575px) {
+  @media (max-width: 767px) {
     height: 82.5vh;
   }
 }
@@ -154,7 +158,10 @@ export default {
 
 .scroll-area {
   width: 95%;
-  height: 86.9vh;
+  height: 76vh;
+  @media (max-width: 767px) {
+    height: 70.9vh;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
@@ -201,5 +208,23 @@ export default {
 .view-photos-button {
   margin-top: 8px;
   color: white;
+}
+
+.position-album {
+  display: flex;
+  align-items: center;
+  margin-left: 5%;
+  @media (max-width: 767px) {
+    justify-content: center;
+    margin-left: 0%;
+  }
+  width: 100%;
+}
+.album-text {
+  font-size: 30px;
+  color: white;
+  z-index: 0;
+  margin-bottom: 20px;
+  font-family: Arupala Grotesk Ultra;
 }
 </style>
