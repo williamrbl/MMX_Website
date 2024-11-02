@@ -263,13 +263,12 @@ export default {
       }
     },
 
-    async updateArticlePhoto() {
+    async updateArticlePhoto(article) {
       console.log(this.currentArticle);
       if (this.currentArticle && this.currentArticle.photo instanceof File) {
         const formData = new FormData();
         formData.append("photo", this.currentArticle.photo);
         formData.append("_id", this.currentArticle._id);
-
         try {
           const response = await fetch(
             `${process.env.VUE_APP_API}/updateArticlePhoto`,
@@ -345,7 +344,7 @@ export default {
       if (fileInput && this.currentArticle) {
         this.currentArticle.photo = fileInput;
         this.modifPhoto = URL.createObjectURL(fileInput);
-        this.updateArticlePhoto();
+        this.updateArticlePhoto(this.currentArticle._id);
       }
     },
 

@@ -342,7 +342,7 @@ app.post("/createCollection", (req, res) => {
 
       // Upload the file to Google Cloud Storage
       await bucket.upload(fileData.filepath, {
-        destination: `collections/${collectionName.toLowerCase()}.png`,
+        destination: `collections/${collectionName.toLowerCase()}.jpg`,
         uploadType: "media",
         metadata: {
           contentType: fileData.mimeType,
@@ -378,7 +378,7 @@ app.post("/createCollection", (req, res) => {
       const imgURL = `https://firebasestorage.googleapis.com/v0/b/${
         bucket.name
       }/o/${encodeURIComponent(
-        `collections/${collectionName.toLowerCase()}.png`
+        `collections/${collectionName.toLowerCase()}.jpg`
       )}?alt=media&token=${uuid}`;
 
       const newCollection = {
@@ -407,7 +407,7 @@ app.post("/deleteCollection", async (req, res) => {
     }
 
     const collectionFolderPath = `photos/${collectionName}/`;
-    const collectionFilePath = `collections/${collectionName}.png`;
+    const collectionFilePath = `collections/${collectionName}.jpg`;
 
     const [files] = await bucket.getFiles({ prefix: collectionFolderPath });
     const deletePromises = files.map((file) => file.delete());
@@ -497,13 +497,24 @@ app.post("/uploadPhotos", upload.any(), async (req, res) => {
   }
 });
 
-app.delete("/deletePhoto", async (req, res) => {
+app.delete("/deletePhoto", upload.single(), async (req, res) => {
   const { id, collection } = req.body;
+
+  if (!id || !collection) {
+    return res.status(400).send("ID and collection are required.");
+  }
+
   try {
+    console.log(collection);
+    console.log(id);
+    const collectionFilePath = `photos/${collection}/${collection}-${id}.jpg`;
+    await bucket.file(collectionFilePath).delete();
+
     const database = client.db("Photos");
     const photoCollection = database.collection(collection);
     await photoCollection.deleteOne({ _id: id });
-    res.status(200).send("Photo supprimée");
+
+    res.status(200).send("Photo deleted successfully");
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -562,7 +573,7 @@ app.post("/addCaroussel", async (req, res) => {
 
       let photoURL = "";
       if (fileData.tempFilePath) {
-        const destinationFileName = `${_id}.png`; // Use _id as the filename
+        const destinationFileName = `${_id}.jpg`;
 
         await bucket.upload(fileData.tempFilePath, {
           destination: `caroussel/${destinationFileName}`,
@@ -641,7 +652,7 @@ app.post("/updateArticlePhoto", async (req, res) => {
       let photoURL = "";
 
       if (fileData.tempFilePath) {
-        const destinationFileName = `${_id}.png`;
+        const destinationFileName = `${_id}.jpg`;
 
         await bucket.upload(fileData.tempFilePath, {
           destination: `caroussel/${destinationFileName}`,
@@ -706,10 +717,9 @@ app.delete("/deleteCaroussel", async (req, res) => {
       return res.status(400).send("Article name is required");
     }
     const collection = client.db("Caroussel").collection("articles");
-    const filePath = `caroussel/${articleId}.png`;
+    const filePath = `caroussel/${articleId}.jpg`;
 
     await bucket.file(filePath).delete();
-    console.log(`File ${filePath} deleted from Firebase Storage`);
 
     await collection.deleteOne({ _id: articleId });
     res.status(200).send("Article deleted successfully");
@@ -722,6 +732,8 @@ app.delete("/deleteCaroussel", async (req, res) => {
 app.delete("/deletePhotoCaroussel", async (req, res) => {
   try {
     const photoID = req.body._id;
+    const filePath = `caroussel/${photoID}.jpg`;
+    await bucket.file(filePath).delete();
     const collection = client.db("Caroussel").collection("articles");
     await collection.updateOne({ _id: photoID }, { $set: { photo: "" } });
     res.status(200).send("Article deleted successfully");

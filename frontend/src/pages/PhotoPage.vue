@@ -160,7 +160,7 @@ export default {
   width: 95%;
   height: 76vh;
   @media (max-width: 767px) {
-    height: 70.9vh;
+    height: 70.5vh;
   }
   display: flex;
   justify-content: center;
