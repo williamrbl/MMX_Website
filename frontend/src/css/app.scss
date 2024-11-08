@@ -54,3 +54,10 @@
   justify-content: center;
   align-items: center;
 }
+
+.taille-page {
+  height: 86.95vh;
+  @media (max-width: 767px) {
+    height: 79.8vh;
+  }
+}

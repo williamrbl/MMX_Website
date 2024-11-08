@@ -325,15 +325,6 @@ export default {
 };
 </script>
 
-<style>
-.taille-page {
-  height: 86.95vh;
-  @media (max-width: 767px) {
-    height: 79.8vh;
-  }
-}
-</style>
-
 <style scoped>
 .title {
   color: purple;
