@@ -313,7 +313,7 @@ export default {
       if (event.availableSB === 2) {
         return "green";
       } else if (event.availableSB === 1) {
-        return "red"; //CHANGER ICI SI REPARE
+        return "red";
       } else {
         return "red";
       }
