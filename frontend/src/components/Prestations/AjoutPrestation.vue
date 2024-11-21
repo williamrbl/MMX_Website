@@ -9,16 +9,27 @@
           <q-input label="Organisateur" v-model="organisateur" />
           <q-input label="Email" v-model="email" />
           <q-input label="Lieu" v-model="lieu" />
-          <div style="display: flex; align-items: center; width: 100%">
+          <q-input label="Description" v-model="description" />
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              margin-top: 10px;
+            "
+          >
             <q-btn
               round
               class="date-btn"
               icon="eva-calendar-outline"
               @click="isSelectDate = true"
             />
-            <div class="date-display">{{ selectedDate }}</div>
+            <div v-if="selectedDate" class="date-display">
+              {{ utils.formatDate(selectedDate) }}
+            </div>
           </div>
-          <q-input label="Description" v-model="description" />
         </div>
         <div style="margin-top: 2vh; display: flex; justify-content: end">
           <q-btn
@@ -57,6 +68,8 @@
 
 <script>
 import utils from "src/helpers/utils.ts";
+import SpinnerComponent from "../Other/SpinnerComponent.vue";
+import { Loading } from "quasar";
 export default {
   name: "AjoutPrestation",
   setup() {
@@ -73,6 +86,7 @@ export default {
       description: "",
     };
   },
+  emits: ["update-events"],
   methods: {
     cancelDemande() {
       this.organisateur = "";
@@ -83,7 +97,7 @@ export default {
       this.isAjoutPrestation = false;
     },
 
-    sendDemande() {
+    async sendDemande() {
       if (
         this.organisateur == "" ||
         this.email == "" ||
@@ -93,7 +107,36 @@ export default {
       ) {
         utils.alert("Veuillez entrer toutes les informations");
       } else {
-        console.log("Sending demande");
+        Loading.show({
+          spinner: SpinnerComponent,
+        });
+        const formData = new FormData();
+        formData.append("organisateur", this.organisateur);
+        formData.append("email", this.email);
+        formData.append("lieu", this.lieu);
+        formData.append("description", this.description);
+        formData.append("date", this.selectedDate);
+        formData.append("demande", false);
+
+        try {
+          const response = await fetch(
+            `${process.env.VUE_APP_API}/addPrestation`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+          }
+          this.$emit("update-events");
+          this.cancelDemande();
+          Loading.hide();
+        } catch (error) {
+          console.error("Error sending mail:", error);
+          utils.alert("Erreur lors de l'envoi du mail");
+        }
       }
     },
   },
@@ -110,7 +153,7 @@ export default {
   background-color: purple;
   color: white;
   border-radius: 5px;
-  width: 20%;
+  width: 25%;
   display: flex;
   justify-content: center;
 }

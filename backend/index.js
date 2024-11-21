@@ -1478,6 +1478,37 @@ app.post("/updateDescription", upload.single(), async (req, res) => {
   }
 });
 
+app.get("/getPrestations", async (req, res) => {
+  try {
+    const collection = client.db("Prestations").collection("Evenements");
+    const objects = await collection.find({}).toArray();
+    res.json(objects);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error adding event");
+  }
+});
+
+app.post("/addPrestation", upload.single(), async (req, res) => {
+  const { organisateur, email, lieu, date, description, demande } = req.body;
+  try {
+    const prestation = {
+      organisateur,
+      email,
+      lieu,
+      date,
+      description,
+      demande,
+    };
+    const collection = client.db("Prestations").collection("Evenements");
+    await collection.insertOne(prestation);
+    res.send("Event added successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error adding event");
+  }
+});
+
 // Listen-----------------------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

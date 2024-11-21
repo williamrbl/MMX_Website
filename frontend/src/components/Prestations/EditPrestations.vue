@@ -28,13 +28,14 @@
               label="Toutes les prestations"
             />
           </q-tabs>
-          <AjoutPrestation />
+          <AjoutPrestation @update-events="this.getEvents()" />
         </div>
         <div class="card-content q-pa-lg">
-          <div class="event">
-            <div>Date</div>
-            <div>Association</div>
-            <div>Description</div>
+          <div v-for="event in this.events" :key="event._id" class="event">
+            <div>{{ utils.formatDate(event.date) }}</div>
+            <div>{{ event.organisateur }}</div>
+            <div>{{ event.lieu }}</div>
+            <div>{{ event.description }}</div>
             <q-btn
               outline
               dense
@@ -77,16 +78,41 @@
 import AjoutPrestation from "./AjoutPrestation.vue";
 import CustomPrestationsPage from "./CustomPrestationsPage.vue";
 import DemandePrestation from "./DemandePrestation.vue";
+import utils from "src/helpers/utils.ts";
 export default {
   name: "EditPrestations",
   data() {
     return {
       isCustom: false,
       isDemandes: false,
+      events: {},
     };
   },
+  setup() {
+    return { utils };
+  },
   components: { CustomPrestationsPage, DemandePrestation, AjoutPrestation },
-  methods: {},
+  methods: {
+    async getEvents() {
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API}/getPrestations`,
+          {
+            method: "GET",
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        this.events = await response.json();
+      } catch (error) {
+        console.error("Error getting events", error);
+      }
+    },
+  },
+  mounted() {
+    this.getEvents();
+  },
 };
 </script>
 
@@ -130,5 +156,6 @@ export default {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  padding-top: 15px;
 }
 </style>
