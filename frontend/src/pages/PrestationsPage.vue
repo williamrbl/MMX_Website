@@ -122,18 +122,24 @@
                   icon="eva-calendar-outline"
                   style="background-color: white; color: purple"
                 />
-                <div style="margin-left: 5px">
+                <div style="margin-left: 5px" v-if="selectedDate">
                   Date : {{ utils.formatDate(selectedDate) }}
+                </div>
+                <div style="margin-left: 5px" v-else>
+                  Veuillez sélectionner une date
                 </div>
               </div>
 
               <q-dialog v-model="isSelectDate" class="col">
-                <q-date v-model="selectedDate" class="row" />
-                <q-btn
-                  label="Valider"
-                  @click="isSelectDate = false"
-                  class="row validate-btn"
-                />
+                <q-date v-model="selectedDate" class="row">
+                  <div style="width: 100%; display: flex; justify-content: end">
+                    <q-btn
+                      label="Valider"
+                      @click="checkSelectedDate()"
+                      class="row validate-btn"
+                    />
+                  </div>
+                </q-date>
               </q-dialog>
 
               <q-input
@@ -212,32 +218,25 @@ export default {
       lieu: "",
       isSelectDate: false,
       description: "",
-      selectedDate: new Date(),
+      selectedDate: "",
       mail: "",
       images: [],
       texte: "",
     };
   },
   methods: {
+    checkSelectedDate() {
+      const checkDate = new Date(this.selectedDate).setHours(0, 0, 0, 0);
+      if (checkDate <= new Date().setHours(0, 0, 0, 0)) {
+        utils.alert("Veuillez vérifier la date de l'événement");
+      } else {
+        this.isSelectDate = false;
+      }
+    },
+
     async createDemande() {
-      const isDatePassed = (date) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date.getTime() < today.getTime();
-      };
       if (!this.organisateur || !this.lieu || !this.description || !this.mail) {
         utils.alert("Veuillez remplir toutes les informations");
-      } else if (
-        this.selectedDate instanceof Date &&
-        this.selectedDate.setHours(0, 0, 0, 0) ===
-          new Date().setHours(0, 0, 0, 0)
-      ) {
-        utils.alert("Impossible de demander un événement pour le jour même");
-      } else if (
-        this.selectedDate instanceof Date &&
-        isDatePassed(this.selectedDate)
-      ) {
-        utils.alert("La date sélectionnée est déjà passée");
       } else {
         Loading.show({
           spinner: SpinnerComponent,
@@ -265,7 +264,7 @@ export default {
           this.organisateur = "";
           this.mail = "";
           this.lieu = "";
-          this.selectedDate = new Date();
+          this.selectedDate = "";
           this.description = "";
           Loading.hide();
           utils.validate("Demande de prestation envoyée !");

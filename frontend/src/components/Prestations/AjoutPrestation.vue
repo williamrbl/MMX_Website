@@ -59,7 +59,7 @@
           dense
           label="Valider"
           color="purple"
-          @click="isSelectDate = false"
+          @click="checkSelectedDate()"
         />
       </div>
     </q-date>
@@ -95,6 +95,15 @@ export default {
       this.selectedDate = "";
       this.description = "";
       this.isAjoutPrestation = false;
+    },
+
+    checkSelectedDate() {
+      const checkDate = new Date(this.selectedDate).setHours(0, 0, 0, 0);
+      if (checkDate <= new Date().setHours(0, 0, 0, 0)) {
+        utils.alert("Veuillez vérifier la date de l'événement");
+      } else {
+        this.isSelectDate = false;
+      }
     },
 
     async sendDemande() {

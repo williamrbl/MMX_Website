@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const ExcelJS = require("exceljs");
 const fs = require("fs");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const { v4: UUID } = require("uuid");
 const busboy = require("busboy");
 const os = require("os");
@@ -1329,22 +1329,39 @@ app.post("/accepterDemande", async (req, res) => {
 
 // Demandes -----------------------------------------------------------------------------------------------
 
-app.post("/createDemande", upload.none(), (req, res) => {
+app.post("/createDemande", upload.single(), async (req, res) => {
   const infos = req.body;
+  const uuid = UUID();
+  try {
+    const prestation = {
+      _id: uuid,
+      organisateur: infos.organisateur,
+      email: infos.mail,
+      lieu: infos.lieu,
+      date: infos.date,
+      description: infos.description,
+      demande: true,
+    };
+    const collection = client.db("Prestations").collection("Evenements");
+    await collection.insertOne(prestation);
+    res.status(200).send("Event added successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching objects");
+  }
 
   const generateEmailContent = () => {
     return `
     <html>
       <body>
-        <h1>Hello l'équipe !</h1>
-        <p>Y'a eu une demande d'évènement pour le ${utils.formatDate(
+        <h1>Hello le bureau !</h1>
+        <p>Nouvelle demande d'évènement pour le ${utils.formatDate(
           infos.date
-        )} de la part de ${infos.organisateur}.
-        <p>Description de l'évènement : </p>
-        <p>${infos.description}</p>
+        )} de la part de ${infos.organisateur} !
+        <p>Description de l'évènement : ${infos.description}</p>
         <p>Mail de l'organisateur de l'évènement : ${infos.mail}</p>
         <p>Bougez vous pour traiter la demande !<br>Le robot du site MMX</p>
-        <img src="${process.env.LOGO_URL}" alt="Logo" />    
+        <img src="${process.env.LOGO_URL}" alt="Logo" />
       </body>
     </html>
   `;
@@ -1458,7 +1475,6 @@ app.get("/getDescription", async (req, res) => {
 
 app.post("/updateDescription", upload.single(), async (req, res) => {
   const description = req.body.description;
-  console.log(description);
   try {
     const collection = client.db("Prestations").collection("Description");
     const updateResult = await collection.updateOne(
@@ -1491,14 +1507,16 @@ app.get("/getPrestations", async (req, res) => {
 
 app.post("/addPrestation", upload.single(), async (req, res) => {
   const { organisateur, email, lieu, date, description, demande } = req.body;
+  const uuid = UUID();
   try {
     const prestation = {
+      _id: uuid,
       organisateur,
       email,
       lieu,
       date,
       description,
-      demande,
+      demande: demande === "true",
     };
     const collection = client.db("Prestations").collection("Evenements");
     await collection.insertOne(prestation);
@@ -1506,6 +1524,42 @@ app.post("/addPrestation", upload.single(), async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error adding event");
+  }
+});
+
+app.post("/deletePrestation", upload.single(), async (req, res) => {
+  const idEvent = req.body.id;
+  try {
+    const collection = client.db("Prestations").collection("Evenements");
+    await collection.deleteOne({ _id: idEvent });
+    res.send("Event deleted successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error deleting event");
+  }
+});
+
+app.post("/accepterPrestation", upload.single(), async (req, res) => {
+  const idEvent = req.body.id;
+  try {
+    const collection = client.db("Prestations").collection("Evenements");
+    await collection.updateOne({ _id: idEvent }, { $set: { demande: false } });
+    res.send("Event accepted successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error accepting event");
+  }
+});
+
+app.delete("/refuserPrestation", upload.single(), async (req, res) => {
+  const idEvent = req.body.id;
+  try {
+    const collection = client.db("Prestations").collection("Evenements");
+    await collection.deleteOne({ _id: idEvent });
+    res.send("Event declined successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error declining event");
   }
 });
 

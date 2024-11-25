@@ -3,12 +3,7 @@
     <div class="row items-center">
       <div style="display: flex; justify-content: space-between; width: 90%">
         <div class="section-title">Prestations</div>
-        <q-btn
-          label="Demandes"
-          @click="isDemandes = true"
-          outline
-          color="white"
-        />
+        <ListeDemandes :events="events" @update-events="this.getEvents()" />
         <q-btn
           label="Modifier la page"
           @click="isCustom = true"
@@ -31,17 +26,16 @@
           <AjoutPrestation @update-events="this.getEvents()" />
         </div>
         <div class="card-content q-pa-lg">
-          <div v-for="event in this.events" :key="event._id" class="event">
+          <div
+            v-for="event in listeEventsConfirmes"
+            :key="event._id"
+            class="event"
+          >
             <div>{{ utils.formatDate(event.date) }}</div>
             <div>{{ event.organisateur }}</div>
             <div>{{ event.lieu }}</div>
             <div>{{ event.description }}</div>
-            <q-btn
-              outline
-              dense
-              label="Gestion de l'événement"
-              @click="gererEvent(event)"
-            />
+            <GestionEvent :event="event" @update-events="this.getEvents()" />
           </div>
         </div>
       </div>
@@ -51,47 +45,32 @@
   <div v-if="isCustom">
     <CustomPrestationsPage @return-prestations="isCustom = false" />
   </div>
-
-  <q-dialog v-model="isDemandes">
-    <q-card style="width: 30%">
-      <div class="header">Demandes de prestations</div>
-      <div class="q-pa-md" style="height: 100%">
-        <!-- <div v-if="(isDemandes = false)">Aucune demande de prestation</div> -->
-        <div
-          class="row"
-          style="
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          "
-        >
-          <div>Association</div>
-          <DemandePrestation />
-        </div>
-      </div>
-    </q-card>
-  </q-dialog>
 </template>
 
 <script>
 import AjoutPrestation from "./AjoutPrestation.vue";
 import CustomPrestationsPage from "./CustomPrestationsPage.vue";
-import DemandePrestation from "./DemandePrestation.vue";
 import utils from "src/helpers/utils.ts";
+import GestionEvent from "./GestionEvent.vue";
+import ListeDemandes from "./ListeDemandes.vue";
 export default {
   name: "EditPrestations",
   data() {
     return {
       isCustom: false,
       isDemandes: false,
-      events: {},
+      events: [],
     };
   },
   setup() {
     return { utils };
   },
-  components: { CustomPrestationsPage, DemandePrestation, AjoutPrestation },
+  components: {
+    CustomPrestationsPage,
+    AjoutPrestation,
+    GestionEvent,
+    ListeDemandes,
+  },
   methods: {
     async getEvents() {
       try {
@@ -108,6 +87,11 @@ export default {
       } catch (error) {
         console.error("Error getting events", error);
       }
+    },
+  },
+  computed: {
+    listeEventsConfirmes() {
+      return this.events.filter((event) => event.demande === false);
     },
   },
   mounted() {
