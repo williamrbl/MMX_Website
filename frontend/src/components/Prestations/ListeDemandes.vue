@@ -20,7 +20,9 @@
     <q-card style="width: 30%">
       <div class="header">Demandes de prestations</div>
       <div class="q-pa-md" style="height: 100%">
-        <div v-if="events.length == 0">Aucune demande de prestation</div>
+        <div v-if="events.filter((event) => event.demande).length === 0">
+          Aucune demande de prestation
+        </div>
         <div
           v-else
           v-for="event in listeDemande"

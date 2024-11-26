@@ -1,5 +1,13 @@
 <template>
-  <q-btn flat icon="eva-plus-outline" @click="isAjoutPrestation = true" />
+  <div>
+    <q-btn
+      flat
+      no-caps
+      icon="eva-plus-outline"
+      label="Ajouter une prestation"
+      @click="isAjoutPrestation = true"
+    />
+  </div>
 
   <q-dialog v-model="isAjoutPrestation">
     <q-card style="width: 40%">

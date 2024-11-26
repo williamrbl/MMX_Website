@@ -22,7 +22,7 @@
             dense
             color="purple"
             label="Refuser"
-            @click="refusPrestation"
+            @click="isRefusing = true"
           />
           <q-btn
             outline
@@ -30,6 +30,31 @@
             color="purple"
             label="Accepter"
             @click="accepterPrestation"
+          />
+        </div>
+      </div>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="isRefusing">
+    <q-card style="width: 40%">
+      <div class="header">Refus de l'événement de {{ event.organisateur }}</div>
+      <div class="q-pa-md">
+        <q-input label="Raison du refus" v-model="justification" />
+        <div style="margin-top: 10px; display: flex; justify-content: end">
+          <q-btn
+            outline
+            dense
+            color="purple"
+            label="Annuler"
+            @click="cancelRefus"
+          />
+          <q-btn
+            outline
+            dense
+            color="purple"
+            label="Refuser"
+            @click="refusPrestation"
           />
         </div>
       </div>
@@ -48,6 +73,8 @@ export default {
   data() {
     return {
       isVisuDemande: false,
+      isRefusing: false,
+      justification: "",
     };
   },
   props: {
@@ -82,8 +109,14 @@ export default {
       }
     },
 
+    cancelRefus() {
+      this.isRefusing = false;
+      this.justification = "";
+    },
+
     async refusPrestation() {
       console.log("id:", this.event._id);
+      console.log("Justification");
       try {
         const response = await fetch(
           `${process.env.VUE_APP_API}/refuserPrestation`,

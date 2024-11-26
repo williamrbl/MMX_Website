@@ -15,7 +15,7 @@
 
       <div class="border-card">
         <div class="title-card" style="display: flex; align-items: center">
-          <q-tabs no-caps inline-label style="height: 100%">
+          <q-tabs no-caps inline-label style="height: 100%" v-model="tab">
             <q-tab name="avenir" icon="eva-clock-outline" label="A venir" />
             <q-tab
               name="tout"
@@ -26,11 +26,7 @@
           <AjoutPrestation @update-events="this.getEvents()" />
         </div>
         <div class="card-content q-pa-lg">
-          <div
-            v-for="event in listeEventsConfirmes"
-            :key="event._id"
-            class="event"
-          >
+          <div v-for="event in filteredEvents" :key="event._id" class="event">
             <div>{{ utils.formatDate(event.date) }}</div>
             <div>{{ event.organisateur }}</div>
             <div>{{ event.lieu }}</div>
@@ -60,6 +56,7 @@ export default {
       isCustom: false,
       isDemandes: false,
       events: [],
+      tab: "avenir",
     };
   },
   setup() {
@@ -91,9 +88,28 @@ export default {
   },
   computed: {
     listeEventsConfirmes() {
-      return this.events.filter((event) => event.demande === false);
+      return this.events
+        .filter((event) => event.demande === false)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    },
+
+    listeEventsAVenir() {
+      return this.events
+        .filter((event) => {
+          const checkDate = new Date(event.date).setHours(0, 0, 0, 0);
+          const isAvenir = checkDate > new Date().setHours(0, 0, 0, 0);
+          return event.demande === false && isAvenir;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    },
+
+    filteredEvents() {
+      return this.tab !== "avenir"
+        ? this.listeEventsConfirmes
+        : this.listeEventsAVenir;
     },
   },
+
   mounted() {
     this.getEvents();
   },
@@ -117,7 +133,7 @@ export default {
   width: 100%;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  height: 10%;
+  height: 15%;
   display: flex;
   align-items: center;
   border-bottom: 1px solid white;
