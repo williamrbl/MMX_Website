@@ -25,14 +25,34 @@
           </q-tabs>
           <AjoutPrestation @update-events="this.getEvents()" />
         </div>
-        <div class="card-content q-pa-lg">
-          <div v-for="event in filteredEvents" :key="event._id" class="event">
-            <div>{{ utils.formatDate(event.date) }}</div>
-            <div>{{ event.organisateur }}</div>
-            <div>{{ event.lieu }}</div>
-            <div>{{ event.description }}</div>
-            <GestionEvent :event="event" @update-events="this.getEvents()" />
-          </div>
+        <div class="card-content q-pa-md">
+          <q-scroll-area style="width: 100%; height: 100%">
+            <table class="events-table" style="width: 100%; height: 100%">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Organisateur</th>
+                  <th>Lieu</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in filteredEvents" :key="event._id">
+                  <td>{{ utils.formatDate(event.date) }}</td>
+                  <td>{{ event.organisateur }}</td>
+                  <td>{{ event.lieu }}</td>
+                  <td>{{ event.description }}</td>
+                  <td>
+                    <GestionEvent
+                      :event="event"
+                      @update-events="this.getEvents()"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </q-scroll-area>
         </div>
       </div>
     </div>
@@ -146,8 +166,7 @@ export default {
 }
 
 .card-content {
-  /* background-color: blue; */
-  height: 90%;
+  height: 88%;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
@@ -157,5 +176,17 @@ export default {
   display: flex;
   justify-content: space-between;
   padding-top: 15px;
+}
+
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.events-table th,
+.events-table td {
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
 }
 </style>
