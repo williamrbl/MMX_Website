@@ -235,8 +235,14 @@ export default {
     },
 
     async createDemande() {
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
       if (!this.organisateur || !this.lieu || !this.description || !this.mail) {
         utils.alert("Veuillez remplir toutes les informations");
+      } else if (!isValidEmail(this.mail)) {
+        utils.alert("Veuillez saisir une adresse mail valide");
       } else {
         Loading.show({
           spinner: SpinnerComponent,

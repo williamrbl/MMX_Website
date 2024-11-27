@@ -86,7 +86,6 @@ export default {
 
   methods: {
     async accepterPrestation() {
-      console.log("id:", this.event._id);
       try {
         const response = await fetch(
           `${process.env.VUE_APP_API}/accepterPrestation`,
@@ -95,7 +94,7 @@ export default {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ id: this.event._id }),
+            body: JSON.stringify(this.event),
           }
         );
         if (!response.ok) {
@@ -118,6 +117,10 @@ export default {
       console.log("id:", this.event._id);
       console.log("Justification");
       try {
+        const body = {
+          ...this.event,
+          justification: this.justification,
+        };
         const response = await fetch(
           `${process.env.VUE_APP_API}/refuserPrestation`,
           {
@@ -125,7 +128,7 @@ export default {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ id: this.event._id }),
+            body: JSON.stringify(body),
           }
         );
         if (!response.ok) {

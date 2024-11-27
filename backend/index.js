@@ -1358,6 +1358,7 @@ app.post("/createDemande", upload.single(), async (req, res) => {
         <p>Nouvelle demande d'évènement pour le ${utils.formatDate(
           infos.date
         )} de la part de ${infos.organisateur} !
+        <p>Lieu de l'évènement : ${infos.lieu}</p>
         <p>Description de l'évènement : ${infos.description}</p>
         <p>Mail de l'organisateur de l'évènement : ${infos.mail}</p>
         <p>Bougez vous pour traiter la demande !<br>Le robot du site MMX</p>
@@ -1372,13 +1373,51 @@ app.post("/createDemande", upload.single(), async (req, res) => {
   let mailOptions = {
     from: process.env.USER,
     to: process.env.MAIL_ASSO,
-    subject: `Demande de prestation - ${
+    subject: `Nouvelle demande de prestation - ${
       infos.organisateur
     } - ${utils.formatDate(infos.date)}`,
     html: emailContent,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log("Error: " + error);
+      return res.status(500).send("Error sending email");
+    }
+    console.log("Email sent: " + info.response);
+    res.status(200).send("Mail envoyé");
+  });
+
+  const generateEmailContent2 = () => {
+    return `
+    <html>
+      <body>
+        <h1>Hello ${infos.organisateur} !</h1>
+        <p>Vous avez fait une demande de prestation pour le ${utils.formatDate(
+          infos.date
+        )}!
+        <p>Description de l'évènement : ${infos.description}</p>
+        <p>La demande est en cours de traitement, nous revenons vers vous au plus vite.</p> 
+        <p>MMX</p>
+        <p>PS: pensez à vérifier vos spams</p>
+        <img src="${process.env.LOGO_URL}" alt="Logo" />
+      </body>
+    </html>
+  `;
+  };
+
+  const emailContent2 = generateEmailContent2();
+
+  let mailOptions2 = {
+    from: process.env.USER,
+    to: infos.mail,
+    subject: `Demande de prestation - ${
+      infos.organisateur
+    } - ${utils.formatDate(infos.date)}`,
+    html: emailContent2,
+  };
+
+  transporter.sendMail(mailOptions2, (error, info) => {
     if (error) {
       console.log("Error: " + error);
       return res.status(500).send("Error sending email");
@@ -1540,8 +1579,48 @@ app.post("/deletePrestation", upload.single(), async (req, res) => {
 });
 
 app.post("/accepterPrestation", upload.single(), async (req, res) => {
-  const idEvent = req.body.id;
+  const idEvent = req.body._id;
+  const infos = req.body;
   try {
+    const generateEmailContent = () => {
+      return `
+      <html>
+        <body>
+          <h1>Hello ${infos.organisateur} !</h1>
+          <p>Vous avez fait une demande de prestation pour le ${utils.formatDate(
+            infos.date
+          )}!
+          <p>Lieu de l'évènement : ${infos.lieu}</p>
+          <p>Description de l'évènement : ${infos.description}</p>
+          <p>Cette demande à été acceptée. Si vous avez d'autres questions, envoyez nous un DM ou un email !</p>
+          <p>A bientôt !</p>
+          <p>MMX</p>
+          <img src="${process.env.LOGO_URL}" alt="Logo" />
+        </body>
+      </html>
+    `;
+    };
+
+    const emailContent = generateEmailContent();
+
+    let mailOptions = {
+      from: process.env.USER,
+      to: infos.email,
+      subject: `Demande de prestation acceptée - ${
+        infos.organisateur
+      } - ${utils.formatDate(infos.date)}`,
+      html: emailContent,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error: " + error);
+        return res.status(500).send("Error sending email");
+      }
+      console.log("Email sent: " + info.response);
+      res.status(200).send("Mail envoyé");
+    });
+
     const collection = client.db("Prestations").collection("Evenements");
     await collection.updateOne({ _id: idEvent }, { $set: { demande: false } });
     res.send("Event accepted successfully");
@@ -1552,8 +1631,50 @@ app.post("/accepterPrestation", upload.single(), async (req, res) => {
 });
 
 app.delete("/refuserPrestation", upload.single(), async (req, res) => {
-  const idEvent = req.body.id;
+  const idEvent = req.body._id;
+  const infos = req.body;
   try {
+    const generateEmailContent = () => {
+      return `
+      <html>
+        <body>
+          <h1>Hello ${infos.organisateur} !</h1>
+          <p>Vous avez fait une demande de prestation pour le ${utils.formatDate(
+            infos.date
+          )}!
+          <p>Lieu de l'évènement : ${infos.lieu}</p>
+          <p>Description de l'évènement : ${infos.description}</p>
+          <p>Cette demande à malheureusement été refusée.</p>
+          <p>Justification : ${infos.justification}</p>
+          <p> Si vous avez d'autres questions, envoyez nous un DM ou un email !</p>
+          <p>Désolé et à bientôt bientôt !</p>
+          <p>MMX</p>
+          <img src="${process.env.LOGO_URL}" alt="Logo" />
+        </body>
+      </html>
+    `;
+    };
+
+    const emailContent = generateEmailContent();
+
+    let mailOptions = {
+      from: process.env.USER,
+      to: infos.email,
+      subject: `Demande de prestation refusée - ${
+        infos.organisateur
+      } - ${utils.formatDate(infos.date)}`,
+      html: emailContent,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error: " + error);
+        return res.status(500).send("Error sending email");
+      }
+      console.log("Email sent: " + info.response);
+      res.status(200).send("Mail envoyé");
+    });
+
     const collection = client.db("Prestations").collection("Evenements");
     await collection.deleteOne({ _id: idEvent });
     res.send("Event declined successfully");

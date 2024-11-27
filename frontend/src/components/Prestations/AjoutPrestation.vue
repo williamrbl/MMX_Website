@@ -115,6 +115,10 @@ export default {
     },
 
     async sendDemande() {
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
       if (
         this.organisateur == "" ||
         this.email == "" ||
@@ -123,6 +127,8 @@ export default {
         this.description == ""
       ) {
         utils.alert("Veuillez entrer toutes les informations");
+      } else if (!isValidEmail(this.email)) {
+        utils.alert("Veuillez saisir une adresse mail valide");
       } else {
         Loading.show({
           spinner: SpinnerComponent,
