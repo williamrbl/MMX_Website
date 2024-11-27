@@ -16,7 +16,8 @@ const routes = [
       },
       {
         path: "prestations/customize",
-        component: () => import("src/pages/CustomPrestationsPage.vue"),
+        component: () =>
+          import("src/components/Prestations/CustomPrestationsPage.vue"),
       },
       {
         path: "bureau",
