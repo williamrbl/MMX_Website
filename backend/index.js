@@ -1501,6 +1501,32 @@ app.get("/getImagesPrestations", async (req, res) => {
   }
 });
 
+app.delete("/deleteImagePrestation", upload.single(), async (req, res) => {
+  try {
+    const image = req.body;
+    const idImage = image._id;
+    const urlPhoto = image.photo;
+
+    let position = "";
+    if (urlPhoto.includes("haut")) {
+      position = "haut";
+    } else {
+      position = "bas";
+    }
+
+    const collectionFilePath = `prestations/${position}-${idImage}.jpg`;
+    await bucket.file(collectionFilePath).delete();
+
+    const collection = client.db("Prestations").collection("Photos");
+    await collection.deleteOne({ _id: idImage });
+
+    res.status(200).send("Image deleted sucessfully");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error deleting image");
+  }
+});
+
 app.get("/getDescription", async (req, res) => {
   try {
     const collection = client.db("Prestations").collection("Description");

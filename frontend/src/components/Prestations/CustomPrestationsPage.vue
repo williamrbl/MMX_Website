@@ -146,13 +146,16 @@ export default {
         spinner: SpinnerComponent,
       });
       try {
-        const response = await fetch(process.env.VUE_APP_API + "/deleteImage", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(image),
-        });
+        const response = await fetch(
+          process.env.VUE_APP_API + "/deleteImagePrestation",
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(image),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
