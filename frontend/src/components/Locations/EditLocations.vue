@@ -162,7 +162,7 @@ export default {
   data() {
     return {
       locations: {},
-      tab: "afinaliser",
+      tab: "avenir",
       isDeleting: false,
       selectedLocation: null,
     };
