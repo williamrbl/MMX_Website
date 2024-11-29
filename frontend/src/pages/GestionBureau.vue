@@ -96,6 +96,22 @@
                 class="item"
                 clickable
                 v-ripple
+                :class="{ 'selected-item': selectedPage === 'prestations' }"
+                @click="selectedPage = 'prestations'"
+                aria-label="Prestations"
+              >
+                <q-item-section>
+                  <q-item-label>Prestations</q-item-label>
+                  <q-item-label caption class="caption">
+                    Gérez les prestations et personnalisez la page
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item
+                class="item"
+                clickable
+                v-ripple
                 :class="{ 'selected-item': selectedPage === 'photos' }"
                 @click="selectedPage = 'photos'"
                 aria-label="Photos"
@@ -120,22 +136,6 @@
                   <q-item-label>Caroussel</q-item-label>
                   <q-item-label caption class="caption">
                     Mettez à jour le caroussel de la page d'accueil
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item
-                class="item"
-                clickable
-                v-ripple
-                :class="{ 'selected-item': selectedPage === 'prestations' }"
-                @click="selectedPage = 'prestations'"
-                aria-label="Prestations"
-              >
-                <q-item-section>
-                  <q-item-label>Prestations</q-item-label>
-                  <q-item-label caption class="caption">
-                    Gérez les prestations et personnalisez la page
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -194,6 +194,10 @@
               ref="locationsComponent"
               v-if="selectedPage === 'locations'"
             />
+            <EditPrestations
+              ref="prestationsComponent"
+              v-if="selectedPage === 'prestations'"
+            />
             <EditPhotos
               ref="photosComponent"
               v-if="selectedPage === 'photos'"
@@ -201,10 +205,6 @@
             <EditCaroussel
               ref="carousselComponent"
               v-if="selectedPage === 'caroussel'"
-            />
-            <EditPrestations
-              ref="prestationsComponent"
-              v-if="selectedPage === 'prestations'"
             />
 
             <!-- <EditStudio
@@ -249,6 +249,10 @@
               ref="locationsComponent"
               v-if="selectedPage === 'locations'"
             />
+            <EditPrestations
+              ref="prestationsComponent"
+              v-if="selectedPage === 'prestations'"
+            />
             <EditPhotos
               ref="photosComponent"
               v-if="selectedPage === 'photos'"
@@ -257,10 +261,7 @@
               ref="carousselComponent"
               v-if="selectedPage === 'caroussel'"
             />
-            <EditPrestations
-              ref="prestationsComponent"
-              v-if="selectedPage === 'prestations'"
-            />
+
             <!-- <TachesComponent
               ref="tachesComponent"
               v-if="selectedPage === 'taches'"
@@ -313,9 +314,9 @@ export default {
       isLargeScreen: this.$q.screen.gt.sm,
       pages: [
         { label: "Locations", value: "locations" },
+        { label: "Prestations", value: "prestations" },
         { label: "Photos", value: "photos" },
         { label: "Caroussel", value: "caroussel" },
-        { label: "Prestations", value: "prestations" },
         // { label: "Studio", value: "studio" },
         // { label: "Tâches", value: "taches" },
         { label: "Comptes", value: "connexions" },

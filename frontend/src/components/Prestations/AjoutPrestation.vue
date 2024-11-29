@@ -6,11 +6,19 @@
       icon="eva-plus-outline"
       label="Ajouter une prestation"
       @click="isAjoutPrestation = true"
+      class="large-screen-only"
+    />
+    <q-btn
+      flat
+      no-caps
+      icon="eva-plus-outline"
+      @click="isAjoutPrestation = true"
+      class="small-screen-only"
     />
   </div>
 
   <q-dialog v-model="isAjoutPrestation">
-    <q-card style="width: 40%">
+    <q-card class="size-dialog">
       <div class="header">Ajouter un événement</div>
       <div class="q-pa-md">
         <div>

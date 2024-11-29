@@ -25,8 +25,8 @@
           <div
             class="q-pa-md large-screen-only"
             style="
-              width: 100%;
-              height: 50vh;
+              max-width: 100vw;
+              height: 30vh;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -47,7 +47,7 @@
                 v-for="image in imagesHaut"
                 :key="image._id"
                 class="image-container col"
-                style="max-height: 100%"
+                style="max-height: 100%; display: flex; align-items: center"
               >
                 <q-img
                   :src="image.photo"
@@ -161,36 +161,42 @@
               </div>
             </div>
           </div>
-          <q-card class="centered">
+
+          <div
+            class="q-pa-md large-screen-only"
+            style="
+              width: 100%;
+              height: 30vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+            v-if="imagesBas.length > 0"
+          >
             <div
-              class="q-pa-md"
+              class="row q-gutter-x-md"
               style="
-                width: 90vw;
-                height: 30vh;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
                 display: flex;
-                align-items: stretch;
-                justify-content: center;
+                align-items: center;
               "
-              v-if="imagesBas.length > 0"
             >
               <div
-                class="centered row q-gutter-md"
-                style="height: 100%; width: 100%"
+                v-for="image in imagesBas"
+                :key="image._id"
+                class="image-container col"
+                style="max-height: 100%; display: flex; align-items: center"
               >
-                <div
-                  v-for="image in imagesBas"
-                  :key="image._id"
-                  class="image-container col"
-                >
-                  <q-img
-                    :src="image.photo"
-                    alt="Image"
-                    style="width: 100%; height: 100%; max-height: 25vh"
-                  />
-                </div>
+                <q-img
+                  :src="image.photo"
+                  alt="Image"
+                  style="max-width: 100%; max-height: 100%"
+                />
               </div>
             </div>
-          </q-card>
+          </div>
         </q-scroll-area>
       </div>
     </div>
@@ -352,24 +358,24 @@ export default {
 }
 
 .scroll-area {
-  height: 85vh;
-  width: 100%;
-  max-width: 90vw;
+  height: 78vh;
+  @media (min-width: 767px) {
+    height: 84vh;
+  }
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide scrollbar for IE, Edge, and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
 .image {
   padding: 16px;
-  background-color: aqua;
+  /* background-color: aqua; */
   height: 100%;
 }
 
@@ -395,7 +401,7 @@ export default {
 
 .card-demande {
   padding: 16px;
-  width: 80vw;
+  max-width: 80vw;
   background-color: purple;
   border-radius: 10px;
   margin: 2vh auto;
@@ -406,6 +412,7 @@ export default {
 }
 
 .description-text {
+  max-width: 100vw;
   font-size: 30px;
   font-family: Aileron Bold;
   @media (max-width: 767px) {

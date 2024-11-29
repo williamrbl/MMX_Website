@@ -61,7 +61,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 200px;
+  height: 230px;
+  @media (max-width: 767px) {
+    height: 200px;
+  }
 }
 
 .contact-details {

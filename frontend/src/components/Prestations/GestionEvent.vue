@@ -2,7 +2,7 @@
   <q-btn outline dense label="Gestion de l'événement" @click="gererEvent()" />
 
   <q-dialog v-model="isGestion">
-    <q-card class="card-gestion-event">
+    <q-card class="size-dialog">
       <div class="header">
         Gestion de l'événement - {{ event.organisateur }}-{{ event.date }}
       </div>
@@ -111,9 +111,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.card-gestion-event {
-  width: 30%;
-}
-</style>

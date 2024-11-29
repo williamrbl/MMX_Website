@@ -32,8 +32,8 @@
                 <tr>
                   <th>Date</th>
                   <th>Organisateur</th>
-                  <th>Lieu</th>
-                  <th>Description</th>
+                  <th class="hide-on-small">Lieu</th>
+                  <th class="hide-on-small">Description</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -41,8 +41,8 @@
                 <tr v-for="event in filteredEvents" :key="event._id">
                   <td>{{ utils.formatDate(event.date) }}</td>
                   <td>{{ event.organisateur }}</td>
-                  <td>{{ event.lieu }}</td>
-                  <td>{{ event.description }}</td>
+                  <td class="hide-on-small">{{ event.lieu }}</td>
+                  <td class="hide-on-small">{{ event.description }}</td>
                   <td>
                     <GestionEvent
                       :event="event"
@@ -144,7 +144,7 @@ export default {
   width: 100%;
   height: 60vh;
   @media (max-width: 767px) {
-    height: 53vh;
+    height: 46vh;
   }
 }
 
@@ -188,5 +188,15 @@ export default {
   padding: 8px;
   text-align: center;
   vertical-align: middle;
+}
+
+.hide-on-small {
+  display: table-cell;
+}
+
+@media screen and (max-width: 768px) {
+  .hide-on-small {
+    display: none;
+  }
 }
 </style>
