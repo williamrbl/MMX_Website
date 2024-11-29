@@ -7,7 +7,7 @@
   />
 
   <q-dialog v-model="isVisuDemande">
-    <q-card style="width: 30%">
+    <q-card class="size-dialog">
       <div class="header">Demande de prestation</div>
       <div class="q-pa-md">
         <div>
