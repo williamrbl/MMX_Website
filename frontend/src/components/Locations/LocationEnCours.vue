@@ -85,39 +85,19 @@ export default {
           const startDate = new Date(location.start).setHours(0, 0, 0, 0);
           const endDate = new Date(location.end).setHours(0, 0, 0, 0);
 
-          const isMissing =
-            (!location.paye ||
-              !location.caution ||
-              location.contrat == null ||
-              !location.prete ||
-              !location.rendu) &&
-            startDate <= today;
-
           const isStartInLessThanFourDays =
-            startDate <= fourDaysFromNow &&
-            startDate >= today &&
-            (!location.paye ||
-              !location.caution ||
-              location.contrat == null ||
-              !location.prete ||
-              !location.rendu);
+            startDate <= fourDaysFromNow && startDate >= today;
 
-          const isBetweenStartAndEnd =
-            startDate <= today &&
-            endDate >= today &&
-            (!location.paye ||
-              !location.caution ||
-              location.contrat == null ||
-              !location.prete ||
-              !location.rendu);
+          const isBetweenStartAndEnd = startDate <= today;
+          endDate >= today;
 
           return (
-            (isMissing || isStartInLessThanFourDays || isBetweenStartAndEnd) &&
+            (isStartInLessThanFourDays || isBetweenStartAndEnd) &&
             !location.demande
           );
         })
         .map(([key, location]) => location)
-        .sort((a, b) => new Date(a.start) - new Date(b.start)); // Sort by start date
+        .sort((a, b) => new Date(a.start) - new Date(b.start));
     },
   },
   methods: {

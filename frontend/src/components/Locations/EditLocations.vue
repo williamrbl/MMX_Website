@@ -26,9 +26,15 @@
       "
     >
       <div class="tab-container">
-        <q-tab name="afinaliser" label="En cours" />
-        <q-tab name="avenir" label="A venir" />
-        <q-tab name="alllocations" label="Toutes les locations" />
+        <q-tabs inline-label no-caps v-model="tab">
+          <q-tab name="avenir" icon="eva-clock-outline" label="A venir" />
+          <!-- <q-tab name="afinaliser" label="En cours" /> -->
+          <q-tab
+            name="alllocations"
+            label="Toutes les locations"
+            icon="eva-list-outline"
+          />
+        </q-tabs>
       </div>
       <q-btn
         flat
@@ -314,10 +320,24 @@ export default {
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "MMX-locations.xlsx";
+        document.body.appendChild(a);
+        a.click();
+
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
         await this.getLocations();
       } catch (error) {
-        console.error("Error updating renting:", error);
-        utils.alert("Erreur lors de la MAJ de la location");
+        console.error("Error exporting Excel:", error);
+        utils.alert("Erreur lors de l'exportation des locations.");
       }
     },
   },

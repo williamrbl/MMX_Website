@@ -1293,10 +1293,15 @@ app.post("/exportExcel", async (req, res) => {
       data.forEach((item) => worksheet.addRow(item));
     }
 
-    const excelFilePath = "Locations.xlsx";
-    await workbook.xlsx.writeFile(excelFilePath);
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=Locations.xlsx");
 
-    res.status(200).send("Data exported to Excel successfully");
+    await workbook.xlsx.write(res);
+
+    res.end();
   } catch (err) {
     console.error("Error in /exportExcel endpoint:", err);
     res.status(500).send("Error processing request");

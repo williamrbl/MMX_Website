@@ -87,11 +87,10 @@ export default {
           const startDate = new Date(location.start).setHours(0, 0, 0, 0);
           const endDate = new Date(location.end).setHours(0, 0, 0, 0);
 
-          const isStartInLessThanTwoDays =
-            startDate <= twoDaysFromNow && startDate >= today;
+          const isStartInLessThanTwoDays = startDate >= today;
 
           return (
-            !isStartInLessThanTwoDays && !location.demande && endDate >= today
+            isStartInLessThanTwoDays && !location.demande && endDate >= today
           );
         })
         .map(([key, location]) => location)
