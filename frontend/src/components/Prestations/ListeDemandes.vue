@@ -17,7 +17,7 @@
     />
   </q-btn>
   <q-dialog v-model="isDemandes">
-    <q-card style="width: 30%">
+    <q-card class="size-dialog">
       <div class="header">Demandes de prestations</div>
       <div class="q-pa-md" style="height: 100%">
         <div v-if="events.filter((event) => event.demande).length === 0">

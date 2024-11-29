@@ -92,7 +92,7 @@
                   Carte Son : {{ locationTemp.materiel.isScarlett ? 1 : 0 }}
                 </div>
                 <div v-if="locationTemp.materiel.nbMicro != 0">
-                  Carte Son : {{ locationTemp.materiel.nbMicro }}
+                  Micro + Câble : {{ locationTemp.materiel.nbMicro }}
                 </div>
               </div>
             </div>
