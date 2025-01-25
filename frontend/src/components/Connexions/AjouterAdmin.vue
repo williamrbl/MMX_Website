@@ -59,10 +59,12 @@ export default {
       nom: "",
       role: "",
       options: [
+        { label: "Modérateur", value: "Modérateur" },
         { label: "Président", value: "Président" },
         { label: "Secrétaire", value: "Secrétaire" },
         { label: "Trésorier", value: "Trésorier" },
         { label: "Responsable", value: "Responsable" },
+        { label: "Chargé", value: "Chargé" },
         { label: "Autre", value: "Autre" },
       ],
       username: "",

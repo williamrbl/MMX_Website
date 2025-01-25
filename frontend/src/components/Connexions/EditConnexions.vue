@@ -124,6 +124,14 @@ export default {
         this.isDelete = false;
         return;
       }
+      const accountToRemove = this.comptes.find(
+        (compte) => compte.username === username
+      );
+      if (accountToRemove && accountToRemove.role === "Modérateur") {
+        utils.alert("Vous ne pouvez pas retirer le compte d'un modérateur");
+        this.isDelete = false;
+        return;
+      }
       try {
         const formData = new FormData();
         formData.append("username", username);
