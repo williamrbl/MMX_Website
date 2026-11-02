@@ -2,11 +2,15 @@
 
 ![MMX Website homepage](img.png)
 
-MMX (Musique Mix) is a modern web platform for the music association at the Pôle Léonard de Vinci. The project brings together the public-facing brand of the association and the internal tools needed to manage photos, rentals, event-related services, and administrative tasks from a single place.
+## Project background
 
-The website is built as a full-stack application with a Vue 3 + Quasar frontend, an Express backend, a MongoDB data layer, and Firebase Storage for media assets.
+MMX Website was developed during my studies as part of my involvement with the Musique Mix association at Pôle Léonard de Vinci.
 
-The platform was successfully used in production during the 2024–2025 academic year. It was subsequently discontinued due to a lack of ongoing maintenance capacity within the association.
+It reflects my technical skills and experience at that point in my development as a software engineer. Since then, I've continued learning, gaining experience, and improving my development practices, so some of the architectural choices and implementation patterns may no longer reflect how I would approach the same project today.
+
+The platform was used in production during the 2024–2025 academic year before being discontinued due to a lack of ongoing maintenance capacity within the association.
+
+The repository is now available as an open-source project for anyone interested in exploring or adapting it.
 
 ## Why this project exists
 
